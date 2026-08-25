@@ -1,1392 +1,550 @@
-<!DOCTYPE html>
+# Generate the final HTML file with liquid glass gloss style and interactive capabilities
+html_code = """<!DOCTYPE html>
 <html lang="zh-CN">
-
 <head>
-
-<meta charset="UTF-8">
-
-<meta name="viewport"
-content="width=device-width,
-initial-scale=1.0,
-maximum-scale=1.0,
-user-scalable=no">
-
-
-<title>动车组接线员</title>
-
-
-<style>
-
-
-/* =========================
-   基础设置
-========================= */
-
-
-*{
-
-margin:0;
-padding:0;
-
-box-sizing:border-box;
-
-font-family:
-
-"Microsoft YaHei",
-"PingFang SC",
-Arial,
-sans-serif;
-
-}
-
-
-html,
-body{
-
-
-width:100%;
-height:100%;
-
-
-overflow:hidden;
-
-
-background:#000;
-
-
-}
-
-
-
-
-/* =========================
-   游戏主屏幕
-========================= */
-
-
-.game-screen{
-
-
-width:100vw;
-
-height:100vh;
-
-
-position:relative;
-
-
-display:flex;
-
-justify-content:center;
-
-align-items:center;
-
-
-
-background:
-
-
-linear-gradient(
-
-135deg,
-
-#06101d,
-
-#16466e,
-
-#06101d
-
-);
-
-
-
-overflow:hidden;
-
-
-}
-
-
-
-
-
-/* 背景光效 */
-
-
-.light{
-
-
-position:absolute;
-
-
-width:90vw;
-
-height:90vw;
-
-
-background:
-
-
-radial-gradient(
-
-circle,
-
-rgba(255,255,255,.28),
-
-transparent 70%
-
-);
-
-
-
-filter:blur(60px);
-
-
-animation:
-
-lightMove 10s infinite alternate;
-
-
-}
-
-
-
-
-
-@keyframes lightMove{
-
-
-from{
-
-transform:
-
-translate(-15%,-10%);
-
-}
-
-
-to{
-
-transform:
-
-translate(15%,10%);
-
-}
-
-
-}
-
-
-
-
-
-/* =========================
-玻璃主容器
-========================= */
-
-
-.glass-panel{
-
-
-width:90%;
-
-
-height:80%;
-
-
-max-width:900px;
-
-
-
-position:relative;
-
-
-
-background:
-
-
-linear-gradient(
-
-145deg,
-
-rgba(255,255,255,.35),
-
-rgba(255,255,255,.08)
-
-);
-
-
-
-border:
-
-
-1px solid
-
-rgba(255,255,255,.45);
-
-
-
-border-radius:
-
-
-45px;
-
-
-
-backdrop-filter:
-
-blur(30px);
-
-
--webkit-backdrop-filter:
-
-blur(30px);
-
-
-
-
-box-shadow:
-
-
-0 40px 100px
-
-rgba(0,0,0,.5),
-
-
-
-inset
-
-0 0 50px
-
-rgba(255,255,255,.25);
-
-
-
-overflow:hidden;
-
-
-}
-
-
-
-
-
-/* 顶部玻璃反光 */
-
-
-.glass-panel::before{
-
-
-content:"";
-
-
-position:absolute;
-
-
-width:150%;
-
-
-height:40%;
-
-
-top:-25%;
-
-
-left:-20%;
-
-
-
-background:
-
-
-linear-gradient(
-
-transparent,
-
-rgba(255,255,255,.35)
-
-);
-
-
-
-transform:
-
-rotate(-15deg);
-
-
-
-pointer-events:none;
-
-
-}
-
-
-
-
-
-/* =========================
-页面系统
-========================= */
-
-
-.page{
-
-
-position:absolute;
-
-
-width:100%;
-
-height:100%;
-
-
-
-display:flex;
-
-
-flex-direction:column;
-
-
-justify-content:center;
-
-
-align-items:center;
-
-
-
-transition:.3s;
-
-
-}
-
-
-
-
-.login-page{
-
-
-display:none;
-
-
-}
-
-
-
-
-
-/* =========================
-标题
-========================= */
-
-
-.title{
-
-
-font-size:
-
-
-clamp(40px,7vw,85px);
-
-
-
-letter-spacing:
-
-
-10px;
-
-
-
-color:white;
-
-
-
-text-align:center;
-
-
-
-text-shadow:
-
-
-0 15px 40px
-
-rgba(0,0,0,.6);
-
-
-
-z-index:2;
-
-
-}
-
-
-
-
-
-.subtitle{
-
-
-margin-top:25px;
-
-
-font-size:
-
-
-clamp(14px,2vw,24px);
-
-
-
-letter-spacing:
-
-
-6px;
-
-
-
-color:white;
-
-
-opacity:.8;
-
-
-
-z-index:2;
-
-
-}
-
-
-
-
-
-/* =========================
-按钮
-========================= */
-
-
-button{
-
-
-cursor:pointer;
-
-
-}
-
-
-
-
-
-.start-btn,
-
-
-.login-btn{
-
-
-margin-top:60px;
-
-
-
-width:
-
-
-clamp(220px,40vw,360px);
-
-
-
-height:70px;
-
-
-
-border-radius:
-
-
-50px;
-
-
-
-
-border:
-
-
-1px solid
-
-rgba(255,255,255,.7);
-
-
-
-
-
-background:
-
-
-rgba(255,255,255,.18);
-
-
-
-color:white;
-
-
-
-font-size:24px;
-
-
-
-letter-spacing:8px;
-
-
-
-backdrop-filter:
-
-blur(15px);
-
-
-
-box-shadow:
-
-
-0 20px 40px
-
-rgba(0,0,0,.35),
-
-
-
-inset
-
-0 0 20px
-
-rgba(255,255,255,.4);
-
-
-
-transition:.3s;
-
-
-}
-
-
-
-.start-btn:hover,
-
-.login-btn:hover{
-
-
-transform:scale(1.08);
-
-
-}
-
-
-
-
-
-/* =========================
-登录界面
-========================= */
-
-
-.login-title{
-
-
-font-size:
-
-
-clamp(30px,5vw,50px);
-
-
-
-color:white;
-
-
-
-letter-spacing:8px;
-
-
-
-}
-
-
-
-
-.input{
-
-
-margin-top:40px;
-
-
-
-width:
-
-
-70%;
-
-
-
-max-width:400px;
-
-
-
-height:60px;
-
-
-
-border-radius:40px;
-
-
-
-border:
-
-
-1px solid
-
-rgba(255,255,255,.6);
-
-
-
-background:
-
-
-rgba(255,255,255,.15);
-
-
-
-outline:none;
-
-
-
-padding-left:30px;
-
-
-
-font-size:20px;
-
-
-
-color:white;
-
-
-
-backdrop-filter:
-
-blur(15px);
-
-
-}
-
-
-
-
-.input::placeholder{
-
-
-color:
-
-rgba(255,255,255,.7);
-
-
-}
-
-
-
-
-
-.back-btn{
-
-
-margin-top:25px;
-
-
-
-border:none;
-
-
-
-background:none;
-
-
-
-color:white;
-
-
-
-font-size:16px;
-
-
-
-opacity:.7;
-
-
-}
-
-
-
-
-
-/* =========================
-版本信息
-========================= */
-
-
-.version{
-
-
-position:absolute;
-
-
-
-bottom:25px;
-
-
-
-color:white;
-
-
-
-font-size:14px;
-
-
-
-opacity:.65;
-
-
-
-}
-
-
-
-
-
-/* =========================
-游戏弹窗
-========================= */
-
-
-.notice-layer{
-
-
-display:none;
-
-
-position:fixed;
-
-
-
-top:0;
-
-left:0;
-
-
-
-width:100vw;
-
-height:100vh;
-
-
-
-background:
-
-rgba(0,0,0,.35);
-
-
-
-justify-content:center;
-
-align-items:center;
-
-
-
-z-index:100;
-
-
-}
-
-
-
-
-
-.notice-box{
-
-
-width:320px;
-
-
-
-min-height:130px;
-
-
-
-padding:35px;
-
-
-
-border-radius:35px;
-
-
-
-background:
-
-
-linear-gradient(
-
-145deg,
-
-rgba(255,255,255,.45),
-
-rgba(255,255,255,.12)
-
-);
-
-
-
-border:
-
-
-1px solid
-
-rgba(255,255,255,.6);
-
-
-
-backdrop-filter:
-
-blur(25px);
-
-
-
-box-shadow:
-
-
-0 30px 70px
-
-rgba(0,0,0,.5);
-
-
-
-color:white;
-
-
-
-font-size:22px;
-
-
-
-text-align:center;
-
-
-
-letter-spacing:3px;
-
-
-}
-
-
-
-
-
-/* =========================
-手机适配
-========================= */
-
-
-@media(max-width:600px){
-
-
-
-.glass-panel{
-
-
-width:92%;
-
-
-height:85%;
-
-
-
-border-radius:30px;
-
-
-}
-
-
-
-.input{
-
-
-width:85%;
-
-
-}
-
-
-
-.start-btn,
-
-.login-btn{
-
-
-height:60px;
-
-
-font-size:20px;
-
-
-}
-
-
-
-}
-
-
-
-</style>
-
-
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>动车组接线员 - 调度终端</title>
+    <style>
+        /* CSS 重置与基础设置 */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body, html {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background-color: #060913;
+            color: #ffffff;
+        }
+
+        /* 动态流动背景：拟真液态色彩流动 */
+        #app-background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #060913;
+            overflow: hidden;
+            z-index: 1;
+        }
+
+        .liquid-blob {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.6;
+            animation: float 18s ease-in-out infinite alternate;
+        }
+
+        .blob-1 {
+            top: -10%;
+            left: -10%;
+            width: 50vw;
+            height: 50vw;
+            background: radial-gradient(circle, rgba(0, 242, 254, 0.4) 0%, rgba(0, 102, 255, 0.1) 70%);
+            animation-duration: 16s;
+        }
+
+        .blob-2 {
+            bottom: -15%;
+            right: -10%;
+            width: 60vw;
+            height: 60vw;
+            background: radial-gradient(circle, rgba(147, 51, 234, 0.35) 0%, rgba(79, 70, 229, 0.1) 70%);
+            animation-duration: 22s;
+        }
+
+        .blob-3 {
+            top: 40%;
+            left: 30%;
+            width: 40vw;
+            height: 40vw;
+            background: radial-gradient(circle, rgba(56, 189, 248, 0.25) 0%, rgba(16, 185, 129, 0.05) 70%);
+            animation-duration: 20s;
+        }
+
+        @keyframes float {
+            0% { transform: translate(0, 0) scale(1) rotate(0deg); }
+            50% { transform: translate(8%, 12%) scale(1.1) rotate(180deg); }
+            100% { transform: translate(-5%, -8%) scale(0.95) rotate(360deg); }
+        }
+
+        /* 轨道光效装饰线 */
+        .track-line {
+            position: absolute;
+            background: linear-gradient(90deg, transparent, rgba(0, 242, 254, 0.25), transparent);
+            height: 1px;
+            width: 100%;
+            z-index: 2;
+        }
+        .track-line:nth-child(1) { top: 22%; animation: scan 9s linear infinite; }
+        .track-line:nth-child(2) { top: 68%; animation: scan 13s linear infinite reverse; }
+
+        @keyframes scan {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        /* 全屏容器：电脑与手机统一无缝占满 */
+        #game-container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+            padding: 40px 20px;
+            z-index: 10;
+        }
+
+        /* 核心液态高光拟真玻璃（Liquid Glass Surface）UI 规范 */
+        .liquid-glass {
+            background: linear-gradient(
+                135deg,
+                rgba(255, 255, 255, 0.08) 0%,
+                rgba(255, 255, 255, 0.02) 50%,
+                rgba(255, 255, 255, 0.05) 100%
+            );
+            backdrop-filter: blur(24px) saturate(180%);
+            -webkit-backdrop-filter: blur(24px) saturate(180%);
+            border-radius: 24px;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            /* 多层边缘弥散与液态内透光高光 */
+            border-top: 1px solid rgba(255, 255, 255, 0.35);
+            border-left: 1px solid rgba(255, 255, 255, 0.25);
+            box-shadow: 
+                0 30px 60px rgba(0, 0, 0, 0.45),
+                inset 0 1px 0 rgba(255, 255, 255, 0.4),
+                inset 0 -1px 2px rgba(0, 0, 0, 0.3),
+                0 0 30px rgba(0, 242, 254, 0.08);
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* 液态折射光斑流光（玻璃表面的自然光泽流动） */
+        .liquid-glass::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(
+                circle at 30% 30%,
+                rgba(255, 255, 255, 0.15) 0%,
+                transparent 50%
+            );
+            pointer-events: none;
+            transform: rotate(-15deg);
+        }
+
+        /* 头部：游戏标题区 */
+        header {
+            text-align: center;
+            margin-top: 2vh;
+        }
+
+        .game-subtitle {
+            font-size: 0.85rem;
+            letter-spacing: 5px;
+            color: #38bdf8;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+            text-shadow: 0 0 12px rgba(56, 189, 248, 0.5);
+            font-weight: 600;
+        }
+
+        .game-title {
+            font-size: 2.6rem;
+            font-weight: 800;
+            letter-spacing: 3px;
+            background: linear-gradient(180deg, #ffffff 0%, #cbd5e1 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 4px 20px rgba(0,0,0,0.6);
+        }
+
+        /* 中部：核心状态与信息显示区 */
+        .center-display {
+            width: 100%;
+            max-width: 420px;
+            padding: 24px 28px;
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+        }
+
+        .status-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.9rem;
+            color: #94a3b8;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+            padding-bottom: 10px;
+        }
+
+        .status-value {
+            color: #38bdf8;
+            font-family: monospace;
+            font-weight: 700;
+        }
+
+        /* 交互选择区段项 */
+        .selectable-area {
+            cursor: pointer;
+            color: #00f2fe;
+            text-decoration: underline;
+            text-underline-offset: 4px;
+            transition: all 0.2s ease;
+        }
+        .selectable-area:hover {
+            color: #7dd3fc;
+            text-shadow: 0 0 8px rgba(0, 242, 254, 0.4);
+        }
+
+        /* 底部：菜单与交互按钮区 */
+        .menu-container {
+            width: 100%;
+            max-width: 420px;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            margin-bottom: 1vh;
+        }
+
+        .glass-btn {
+            position: relative;
+            width: 100%;
+            padding: 16px;
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-top: 1px solid rgba(255, 255, 255, 0.3);
+            background: linear-gradient(
+                135deg,
+                rgba(255, 255, 255, 0.08) 0%,
+                rgba(255, 255, 255, 0.02) 100%
+            );
+            color: #ffffff;
+            font-size: 1.1rem;
+            font-weight: 600;
+            letter-spacing: 2px;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25),
+                        inset 0 1px 0 rgba(255, 255, 255, 0.3);
+            overflow: hidden;
+        }
+
+        /* 按钮光波反射过渡效果 */
+        .glass-btn::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: 0.6s ease;
+        }
+
+        .glass-btn:hover::after {
+            left: 100%;
+        }
+
+        .glass-btn:hover {
+            background: rgba(255, 255, 255, 0.14);
+            border-color: rgba(0, 242, 254, 0.5);
+            border-top-color: rgba(255, 255, 255, 0.6);
+            box-shadow: 0 0 25px rgba(0, 242, 254, 0.3),
+                        inset 0 1px 2px rgba(255, 255, 255, 0.5);
+            transform: translateY(-2px);
+        }
+
+        .glass-btn:active {
+            transform: translateY(1px);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, rgba(0, 242, 254, 0.2) 0%, rgba(59, 130, 246, 0.15) 100%);
+            border-color: rgba(0, 242, 254, 0.35);
+            border-top-color: rgba(0, 242, 254, 0.6);
+        }
+
+        /* 作者与联系按钮栏 */
+        .footer-info {
+            width: 100%;
+            max-width: 420px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 1vh;
+        }
+
+        .author-text {
+            font-size: 0.8rem;
+            color: #64748b;
+            letter-spacing: 1px;
+        }
+
+        .contact-link-btn {
+            background: none;
+            border: none;
+            color: #38bdf8;
+            font-size: 0.85rem;
+            cursor: pointer;
+            text-decoration: underline;
+            transition: color 0.2s;
+        }
+
+        .contact-link-btn:hover {
+            color: #00f2fe;
+        }
+
+        /* 游戏内液态玻璃弹窗遮罩 */
+        #modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(2, 6, 23, 0.75);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+        #modal-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .modal-box {
+            width: 90%;
+            max-width: 380px;
+            padding: 28px;
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+            transform: scale(0.92);
+            transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        #modal-overlay.active .modal-box {
+            transform: scale(1);
+        }
+
+        .modal-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #00f2fe;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            padding-bottom: 10px;
+        }
+
+        .modal-body {
+            font-size: 0.95rem;
+            color: #e2e8f0;
+            line-height: 1.65;
+            word-break: break-all;
+        }
+
+        .modal-close-btn {
+            margin-top: 6px;
+            padding: 12px;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            background: rgba(255, 255, 255, 0.08);
+            color: #ffffff;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .modal-close-btn:hover {
+            background: rgba(255, 255, 255, 0.18);
+        }
+
+        /* 选择卡片样式 */
+        .option-item {
+            width: 100%;
+            padding: 14px 16px;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.04);
+            color: #e2e8f0;
+            font-size: 0.95rem;
+            text-align: left;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .option-item:hover {
+            background: rgba(0, 242, 254, 0.15);
+            border-color: rgba(0, 242, 254, 0.4);
+            color: #ffffff;
+        }
+    </style>
 </head>
-
-
-
 <body>
 
-
-
-<div class="game-screen">
-
-
-
-<div class="light"></div>
-
-
-
-<div class="glass-panel">
-
-
-
-
-
-<!-- ======================
-启动页面
-====================== -->
-
-
-<div class="page start-page"
-id="startPage">
-
-
-<div class="title">
-
-动车组接线员
-
-</div>
-
-
-
-<div class="subtitle">
-
-HIGH SPEED TRAIN OPERATOR
-
-</div>
-
-
-
-<button
-
-class="start-btn"
-
-onclick="openLogin()">
-
-
-开始运行
-
-
-</button>
-
-
-</div>
-
-
-
-
-
-
-
-<!-- ======================
-登录页面
-====================== -->
-
-
-<div class="page login-page"
-
-id="loginPage">
-
-
-<div class="login-title">
-
-
-操作员登录
-
-
-</div>
-
-
-
-
-<input
-
-id="account"
-
-class="input"
-
-placeholder="请输入操作员编号">
-
-
-
-
-
-<button
-
-class="login-btn"
-
-onclick="login()">
-
-
-
-进入系统
-
-
-
-</button>
-
-
-
-
-<button
-
-class="back-btn"
-
-onclick="backHome()">
-
-
-
-返回首页
-
-
-
-</button>
-
-
-
-</div>
-
-
-
-
-
-
-<div class="version">
-
-
-内测版本01
-
-
-</div>
-
-
-
-</div>
-
-
-
-
-
-
-
-
-<!-- ======================
-游戏提示窗口
-====================== -->
-
-
-<div class="notice-layer"
-
-id="notice">
-
-
-<div class="notice-box"
-
-id="noticeText">
-
-
-提示
-
-
-</div>
-
-
-</div>
-
-
-
-
-
-
-
-<script>
-
-
-
-/*
-=================================
-
-账号管理区域
-
-以后增加账号：
-
-{
-account:"新账号"
-}
-
-
-删除账号：
-
-直接删除对应项目
-
-
-=================================
-*/
-
-
-let accounts=[
-
-
-{
-
-account:"admin"
-
-},
-
-
-
-{
-
-account:"operator001"
-
-},
-
-
-
-{
-
-account:"tester01"
-
-}
-
-
-
-];
-
-
-
-
-
-
-
-// 打开登录
-
-function openLogin(){
-
-
-
-document
-
-.getElementById("startPage")
-
-.style.display="none";
-
-
-
-document
-
-.getElementById("loginPage")
-
-.style.display="flex";
-
-
-}
-
-
-
-
-
-
-// 返回首页
-
-
-function backHome(){
-
-
-document
-
-.getElementById("loginPage")
-
-.style.display="none";
-
-
-
-document
-
-.getElementById("startPage")
-
-.style.display="flex";
-
-
-}
-
-
-
-
-
-
-
-
-// 登录验证
-
-
-function login(){
-
-
-
-let user=
-
-
-document
-
-.getElementById("account")
-
-.value
-
-.trim();
-
-
-
-
-let check=
-
-
-accounts.find(
-
-item=>
-
-item.account===user
-
-);
-
-
-
-
-
-if(check){
-
-
-
-showNotice(
-
-"登录成功<br>正在进入系统"
-
-);
-
-
-
-
-setTimeout(()=>{
-
-
-/*
-
-正式版本：
-
-location.href="main.html";
-
-
-*/
-
-
-},1500);
-
-
-
-}
-
-else{
-
-
-
-showNotice(
-
-"操作员编号错误<br>请重新输入"
-
-);
-
-
-
-}
-
-
-
-}
-
-
-
-
-
-
-
-
-// 游戏内弹窗
-
-
-function showNotice(message){
-
-
-
-let box=
-
-document.getElementById("notice");
-
-
-
-document
-
-.getElementById("noticeText")
-
-.innerHTML=
-
-message;
-
-
-
-box.style.display="flex";
-
-
-
-
-
-setTimeout(()=>{
-
-
-box.style.display="none";
-
-
-},2000);
-
-
-
-}
-
-
-
-
-</script>
-
-
-
+    <!-- 动态背景 -->
+    <div id="app-background">
+        <div class="liquid-blob blob-1"></div>
+        <div class="liquid-blob blob-2"></div>
+        <div class="liquid-blob blob-3"></div>
+        <div class="track-line"></div>
+        <div class="track-line"></div>
+    </div>
+
+    <!-- 游戏主视口 (PC与移动端全屏统一) -->
+    <div id="game-container">
+        
+        <!-- 标题区 -->
+        <header>
+            <div class="game-subtitle">CRH Dispatcher System</div>
+            <h1 class="game-title">动车组接线员</h1>
+        </header>
+
+        <!-- 中部核心状态玻璃面板 -->
+        <div class="liquid-glass center-display">
+            <div class="status-item">
+                <span>系统状态</span>
+                <span class="status-value">🟢 终端运行就绪</span>
+            </div>
+            <div class="status-item">
+                <span>当前调度区段</span>
+                <span class="status-value selectable-area" id="current-dispatch-area" onclick="openAreaSelector()">京沪高铁 - 03号枢纽 (切换)</span>
+            </div>
+            <div class="status-item">
+                <span>当前版本</span>
+                <span class="status-value">内部版本02</span>
+            </div>
+        </div>
+
+        <!-- 底部菜单区 -->
+        <div class="menu-container">
+            <button class="glass-btn btn-primary" onclick="startGame()">开始接车</button>
+            <button class="glass-btn" onclick="openUpdates()">更新日志</button>
+        </div>
+
+        <!-- 版权与联系通道 -->
+        <div class="footer-info">
+            <div class="author-text">Lux作者制作</div>
+            <button class="contact-link-btn" onclick="openContact()">QQ邮箱联系</button>
+        </div>
+
+    </div>
+
+    <!-- 游戏内统一液态玻璃弹窗 -->
+    <div id="modal-overlay" onclick="closeModal(event)">
+        <div class="modal-box liquid-glass" onclick="event.stopPropagation()">
+            <div class="modal-title" id="modal-title">提示</div>
+            <div class="modal-body" id="modal-content">弹窗内容...</div>
+            <div id="modal-actions">
+                <button class="modal-close-btn" style="width:100%;" onclick="closeModalDirect()">确定</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let selectedArea = "京沪高铁 - 03号枢纽";
+
+        function showModal(title, content, customActionsHTML = null) {
+            document.getElementById('modal-title').innerText = title;
+            document.getElementById('modal-content').innerHTML = content;
+            
+            const actionsContainer = document.getElementById('modal-actions');
+            if (customActionsHTML) {
+                actionsContainer.innerHTML = customActionsHTML;
+            } else {
+                actionsContainer.innerHTML = `<button class="modal-close-btn" style="width:100%;" onclick="closeModalDirect()">确定</button>`;
+            }
+
+            document.getElementById('modal-overlay').classList.add('active');
+        }
+
+        function closeModalDirect() {
+            document.getElementById('modal-overlay').classList.remove('active');
+        }
+
+        function closeModal(e) {
+            if (e.target.id === 'modal-overlay') {
+                closeModalDirect();
+            }
+        }
+
+        // 选择调度区段功能
+        function openAreaSelector() {
+            const areas = [
+                "京沪高铁 - 华东调度枢纽",
+                "京广高铁 - 武汉核心枢纽",
+                "沪昆高铁 - 东南调度中心",
+                "成渝客专 - 西南调度中心",
+                "徐兰客专 - 西北调度中心",
+                "京津冀城际 - 北京调度中心"
+            ];
+
+            let html = '<div style="display:flex; flex-direction:column; gap:8px; max-height:240px; overflow-y:auto;">';
+            areas.forEach(area => {
+                html += `<button class="option-item" onclick="selectArea('${area}')">${area}</button>`;
+            });
+            html += '</div>';
+
+            showModal("选择调度区段", "请选择您要接管的高铁干线调度枢纽：", html);
+        }
+
+        function selectArea(areaName) {
+            selectedArea = areaName;
+            document.getElementById('current-dispatch-area').innerText = areaName + " (切换)";
+            closeModalDirect();
+        }
+
+        // 按钮交互
+        function startGame() {
+            showModal("提示", `当前区段【${selectedArea}】接车程序正在筹备中，核心接线调度玩法将在后续更新开放！`);
+        }
+
+        function openUpdates() {
+            showModal("更新日志 (内部版本02)", 
+                "• <b>UI重构</b>：升级为全新【液态高光拟真玻璃】风格，拥有平滑折射与环境柔光。<br>" +
+                "• <b>全屏适配</b>：电脑与移动端统一铺满视口，去除窗口化沉浸式体验。<br>" +
+                "• <b>区段切换</b>：支持自主选择与切换调度铁路线路。<br>" +
+                "• <b>游戏内弹窗</b>：全原生液态玻璃弹窗，替代系统弹窗。"
+            );
+        }
+
+        function openContact() {
+            showModal("联系作者", 
+                "如果您在测试过程中遇到任何问题或有玩法建议，欢迎联系：<br><br>" +
+                "<b style='color:#00f2fe; font-size:1.05rem;'>2210380754@qq.com</b><br><br>" +
+                "<span style='color:#f87171; font-size:0.85rem;'>⚠️ 反馈请备注：游戏反馈</span>"
+            );
+        }
+    </script>
 </body>
-
-
 </html>
+"""
+
+with open("index.html", "w", encoding="utf-8") as f:
+    f.write(html_code)
+
+print("HTML generated successfully as index.html")

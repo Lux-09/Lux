@@ -135,7 +135,7 @@
             display: flex;
             flex-direction: column;
             gap: 12px;
-            margin-bottom: 2vh;
+            margin-bottom: 1vh;
         }
 
         .glass-btn {
@@ -191,12 +191,105 @@
             border-color: rgba(0, 242, 254, 0.4);
         }
 
-        /* 版本信息 */
-        .version-info {
-            font-size: 0.75rem;
-            color: #64748b;
-            text-align: center;
+        /* 作者与联系按钮栏 */
+        .footer-info {
+            width: 100%;
+            max-width: 420px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 1vh;
+        }
+
+        .author-text {
+            font-size: 0.8rem;
+            color: #94a3b8;
             letter-spacing: 1px;
+        }
+
+        .contact-link-btn {
+            background: none;
+            border: none;
+            color: #38bdf8;
+            font-size: 0.85rem;
+            cursor: pointer;
+            text-decoration: underline;
+            transition: color 0.2s;
+        }
+
+        .contact-link-btn:hover {
+            color: #00f2fe;
+        }
+
+        /* 游戏内玻璃拟态弹窗遮罩 */
+        #modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(3, 7, 18, 0.7);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+        #modal-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .modal-box {
+            width: 90%;
+            max-width: 380px;
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            transform: scale(0.95);
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        #modal-overlay.active .modal-box {
+            transform: scale(1);
+        }
+
+        .modal-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #00f2fe;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding-bottom: 8px;
+        }
+
+        .modal-body {
+            font-size: 0.95rem;
+            color: #e2e8f0;
+            line-height: 1.6;
+            word-break: break-all;
+        }
+
+        .modal-close-btn {
+            margin-top: 8px;
+            padding: 10px;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.1);
+            color: #ffffff;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .modal-close-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
         }
     </style>
 </head>
@@ -217,52 +310,125 @@
             <h1 class="game-title">动车组接线员</h1>
         </header>
 
-        <!-- 中部状态与简报玻璃面板 (方便后续扩展游戏剧情/公告/系统日志) -->
+        <!-- 中部状态与区段显示玻璃面板 -->
         <div class="glass-panel center-display">
             <div class="status-item">
                 <span>系统状态</span>
-                <span class="status-value" id="sys-status">🟢 正常运行</span>
+                <span class="status-value" id="sys-status">🟢 内部测试就绪</span>
             </div>
             <div class="status-item">
-                <span>当前调度区段</span>
-                <span class="status-value">京沪线 - 03号枢纽</span>
+                <span>调度区段</span>
+                <span class="status-value" id="ip-dispatch-area">正在定位最近铁路线...</span>
             </div>
             <div class="status-item">
-                <span>版本代号</span>
-                <span class="status-value">内部(01)测试版-alpha</span>
+                <span>当前版本</span>
+                <span class="status-value">内部测试版01</span>
             </div>
         </div>
 
         <!-- 底部菜单与交互按钮 -->
         <div class="menu-container">
             <button class="glass-btn btn-primary" onclick="startGame()">开始接车</button>
-            <button class="glass-btn" onclick="openSettings()">调度设置</button>
             <button class="glass-btn" onclick="openUpdates()">更新日志</button>
         </div>
 
-        <!-- 版本版权 -->
-        <div class="version-info">
-            &copy; 2026 Train Dispatcher Studio. All Rights Reserved.
+        <!-- 作者与联系区 -->
+        <div class="footer-info">
+            <div class="author-text">Lux作者制作</div>
+            <button class="contact-link-btn" onclick="openContact()">QQ邮箱联系</button>
         </div>
 
     </div>
 
+    <!-- 游戏内统一毛玻璃弹窗 -->
+    <div id="modal-overlay" onclick="closeModal(event)">
+        <div class="modal-box glass-panel" onclick="event.stopPropagation()">
+            <div class="modal-title" id="modal-title">提示</div>
+            <div class="modal-body" id="modal-content">弹窗内容...</div>
+            <button class="modal-close-btn" onclick="closeModalDirect()">确定</button>
+        </div>
+    </div>
+
     <script>
-        // 预留后续功能扩展的逻辑接口
-        function startGame() {
-            console.log("玩家点击：开始接车");
-            // 后续可以在这里编写切换到游戏主界面的逻辑，或者加载关卡资源
-            alert("即将进入调度大厅，核心玩法开发中...");
+        // 1. IP 智能匹配铁路线逻辑
+        async function initIPDispatcher() {
+            const areaEl = document.getElementById('ip-dispatch-area');
+            try {
+                // 调用免费 IP 地理位置接口获取用户所在城市/省份
+                const response = await fetch('https://ipapi.co/json/');
+                if (!response.ok) throw new Error('Network error');
+                const data = await response.json();
+                
+                const city = data.city || '';
+                const region = data.region || '';
+                const country = data.country_name || '';
+
+                // 根据地理位置智能匹配最近铁路/高铁干线
+                let matchedArea = "京沪高铁 - 华东调度枢纽"; // 默认回退
+                
+                if (country !== 'China' && country !== 'CN') {
+                    matchedArea = "国际联运线 - 边境调度中心";
+                } else if (region.includes('广东') || region.includes('深圳') || region.includes('广州') || city.includes('广州') || city.includes('深圳')) {
+                    matchedArea = "京广/广深港高铁 - 华南枢纽";
+                } else if (region.includes('四川') || region.includes('重庆') || city.includes('成都') || city.includes('重庆')) {
+                    matchedArea = "成渝客专 - 西南调度中心";
+                } else if (region.includes('浙江') || region.includes('江苏') || region.includes('上海') || city.includes('上海') || city.includes('杭州')) {
+                    matchedArea = "沪昆/京沪线 - 长三角枢纽";
+                } else if (region.includes('陕西') || region.includes('甘肃') || region.includes('西安')) {
+                    matchedArea = "徐兰客专 - 西北调度中心";
+                } else if (region.includes('湖北') || city.includes('武汉')) {
+                    matchedArea = "京广高铁 - 武汉核心枢纽";
+                } else if (region.includes('北京') || region.includes('天津') || region.includes('河北')) {
+                    matchedArea = "京津冀城际 - 北京调度中心";
+                }
+
+                areaEl.innerText = matchedArea;
+            } catch (e) {
+                // 如果定位失败（如无网络或受防火墙限制），显示默认调度区段
+                areaEl.innerText = "京沪高铁 - 03号核心枢纽";
+            }
         }
 
-        function openSettings() {
-            console.log("玩家点击：调度设置");
-            alert("设置面板开发中...");
+        // 初始化时运行 IP 定位
+        initIPDispatcher();
+
+        // 2. 弹窗控制函数
+        function showModal(title, content) {
+            document.getElementById('modal-title').innerText = title;
+            document.getElementById('modal-content').innerHTML = content;
+            document.getElementById('modal-overlay').classList.add('active');
+        }
+
+        function closeModalDirect() {
+            document.getElementById('modal-overlay').classList.remove('active');
+        }
+
+        function closeModal(e) {
+            if (e.target.id === 'modal-overlay') {
+                closeModalDirect();
+            }
+        }
+
+        // 3. 按钮交互响应
+        function startGame() {
+            showModal("提示", "【开始接车】核心玩法正在加紧开发中，请期待后续版本更新！");
         }
 
         function openUpdates() {
-            console.log("玩家点击：更新日志");
-            alert("当前为初始版本：\n1. 完成全屏响应式固态玻璃UI框架。\n2. 适配电脑与移动端全屏铺满。");
+            showModal("更新日志 (内部测试版01)", 
+                "• <b>版本号</b>：更新为内部测试版01。<br>" +
+                "• <b>IP智能调度</b>：已接入基于IP地址的铁路干线自动适配。<br>" +
+                "• <b>UI升级</b>：将所有弹窗全面改写为游戏内拟真玻璃模态框。<br>" +
+                "• <b>版权归属</b>：标明 Lux作者制作与联系通道。"
+            );
+        }
+
+        function openContact() {
+            showModal("联系作者", 
+                "如果您在测试过程中遇到任何问题或Bug，欢迎通过QQ邮箱与我联系：<br><br>" +
+                "<b style='color:#00f2fe; font-size:1.05rem;'>2210380754@qq.com</b><br><br>" +
+                "<span style='color:#f87171; font-size:0.85rem;'>⚠️ 反馈请备注游戏反馈</span>"
+            );
         }
     </script>
 </body>

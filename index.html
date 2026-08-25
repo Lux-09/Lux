@@ -1,550 +1,643 @@
-# Generate the final HTML file with liquid glass gloss style and interactive capabilities
-html_code = """<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>动车组接线员 - 调度终端</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>动车组接线员 - EMU Wire Operator</title>
     <style>
-        /* CSS 重置与基础设置 */
+        /* ==========================================
+           1. 基础重置 & 全屏视口控制 (PC/Mobile一致全屏)
+           ========================================== */
         * {
-            box-sizing: border-box;
             margin: 0;
             padding: 0;
+            box-sizing: border-box;
             user-select: none;
-            -webkit-tap-highlight-color: transparent;
+            -webkit-user-select: none;
+            -webkit-touch-callout: none;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
         }
 
-        body, html {
-            width: 100%;
-            height: 100%;
+        html, body {
+            width: 100vw;
+            height: 100vh;
             overflow: hidden;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
             background-color: #060913;
             color: #ffffff;
-        }
-
-        /* 动态流动背景：拟真液态色彩流动 */
-        #app-background {
             position: fixed;
             top: 0;
             left: 0;
-            width: 100%;
-            height: 100%;
-            background: #060913;
-            overflow: hidden;
-            z-index: 1;
         }
 
-        .liquid-blob {
+        /* ==========================================
+           2. 动态液态背景 (流体光斑与轨道网格)
+           ========================================== */
+        .bg-container {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            z-index: 1;
+            overflow: hidden;
+        }
+
+        /* 动车电路/微缩轨道网格背景 */
+        .rail-grid {
+            position: absolute;
+            width: 200%;
+            height: 200%;
+            top: -50%;
+            left: -50%;
+            background-image: 
+                radial-gradient(circle at 50% 50%, rgba(0, 225, 255, 0.05) 1px, transparent 1px),
+                linear-gradient(to right, rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+            background-size: 40px 40px, 80px 80px, 80px 80px;
+            transform: rotate(-15deg);
+            animation: gridMove 40s linear infinite;
+        }
+
+        /* 液态高光模糊光斑 */
+        .fluid-blob {
             position: absolute;
             border-radius: 50%;
             filter: blur(80px);
             opacity: 0.6;
-            animation: float 18s ease-in-out infinite alternate;
+            animation: fluidFloat 18s ease-in-out infinite alternate;
         }
 
         .blob-1 {
+            width: 500px;
+            height: 500px;
+            background: linear-gradient(135deg, #00d2ff, #005bea);
             top: -10%;
             left: -10%;
-            width: 50vw;
-            height: 50vw;
-            background: radial-gradient(circle, rgba(0, 242, 254, 0.4) 0%, rgba(0, 102, 255, 0.1) 70%);
-            animation-duration: 16s;
         }
 
         .blob-2 {
-            bottom: -15%;
+            width: 600px;
+            height: 600px;
+            background: linear-gradient(135deg, #7f00ff, #e100ff);
+            bottom: -20%;
             right: -10%;
-            width: 60vw;
-            height: 60vw;
-            background: radial-gradient(circle, rgba(147, 51, 234, 0.35) 0%, rgba(79, 70, 229, 0.1) 70%);
-            animation-duration: 22s;
+            animation-delay: -5s;
         }
 
         .blob-3 {
+            width: 350px;
+            height: 350px;
+            background: linear-gradient(135deg, #00f2fe, #4facfe);
             top: 40%;
             left: 30%;
-            width: 40vw;
-            height: 40vw;
-            background: radial-gradient(circle, rgba(56, 189, 248, 0.25) 0%, rgba(16, 185, 129, 0.05) 70%);
-            animation-duration: 20s;
+            animation-delay: -10s;
         }
 
-        @keyframes float {
-            0% { transform: translate(0, 0) scale(1) rotate(0deg); }
-            50% { transform: translate(8%, 12%) scale(1.1) rotate(180deg); }
-            100% { transform: translate(-5%, -8%) scale(0.95) rotate(360deg); }
-        }
-
-        /* 轨道光效装饰线 */
-        .track-line {
-            position: absolute;
-            background: linear-gradient(90deg, transparent, rgba(0, 242, 254, 0.25), transparent);
-            height: 1px;
-            width: 100%;
-            z-index: 2;
-        }
-        .track-line:nth-child(1) { top: 22%; animation: scan 9s linear infinite; }
-        .track-line:nth-child(2) { top: 68%; animation: scan 13s linear infinite reverse; }
-
-        @keyframes scan {
-            0% { transform: translateX(-100%); }
-            100% { transform: translateX(100%); }
-        }
-
-        /* 全屏容器：电脑与手机统一无缝占满 */
-        #game-container {
-            position: relative;
-            width: 100%;
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            align-items: center;
-            padding: 40px 20px;
-            z-index: 10;
-        }
-
-        /* 核心液态高光拟真玻璃（Liquid Glass Surface）UI 规范 */
-        .liquid-glass {
-            background: linear-gradient(
-                135deg,
-                rgba(255, 255, 255, 0.08) 0%,
-                rgba(255, 255, 255, 0.02) 50%,
-                rgba(255, 255, 255, 0.05) 100%
-            );
-            backdrop-filter: blur(24px) saturate(180%);
-            -webkit-backdrop-filter: blur(24px) saturate(180%);
-            border-radius: 24px;
-            border: 1px solid rgba(255, 255, 255, 0.12);
-            /* 多层边缘弥散与液态内透光高光 */
-            border-top: 1px solid rgba(255, 255, 255, 0.35);
-            border-left: 1px solid rgba(255, 255, 255, 0.25);
+        /* ==========================================
+           3. 液态高光拟真玻璃核心组件 (Liquid Glass Style)
+           ========================================== */
+        .liquid-glass-card {
+            background: rgba(255, 255, 255, 0.06);
+            backdrop-filter: blur(28px) saturate(200%);
+            -webkit-backdrop-filter: blur(28px) saturate(200%);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            border-radius: 32px;
+            /* 多层高光反光与高质感阴影 */
             box-shadow: 
-                0 30px 60px rgba(0, 0, 0, 0.45),
-                inset 0 1px 0 rgba(255, 255, 255, 0.4),
-                inset 0 -1px 2px rgba(0, 0, 0, 0.3),
-                0 0 30px rgba(0, 242, 254, 0.08);
+                0 30px 60px rgba(0, 0, 0, 0.4),
+                inset 0 1.5px 1px rgba(255, 255, 255, 0.6),
+                inset 0 -1.5px 1px rgba(255, 255, 255, 0.1),
+                inset 0 0 20px rgba(255, 255, 255, 0.05);
             position: relative;
             overflow: hidden;
         }
 
-        /* 液态折射光斑流光（玻璃表面的自然光泽流动） */
-        .liquid-glass::before {
+        /* 顶部高光折射线 */
+        .liquid-glass-card::before {
             content: '';
             position: absolute;
-            top: -50%;
+            top: 0;
             left: -50%;
             width: 200%;
-            height: 200%;
-            background: radial-gradient(
-                circle at 30% 30%,
-                rgba(255, 255, 255, 0.15) 0%,
-                transparent 50%
-            );
-            pointer-events: none;
-            transform: rotate(-15deg);
-        }
-
-        /* 头部：游戏标题区 */
-        header {
-            text-align: center;
-            margin-top: 2vh;
-        }
-
-        .game-subtitle {
-            font-size: 0.85rem;
-            letter-spacing: 5px;
-            color: #38bdf8;
-            text-transform: uppercase;
-            margin-bottom: 10px;
-            text-shadow: 0 0 12px rgba(56, 189, 248, 0.5);
-            font-weight: 600;
-        }
-
-        .game-title {
-            font-size: 2.6rem;
-            font-weight: 800;
-            letter-spacing: 3px;
-            background: linear-gradient(180deg, #ffffff 0%, #cbd5e1 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            text-shadow: 0 4px 20px rgba(0,0,0,0.6);
-        }
-
-        /* 中部：核心状态与信息显示区 */
-        .center-display {
-            width: 100%;
-            max-width: 420px;
-            padding: 24px 28px;
-            display: flex;
-            flex-direction: column;
-            gap: 18px;
-        }
-
-        .status-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-size: 0.9rem;
-            color: #94a3b8;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-            padding-bottom: 10px;
-        }
-
-        .status-value {
-            color: #38bdf8;
-            font-family: monospace;
-            font-weight: 700;
-        }
-
-        /* 交互选择区段项 */
-        .selectable-area {
-            cursor: pointer;
-            color: #00f2fe;
-            text-decoration: underline;
-            text-underline-offset: 4px;
-            transition: all 0.2s ease;
-        }
-        .selectable-area:hover {
-            color: #7dd3fc;
-            text-shadow: 0 0 8px rgba(0, 242, 254, 0.4);
-        }
-
-        /* 底部：菜单与交互按钮区 */
-        .menu-container {
-            width: 100%;
-            max-width: 420px;
-            display: flex;
-            flex-direction: column;
-            gap: 14px;
-            margin-bottom: 1vh;
-        }
-
-        .glass-btn {
-            position: relative;
-            width: 100%;
-            padding: 16px;
-            border-radius: 16px;
-            border: 1px solid rgba(255, 255, 255, 0.12);
-            border-top: 1px solid rgba(255, 255, 255, 0.3);
+            height: 100%;
             background: linear-gradient(
-                135deg,
-                rgba(255, 255, 255, 0.08) 0%,
-                rgba(255, 255, 255, 0.02) 100%
+                115deg,
+                transparent 40%,
+                rgba(255, 255, 255, 0.15) 45%,
+                rgba(255, 255, 255, 0.35) 50%,
+                rgba(255, 255, 255, 0.15) 55%,
+                transparent 60%
             );
+            transform: translateY(-70%);
+            pointer-events: none;
+        }
+
+        /* 液态玻璃按键 */
+        .glass-btn {
+            width: 100%;
+            padding: 18px 24px;
+            margin-bottom: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            border-radius: 20px;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.03));
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
             color: #ffffff;
             font-size: 1.1rem;
             font-weight: 600;
             letter-spacing: 2px;
             cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25),
-                        inset 0 1px 0 rgba(255, 255, 255, 0.3);
+            outline: none;
+            position: relative;
             overflow: hidden;
+            transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+            box-shadow: 
+                0 8px 20px rgba(0, 0, 0, 0.2),
+                inset 0 1px 1px rgba(255, 255, 255, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
         }
 
-        /* 按钮光波反射过渡效果 */
-        .glass-btn::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-            transition: 0.6s ease;
-        }
-
-        .glass-btn:hover::after {
-            left: 100%;
+        .glass-btn-primary {
+            background: linear-gradient(135deg, rgba(0, 210, 255, 0.4), rgba(0, 91, 234, 0.4));
+            border: 1px solid rgba(0, 225, 255, 0.5);
+            box-shadow: 
+                0 10px 25px rgba(0, 180, 255, 0.3),
+                inset 0 1.5px 2px rgba(255, 255, 255, 0.8);
         }
 
         .glass-btn:hover {
-            background: rgba(255, 255, 255, 0.14);
-            border-color: rgba(0, 242, 254, 0.5);
-            border-top-color: rgba(255, 255, 255, 0.6);
-            box-shadow: 0 0 25px rgba(0, 242, 254, 0.3),
-                        inset 0 1px 2px rgba(255, 255, 255, 0.5);
-            transform: translateY(-2px);
+            transform: translateY(-2px) scale(1.02);
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.22), rgba(255, 255, 255, 0.08));
+            border-color: rgba(255, 255, 255, 0.45);
+            box-shadow: 
+                0 12px 30px rgba(0, 0, 0, 0.3),
+                inset 0 1.5px 2px rgba(255, 255, 255, 0.8);
+        }
+
+        .glass-btn-primary:hover {
+            background: linear-gradient(135deg, rgba(0, 210, 255, 0.6), rgba(0, 91, 234, 0.6));
+            box-shadow: 
+                0 12px 35px rgba(0, 200, 255, 0.5),
+                inset 0 1.5px 3px rgba(255, 255, 255, 0.9);
         }
 
         .glass-btn:active {
-            transform: translateY(1px);
+            transform: translateY(1px) scale(0.98);
         }
 
-        .btn-primary {
-            background: linear-gradient(135deg, rgba(0, 242, 254, 0.2) 0%, rgba(59, 130, 246, 0.15) 100%);
-            border-color: rgba(0, 242, 254, 0.35);
-            border-top-color: rgba(0, 242, 254, 0.6);
-        }
-
-        /* 作者与联系按钮栏 */
-        .footer-info {
+        /* ==========================================
+           4. 全屏封面布局 (Cover Screen)
+           ========================================== */
+        .screen {
+            position: absolute;
             width: 100%;
-            max-width: 420px;
+            height: 100%;
+            top: 0;
+            left: 0;
+            z-index: 10;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 24px;
+            transition: opacity 0.6s ease, transform 0.6s ease;
+        }
+
+        .screen.hidden {
+            opacity: 0;
+            pointer-events: none;
+            transform: scale(1.05);
+        }
+
+        .cover-panel {
+            width: 100%;
+            max-width: 460px; /* 移动端最佳适应度，桌面端同样适配 */
+            padding: 40px 32px;
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 8px;
-            margin-bottom: 1vh;
+            text-align: center;
+            z-index: 2;
         }
 
-        .author-text {
+        /* 动车组状态指示灯徽章 */
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 16px;
+            border-radius: 20px;
+            background: rgba(0, 255, 170, 0.1);
+            border: 1px solid rgba(0, 255, 170, 0.3);
             font-size: 0.8rem;
-            color: #64748b;
+            color: #00ffaa;
+            margin-bottom: 24px;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            background-color: #00ffaa;
+            border-radius: 50%;
+            box-shadow: 0 0 10px #00ffaa;
+            animation: pulse 2s infinite;
+        }
+
+        .game-title {
+            font-size: 2.4rem;
+            font-weight: 800;
+            letter-spacing: 3px;
+            margin-bottom: 8px;
+            background: linear-gradient(180deg, #ffffff 0%, rgba(255, 255, 255, 0.65) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .game-subtitle {
+            font-size: 0.95rem;
+            color: rgba(255, 255, 255, 0.6);
+            margin-bottom: 36px;
+            letter-spacing: 1px;
+            font-weight: 300;
+        }
+
+        .btn-group {
+            width: 100%;
+        }
+
+        .version-tag {
+            margin-top: 24px;
+            font-size: 0.75rem;
+            color: rgba(255, 255, 255, 0.35);
             letter-spacing: 1px;
         }
 
-        .contact-link-btn {
-            background: none;
-            border: none;
-            color: #38bdf8;
-            font-size: 0.85rem;
+        /* ==========================================
+           5. 全屏游戏主要界面预留 (Game Viewport)
+           ========================================== */
+        #game-screen {
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 0;
+            background: #060913;
+        }
+
+        /* 游戏界面顶栏（高光玻璃） */
+        .game-header {
+            width: 100%;
+            height: 64px;
+            padding: 0 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.04);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+            z-index: 20;
+        }
+
+        .header-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            letter-spacing: 1px;
+        }
+
+        .icon-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            width: 38px;
+            height: 38px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
             cursor: pointer;
-            text-decoration: underline;
-            transition: color 0.2s;
+            backdrop-filter: blur(10px);
         }
 
-        .contact-link-btn:hover {
-            color: #00f2fe;
+        /* 游戏核心画布与网格区域，强制占满剩余空间 */
+        .game-viewport {
+            flex: 1;
+            width: 100%;
+            height: calc(100vh - 64px);
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
 
-        /* 游戏内液态玻璃弹窗遮罩 */
-        #modal-overlay {
-            position: fixed;
+        canvas#gameCanvas {
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+
+        /* ==========================================
+           6. 弹窗组件 (Modals)
+           ========================================== */
+        .modal {
+            position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(2, 6, 23, 0.75);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(10px);
+            z-index: 100;
             display: flex;
             justify-content: center;
             align-items: center;
-            z-index: 100;
+            padding: 20px;
             opacity: 0;
             pointer-events: none;
             transition: opacity 0.3s ease;
         }
 
-        #modal-overlay.active {
+        .modal.active {
             opacity: 1;
             pointer-events: auto;
         }
 
-        .modal-box {
-            width: 90%;
-            max-width: 380px;
+        .modal-content {
+            width: 100%;
+            max-width: 400px;
             padding: 28px;
-            display: flex;
-            flex-direction: column;
-            gap: 18px;
-            transform: scale(0.92);
-            transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
-        #modal-overlay.active .modal-box {
-            transform: scale(1);
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
         }
 
         .modal-title {
-            font-size: 1.25rem;
+            font-size: 1.3rem;
             font-weight: 700;
-            color: #00f2fe;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-            padding-bottom: 10px;
         }
 
-        .modal-body {
-            font-size: 0.95rem;
-            color: #e2e8f0;
-            line-height: 1.65;
-            word-break: break-all;
+        /* ==========================================
+           7. 动画定义
+           ========================================== */
+        @keyframes fluidFloat {
+            0% { transform: translate(0, 0) scale(1); }
+            50% { transform: translate(60px, 40px) scale(1.1); }
+            100% { transform: translate(-40px, 80px) scale(0.95); }
         }
 
-        .modal-close-btn {
-            margin-top: 6px;
-            padding: 12px;
-            border-radius: 12px;
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            background: rgba(255, 255, 255, 0.08);
-            color: #ffffff;
-            font-weight: 600;
-            cursor: pointer;
-            transition: background 0.2s;
+        @keyframes gridMove {
+            0% { transform: rotate(-15deg) translateY(0); }
+            100% { transform: rotate(-15deg) translateY(80px); }
         }
 
-        .modal-close-btn:hover {
-            background: rgba(255, 255, 255, 0.18);
-        }
-
-        /* 选择卡片样式 */
-        .option-item {
-            width: 100%;
-            padding: 14px 16px;
-            border-radius: 12px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            background: rgba(255, 255, 255, 0.04);
-            color: #e2e8f0;
-            font-size: 0.95rem;
-            text-align: left;
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-
-        .option-item:hover {
-            background: rgba(0, 242, 254, 0.15);
-            border-color: rgba(0, 242, 254, 0.4);
-            color: #ffffff;
+        @keyframes pulse {
+            0% { opacity: 0.4; transform: scale(0.9); }
+            50% { opacity: 1; transform: scale(1.15); }
+            100% { opacity: 0.4; transform: scale(0.9); }
         }
     </style>
 </head>
 <body>
 
-    <!-- 动态背景 -->
-    <div id="app-background">
-        <div class="liquid-blob blob-1"></div>
-        <div class="liquid-blob blob-2"></div>
-        <div class="liquid-blob blob-3"></div>
-        <div class="track-line"></div>
-        <div class="track-line"></div>
+    <!-- 动态背景层 -->
+    <div class="bg-container">
+        <div class="rail-grid"></div>
+        <div class="fluid-blob blob-1"></div>
+        <div class="fluid-blob blob-2"></div>
+        <div class="fluid-blob blob-3"></div>
     </div>
 
-    <!-- 游戏主视口 (PC与移动端全屏统一) -->
-    <div id="game-container">
-        
-        <!-- 标题区 -->
-        <header>
-            <div class="game-subtitle">CRH Dispatcher System</div>
+    <!-- 1. 游戏开始封面屏 (全屏铺满/拟真液态高光玻璃) -->
+    <div id="cover-screen" class="screen">
+        <div class="liquid-glass-card cover-panel">
+            <div class="status-badge">
+                <span class="status-dot"></span>
+                <span>EMU-SYSTEM READY</span>
+            </div>
+            
             <h1 class="game-title">动车组接线员</h1>
+            <p class="game-subtitle">高速铁路信号与控制线路调度系统</p>
+
+            <div class="btn-group">
+                <button class="glass-btn glass-btn-primary" id="btn-start">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+                    开始接线
+                </button>
+
+                <button class="glass-btn" id="btn-levels">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+                    关卡选择
+                </button>
+
+                <button class="glass-btn" id="btn-settings">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+                    系统设置
+                </button>
+            </div>
+
+            <div class="version-tag">SYSTEM v1.0.0 · CRH/EMU DISPATCH</div>
+        </div>
+    </div>
+
+    <!-- 2. 全屏主游戏界面屏 (进入游戏后的铺满视图) -->
+    <div id="game-screen" class="screen hidden">
+        <!-- 顶部控制条 -->
+        <header class="game-header">
+            <button class="icon-btn" id="btn-back">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+            </button>
+            <div class="header-title">关卡 01: 信号电路复位</div>
+            <button class="icon-btn" id="btn-pause">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>
+            </button>
         </header>
 
-        <!-- 中部核心状态玻璃面板 -->
-        <div class="liquid-glass center-display">
-            <div class="status-item">
-                <span>系统状态</span>
-                <span class="status-value">🟢 终端运行就绪</span>
-            </div>
-            <div class="status-item">
-                <span>当前调度区段</span>
-                <span class="status-value selectable-area" id="current-dispatch-area" onclick="openAreaSelector()">京沪高铁 - 03号枢纽 (切换)</span>
-            </div>
-            <div class="status-item">
-                <span>当前版本</span>
-                <span class="status-value">内部版本02</span>
-            </div>
-        </div>
-
-        <!-- 底部菜单区 -->
-        <div class="menu-container">
-            <button class="glass-btn btn-primary" onclick="startGame()">开始接车</button>
-            <button class="glass-btn" onclick="openUpdates()">更新日志</button>
-        </div>
-
-        <!-- 版权与联系通道 -->
-        <div class="footer-info">
-            <div class="author-text">Lux作者制作</div>
-            <button class="contact-link-btn" onclick="openContact()">QQ邮箱联系</button>
-        </div>
-
+        <!-- 游戏全屏主画布/视图 -->
+        <main class="game-viewport">
+            <canvas id="gameCanvas"></canvas>
+        </main>
     </div>
 
-    <!-- 游戏内统一液态玻璃弹窗 -->
-    <div id="modal-overlay" onclick="closeModal(event)">
-        <div class="modal-box liquid-glass" onclick="event.stopPropagation()">
-            <div class="modal-title" id="modal-title">提示</div>
-            <div class="modal-body" id="modal-content">弹窗内容...</div>
-            <div id="modal-actions">
-                <button class="modal-close-btn" style="width:100%;" onclick="closeModalDirect()">确定</button>
+    <!-- 3. 设置弹窗 -->
+    <div id="settings-modal" class="modal">
+        <div class="liquid-glass-card modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">系统设置</h2>
+                <button class="icon-btn" id="btn-close-settings">✕</button>
             </div>
+            <p style="color: rgba(255,255,255,0.7); margin-bottom: 20px;">音频与画质选项预留位置...</p>
+            <button class="glass-btn" id="btn-confirm-settings">保存设置</button>
         </div>
     </div>
 
+    <!-- ==========================================
+       8. 核心 JavaScript 架构 (预留更新与扩展)
+       ========================================== -->
     <script>
-        let selectedArea = "京沪高铁 - 03号枢纽";
-
-        function showModal(title, content, customActionsHTML = null) {
-            document.getElementById('modal-title').innerText = title;
-            document.getElementById('modal-content').innerHTML = content;
-            
-            const actionsContainer = document.getElementById('modal-actions');
-            if (customActionsHTML) {
-                actionsContainer.innerHTML = customActionsHTML;
-            } else {
-                actionsContainer.innerHTML = `<button class="modal-close-btn" style="width:100%;" onclick="closeModalDirect()">确定</button>`;
+        /**
+         * 动车组接线员 - 核心客户端逻辑模组
+         * 预留良好的更新接口方便后续添加电路判断、接线算法等
+         */
+        class EMUWireGame {
+            constructor() {
+                this.initElements();
+                this.bindEvents();
+                this.initCanvas();
+                
+                // 监听窗口大小变化（保证PC和移动端全屏无缝渲染）
+                window.addEventListener('resize', () => this.resizeCanvas());
             }
 
-            document.getElementById('modal-overlay').classList.add('active');
-        }
+            // 初始化 DOM 元素引用
+            initElements() {
+                this.screens = {
+                    cover: document.getElementById('cover-screen'),
+                    game: document.getElementById('game-screen')
+                };
+                
+                this.buttons = {
+                    start: document.getElementById('btn-start'),
+                    levels: document.getElementById('btn-levels'),
+                    settings: document.getElementById('btn-settings'),
+                    back: document.getElementById('btn-back'),
+                    closeSettings: document.getElementById('btn-close-settings'),
+                    confirmSettings: document.getElementById('btn-confirm-settings')
+                };
 
-        function closeModalDirect() {
-            document.getElementById('modal-overlay').classList.remove('active');
-        }
+                this.modals = {
+                    settings: document.getElementById('settings-modal')
+                };
 
-        function closeModal(e) {
-            if (e.target.id === 'modal-overlay') {
-                closeModalDirect();
+                this.canvas = document.getElementById('gameCanvas');
+                this.ctx = this.canvas.getContext('2d');
+            }
+
+            // 事件绑定
+            bindEvents() {
+                // 开始游戏
+                this.buttons.start.addEventListener('click', () => this.startGame());
+
+                // 返回封面
+                this.buttons.back.addEventListener('click', () => this.exitToCover());
+
+                // 打开/关闭设置
+                this.buttons.settings.addEventListener('click', () => this.toggleModal('settings', true));
+                this.buttons.closeSettings.addEventListener('click', () => this.toggleModal('settings', false));
+                this.buttons.confirmSettings.addEventListener('click', () => this.toggleModal('settings', false));
+
+                // 关卡选择提示
+                this.buttons.levels.addEventListener('click', () => {
+                    alert('【关卡系统预留】后续更新后可选择更多动车组电路图！');
+                });
+            }
+
+            // 切换屏幕（全屏无缝平移）
+            switchScreen(screenName) {
+                Object.keys(this.screens).forEach(key => {
+                    if (key === screenName) {
+                        this.screens[key].classList.remove('hidden');
+                    } else {
+                        this.screens[key].classList.add('hidden');
+                    }
+                });
+            }
+
+            // 打开/关闭模态弹窗
+            toggleModal(modalName, show) {
+                if (show) {
+                    this.modals[modalName].classList.add('active');
+                } else {
+                    this.modals[modalName].classList.remove('active');
+                }
+            }
+
+            // 启动游戏
+            startGame() {
+                this.switchScreen('game');
+                this.resizeCanvas();
+                this.startRenderLoop();
+            }
+
+            // 退出至封面
+            exitToCover() {
+                this.switchScreen('cover');
+                if (this.animFrameId) {
+                    cancelAnimationFrame(this.animFrameId);
+                }
+            }
+
+            // 自适应全屏 Canvas 尺寸
+            resizeCanvas() {
+                if (!this.canvas) return;
+                const rect = this.canvas.parentElement.getBoundingClientRect();
+                
+                // 处理 Retina 高清屏幕缩放
+                const dpr = window.devicePixelRatio || 1;
+                this.canvas.width = rect.width * dpr;
+                this.canvas.height = rect.height * dpr;
+                this.ctx.scale(dpr, dpr);
+                
+                this.viewportWidth = rect.width;
+                this.viewportHeight = rect.height;
+            }
+
+            // 游戏主渲染循环 (预留以后编写电路/接线交互)
+            startRenderLoop() {
+                const render = () => {
+                    this.drawPlaceholderGame();
+                    this.animFrameId = requestAnimationFrame(render);
+                };
+                render();
+            }
+
+            // Canvas 占位绘制演示（后续接线逻辑编写处）
+            drawPlaceholderGame() {
+                const ctx = this.ctx;
+                const width = this.viewportWidth;
+                const height = this.viewportHeight;
+
+                // 清空画布
+                ctx.clearRect(0, 0, width, height);
+
+                // 绘制演示文字
+                ctx.fillStyle = "rgba(255, 255, 255, 0.4)";
+                ctx.font = "16px sans-serif";
+                ctx.textAlign = "center";
+                ctx.fillText("【接线画布预留区域】", width / 2, height / 2 - 20);
+                ctx.fillText("请在此处添加电路节点、导线拖拽与通电判定逻辑", width / 2, height / 2 + 20);
+
+                // 绘制示例接线节点
+                this.drawNode(width / 2 - 120, height / 2, "#00ffaa", "输入 A");
+                this.drawNode(width / 2 + 120, height / 2, "#00d2ff", "输出 B");
+            }
+
+            drawNode(x, y, color, label) {
+                const ctx = this.ctx;
+                ctx.beginPath();
+                ctx.arc(x, y, 16, 0, Math.PI * 2);
+                ctx.fillStyle = color;
+                ctx.shadowColor = color;
+                ctx.shadowBlur = 15;
+                ctx.fill();
+                ctx.shadowBlur = 0;
+
+                ctx.fillStyle = "#ffffff";
+                ctx.font = "12px sans-serif";
+                ctx.fillText(label, x, y + 32);
             }
         }
 
-        // 选择调度区段功能
-        function openAreaSelector() {
-            const areas = [
-                "京沪高铁 - 华东调度枢纽",
-                "京广高铁 - 武汉核心枢纽",
-                "沪昆高铁 - 东南调度中心",
-                "成渝客专 - 西南调度中心",
-                "徐兰客专 - 西北调度中心",
-                "京津冀城际 - 北京调度中心"
-            ];
-
-            let html = '<div style="display:flex; flex-direction:column; gap:8px; max-height:240px; overflow-y:auto;">';
-            areas.forEach(area => {
-                html += `<button class="option-item" onclick="selectArea('${area}')">${area}</button>`;
-            });
-            html += '</div>';
-
-            showModal("选择调度区段", "请选择您要接管的高铁干线调度枢纽：", html);
-        }
-
-        function selectArea(areaName) {
-            selectedArea = areaName;
-            document.getElementById('current-dispatch-area').innerText = areaName + " (切换)";
-            closeModalDirect();
-        }
-
-        // 按钮交互
-        function startGame() {
-            showModal("提示", `当前区段【${selectedArea}】接车程序正在筹备中，核心接线调度玩法将在后续更新开放！`);
-        }
-
-        function openUpdates() {
-            showModal("更新日志 (内部版本02)", 
-                "• <b>UI重构</b>：升级为全新【液态高光拟真玻璃】风格，拥有平滑折射与环境柔光。<br>" +
-                "• <b>全屏适配</b>：电脑与移动端统一铺满视口，去除窗口化沉浸式体验。<br>" +
-                "• <b>区段切换</b>：支持自主选择与切换调度铁路线路。<br>" +
-                "• <b>游戏内弹窗</b>：全原生液态玻璃弹窗，替代系统弹窗。"
-            );
-        }
-
-        function openContact() {
-            showModal("联系作者", 
-                "如果您在测试过程中遇到任何问题或有玩法建议，欢迎联系：<br><br>" +
-                "<b style='color:#00f2fe; font-size:1.05rem;'>2210380754@qq.com</b><br><br>" +
-                "<span style='color:#f87171; font-size:0.85rem;'>⚠️ 反馈请备注：游戏反馈</span>"
-            );
-        }
+        // 初始化游戏引擎
+        window.addEventListener('DOMContentLoaded', () => {
+            window.gameInstance = new EMUWireGame();
+        });
     </script>
 </body>
 </html>
-"""
-
-with open("index.html", "w", encoding="utf-8") as f:
-    f.write(html_code)
-
-print("HTML generated successfully as index.html")

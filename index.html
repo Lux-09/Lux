@@ -2,172 +2,267 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>动车组接线员 - 游戏开始</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>动车组接线员 - 调度终端</title>
     <style>
+        /* CSS 重置与基础设置 */
         * {
+            box-sizing: border-box;
             margin: 0;
             padding: 0;
-            box-sizing: border-box;
-            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
         }
 
-        body {
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            background: linear-gradient(135deg, #0f172a, #1e293b, #0f172a);
-            background-size: 400% 400%;
-            animation: gradientBG 15s ease infinite;
+        body, html {
+            width: 100%;
+            height: 100%;
             overflow: hidden;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background-color: #0b0f19;
             color: #ffffff;
         }
 
-        @keyframes gradientBG {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-        }
-
-        /* 背景动车元素装饰 */
-        .bg-glow {
-            position: absolute;
-            width: 300px;
-            height: 300px;
-            background: rgba(56, 189, 248, 0.15);
-            filter: blur(80px);
-            border-radius: 50%;
+        /* 背景：模拟动车段/调度大厅未来科技感背景 */
+        #app-background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 20% 30%, rgba(0, 150, 255, 0.15) 0%, transparent 40%),
+                radial-gradient(circle at 80% 70%, rgba(255, 100, 0, 0.1) 0%, transparent 40%),
+                linear-gradient(135deg, #070a13 0%, #111827 100%);
             z-index: 1;
         }
 
-        .container {
-            position: relative;
+        /* 轨道光效装饰线 */
+        .track-line {
+            position: absolute;
+            background: linear-gradient(90deg, transparent, rgba(0, 242, 254, 0.3), transparent);
+            height: 1px;
+            width: 100%;
             z-index: 2;
-            width: 90%;
-            max-width: 480px;
-            padding: 40px 30px;
+        }
+        .track-line:nth-child(1) { top: 20%; animation: scan 8s linear infinite; }
+        .track-line:nth-child(2) { top: 70%; animation: scan 12s linear infinite reverse; }
+
+        @keyframes scan {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        /* 全屏容器：电脑与手机统一强制全屏占满 */
+        #game-container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+            padding: 40px 20px;
+            z-index: 10;
+        }
+
+        /* 固态高光拟真玻璃 UI 核心样式 */
+        .glass-panel {
             background: rgba(255, 255, 255, 0.05);
             backdrop-filter: blur(16px);
             -webkit-backdrop-filter: blur(16px);
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            border-top: 1px solid rgba(255, 255, 255, 0.3);
-            border-radius: 24px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4),
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-top: 1px solid rgba(255, 255, 255, 0.25); /* 顶部高光 */
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4), 
                         inset 0 1px 0 rgba(255, 255, 255, 0.2);
-            text-align: center;
+            border-radius: 20px;
         }
 
-        .game-title {
-            font-size: 2rem;
-            font-weight: 700;
-            letter-spacing: 2px;
-            margin-bottom: 10px;
-            background: linear-gradient(to right, #38bdf8, #818cf8);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            text-shadow: 0 2px 10px rgba(56, 189, 248, 0.3);
+        /* 头部：游戏标题区 */
+        header {
+            text-align: center;
+            margin-top: 2vh;
         }
 
         .game-subtitle {
-            font-size: 0.9rem;
-            color: #94a3b8;
-            margin-bottom: 40px;
-            letter-spacing: 1px;
+            font-size: 0.85rem;
+            letter-spacing: 4px;
+            color: #00f2fe;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+            text-shadow: 0 0 10px rgba(0, 242, 254, 0.5);
         }
 
-        .menu-list {
+        .game-title {
+            font-size: 2.5rem;
+            font-weight: 800;
+            letter-spacing: 2px;
+            background: linear-gradient(180deg, #ffffff 0%, #94a3b8 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 4px 12px rgba(0,0,0,0.5);
+        }
+
+        /* 中部：动态或核心状态显示玻璃窗 */
+        .center-display {
+            width: 100%;
+            max-width: 420px;
+            padding: 24px;
             display: flex;
             flex-direction: column;
             gap: 16px;
         }
 
-        .btn {
+        .status-item {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.9rem;
+            color: #cbd5e1;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            padding-bottom: 8px;
+        }
+
+        .status-value {
+            color: #38bdf8;
+            font-family: monospace;
+            font-weight: bold;
+        }
+
+        /* 底部：操作菜单与按钮区 */
+        .menu-container {
+            width: 100%;
+            max-width: 420px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 2vh;
+        }
+
+        .glass-btn {
             position: relative;
             width: 100%;
-            padding: 14px 20px;
-            font-size: 1rem;
-            font-weight: 600;
-            color: #ffffff;
+            padding: 16px;
+            border-radius: 14px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
             background: rgba(255, 255, 255, 0.08);
-            border: 1px solid rgba(255, 255, 255, 0.12);
-            border-radius: 12px;
+            color: #ffffff;
+            font-size: 1.1rem;
+            font-weight: 600;
+            letter-spacing: 1px;
             cursor: pointer;
-            transition: all 0.3s ease;
-            backdrop-filter: blur(4px);
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2),
+                        inset 0 1px 0 rgba(255, 255, 255, 0.3);
+            overflow: hidden;
         }
 
-        .btn:hover {
-            background: rgba(56, 189, 248, 0.2);
-            border-color: rgba(56, 189, 248, 0.4);
+        /* 按钮高光扫过效果 */
+        .glass-btn::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: 0.5s;
+        }
+
+        .glass-btn:hover::after {
+            left: 100%;
+        }
+
+        .glass-btn:hover {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: rgba(0, 242, 254, 0.6);
+            box-shadow: 0 0 20px rgba(0, 242, 254, 0.3),
+                        inset 0 1px 0 rgba(255, 255, 255, 0.4);
             transform: translateY(-2px);
-            box-shadow: 0 6px 15px rgba(56, 189, 248, 0.3);
         }
 
-        .btn:active {
-            transform: translateY(0);
+        .glass-btn:active {
+            transform: translateY(1px);
         }
 
         .btn-primary {
-            background: linear-gradient(135deg, rgba(56, 189, 248, 0.4), rgba(37, 99, 235, 0.4));
-            border-color: rgba(56, 189, 248, 0.5);
+            background: linear-gradient(135deg, rgba(0, 242, 254, 0.2), rgba(79, 172, 254, 0.2));
+            border-color: rgba(0, 242, 254, 0.4);
         }
 
-        .btn-primary:hover {
-            background: linear-gradient(135deg, rgba(56, 189, 248, 0.6), rgba(37, 99, 235, 0.6));
-        }
-
+        /* 版本信息 */
         .version-info {
-            margin-top: 30px;
             font-size: 0.75rem;
             color: #64748b;
-        }
-
-        /* 移动端适配调整 */
-        @media (max-width: 480px) {
-            .container {
-                width: 92%;
-                padding: 30px 20px;
-            }
-            .game-title {
-                font-size: 1.7rem;
-            }
+            text-align: center;
+            letter-spacing: 1px;
         }
     </style>
 </head>
 <body>
 
-    <div class="bg-glow" style="top: 10%; left: 10%;"></div>
-    <div class="bg-glow" style="bottom: 10%; right: 10%;"></div>
+    <!-- 背景装饰 -->
+    <div id="app-background">
+        <div class="track-line"></div>
+        <div class="track-line"></div>
+    </div>
 
-    <div class="container">
-        <h1 class="game-title">动车组接线员</h1>
-        <p class="game-subtitle">EMU Dispatcher Simulation</p>
+    <!-- 游戏主视口 (强制全屏) -->
+    <div id="game-container">
         
-        <div class="menu-list">
-            <button class="btn btn-primary" onclick="startGame()">开始接线</button>
-            <button class="btn" onclick="openSettings()">游戏设置</button>
-            <button class="btn" onclick="openUpdates()">更新日志</button>
+        <!-- 标题区 -->
+        <header>
+            <div class="game-subtitle">CRH Dispatcher System</div>
+            <h1 class="game-title">动车组接线员</h1>
+        </header>
+
+        <!-- 中部状态与简报玻璃面板 (方便后续扩展游戏剧情/公告/系统日志) -->
+        <div class="glass-panel center-display">
+            <div class="status-item">
+                <span>系统状态</span>
+                <span class="status-value" id="sys-status">🟢 正常运行</span>
+            </div>
+            <div class="status-item">
+                <span>当前调度区段</span>
+                <span class="status-value">京沪线 - 03号枢纽</span>
+            </div>
+            <div class="status-item">
+                <span>版本代号</span>
+                <span class="status-value">内部(01)测试版-alpha</span>
+            </div>
         </div>
 
-        <div class="version-info">
-            Version 1.0.0 | Prepared for Future Updates
+        <!-- 底部菜单与交互按钮 -->
+        <div class="menu-container">
+            <button class="glass-btn btn-primary" onclick="startGame()">开始接车</button>
+            <button class="glass-btn" onclick="openSettings()">调度设置</button>
+            <button class="glass-btn" onclick="openUpdates()">更新日志</button>
         </div>
+
+        <!-- 版本版权 -->
+        <div class="version-info">
+            &copy; 2026 Train Dispatcher Studio. All Rights Reserved.
+        </div>
+
     </div>
 
     <script>
+        // 预留后续功能扩展的逻辑接口
         function startGame() {
-            alert("即将进入调度台，准备接线...");
-            // 后续可以在这里编写跳转到游戏主界面的逻辑
+            console.log("玩家点击：开始接车");
+            // 后续可以在这里编写切换到游戏主界面的逻辑，或者加载关卡资源
+            alert("即将进入调度大厅，核心玩法开发中...");
         }
 
         function openSettings() {
+            console.log("玩家点击：调度设置");
             alert("设置面板开发中...");
         }
 
         function openUpdates() {
-            alert("当前为初始版本：v0.0.1");
+            console.log("玩家点击：更新日志");
+            alert("当前为初始版本：\n1. 完成全屏响应式固态玻璃UI框架。\n2. 适配电脑与移动端全屏铺满。");
         }
     </script>
 </body>

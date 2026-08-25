@@ -5,8 +5,12 @@
 
 <meta charset="UTF-8">
 
-<meta name="viewport" 
-content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
+<meta name="viewport"
+content="width=device-width,
+initial-scale=1.0,
+maximum-scale=1.0,
+user-scalable=no">
+
 
 <title>动车组接线员</title>
 
@@ -14,47 +18,61 @@ content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no
 <style>
 
 
+/* =========================
+   基础设置
+========================= */
+
+
 *{
 
 margin:0;
 padding:0;
+
 box-sizing:border-box;
 
 font-family:
+
 "Microsoft YaHei",
 "PingFang SC",
-Arial;
+Arial,
+sans-serif;
 
 }
 
 
+html,
+body{
 
-html,body{
 
 width:100%;
 height:100%;
 
+
 overflow:hidden;
+
+
+background:#000;
+
 
 }
 
+
+
+
+/* =========================
+   游戏主屏幕
+========================= */
 
 
 .game-screen{
 
 
 width:100vw;
+
 height:100vh;
 
 
-background:
-
-linear-gradient(
-135deg,
-#071522,
-#16456b,
-#071522
-);
+position:relative;
 
 
 display:flex;
@@ -64,12 +82,34 @@ justify-content:center;
 align-items:center;
 
 
-position:relative;
+
+background:
+
+
+linear-gradient(
+
+135deg,
+
+#06101d,
+
+#16466e,
+
+#06101d
+
+);
+
+
+
+overflow:hidden;
 
 
 }
 
 
+
+
+
+/* 背景光效 */
 
 
 .light{
@@ -77,31 +117,38 @@ position:relative;
 
 position:absolute;
 
-width:80vw;
 
-height:80vw;
+width:90vw;
+
+height:90vw;
 
 
 background:
+
 
 radial-gradient(
 
 circle,
 
-rgba(255,255,255,.3),
+rgba(255,255,255,.28),
 
 transparent 70%
 
 );
 
 
-filter:blur(50px);
+
+filter:blur(60px);
 
 
-animation:lightMove 8s infinite alternate;
+animation:
+
+lightMove 10s infinite alternate;
 
 
 }
+
+
 
 
 
@@ -110,14 +157,18 @@ animation:lightMove 8s infinite alternate;
 
 from{
 
-transform:translate(-10%,-10%);
+transform:
+
+translate(-15%,-10%);
 
 }
 
 
 to{
 
-transform:translate(10%,10%);
+transform:
+
+translate(15%,10%);
 
 }
 
@@ -126,6 +177,11 @@ transform:translate(10%,10%);
 
 
 
+
+
+/* =========================
+玻璃主容器
+========================= */
 
 
 .glass-panel{
@@ -133,14 +189,20 @@ transform:translate(10%,10%);
 
 width:90%;
 
-max-width:850px;
+
+height:80%;
 
 
-height:75%;
+max-width:900px;
+
+
+
+position:relative;
 
 
 
 background:
+
 
 linear-gradient(
 
@@ -154,46 +216,166 @@ rgba(255,255,255,.08)
 
 
 
-backdrop-filter:blur(25px);
-
-
--webkit-backdrop-filter:blur(25px);
-
-
-
-border-radius:40px;
-
-
 border:
 
-1px solid rgba(255,255,255,.5);
+
+1px solid
+
+rgba(255,255,255,.45);
+
+
+
+border-radius:
+
+
+45px;
+
+
+
+backdrop-filter:
+
+blur(30px);
+
+
+-webkit-backdrop-filter:
+
+blur(30px);
+
 
 
 
 box-shadow:
 
-0 30px 80px rgba(0,0,0,.5),
 
-inset 0 0 40px rgba(255,255,255,.25);
+0 40px 100px
+
+rgba(0,0,0,.5),
+
+
+
+inset
+
+0 0 50px
+
+rgba(255,255,255,.25);
+
+
+
+overflow:hidden;
+
+
+}
+
+
+
+
+
+/* 顶部玻璃反光 */
+
+
+.glass-panel::before{
+
+
+content:"";
+
+
+position:absolute;
+
+
+width:150%;
+
+
+height:40%;
+
+
+top:-25%;
+
+
+left:-20%;
+
+
+
+background:
+
+
+linear-gradient(
+
+transparent,
+
+rgba(255,255,255,.35)
+
+);
+
+
+
+transform:
+
+rotate(-15deg);
+
+
+
+pointer-events:none;
+
+
+}
+
+
+
+
+
+/* =========================
+页面系统
+========================= */
+
+
+.page{
+
+
+position:absolute;
+
+
+width:100%;
+
+height:100%;
 
 
 
 display:flex;
 
+
 flex-direction:column;
 
+
 justify-content:center;
+
 
 align-items:center;
 
 
 
-color:white;
-
+transition:.3s;
 
 
 }
 
+
+
+
+.login-page{
+
+
+display:none;
+
+
+}
+
+
+
+
+
+/* =========================
+标题
+========================= */
 
 
 .title{
@@ -201,18 +383,41 @@ color:white;
 
 font-size:
 
-clamp(35px,6vw,80px);
+
+clamp(40px,7vw,85px);
 
 
-letter-spacing:8px;
+
+letter-spacing:
+
+
+10px;
+
+
+
+color:white;
+
+
+
+text-align:center;
+
 
 
 text-shadow:
 
-0 10px 30px rgba(0,0,0,.5);
+
+0 15px 40px
+
+rgba(0,0,0,.6);
+
+
+
+z-index:2;
 
 
 }
+
+
 
 
 
@@ -224,18 +429,37 @@ margin-top:25px;
 
 font-size:
 
-clamp(15px,2vw,25px);
+
+clamp(14px,2vw,24px);
 
 
-letter-spacing:5px;
+
+letter-spacing:
+
+
+6px;
+
+
+
+color:white;
 
 
 opacity:.8;
 
 
+
+z-index:2;
+
+
 }
 
 
+
+
+
+/* =========================
+按钮
+========================= */
 
 
 button{
@@ -243,35 +467,55 @@ button{
 
 cursor:pointer;
 
+
 }
 
 
 
-.start-btn{
 
 
-margin-top:70px;
+.start-btn,
+
+
+.login-btn{
+
+
+margin-top:60px;
+
 
 
 width:
 
+
 clamp(220px,40vw,360px);
+
 
 
 height:70px;
 
 
-border-radius:50px;
+
+border-radius:
+
+
+50px;
+
 
 
 
 border:
 
-1px solid rgba(255,255,255,.7);
+
+1px solid
+
+rgba(255,255,255,.7);
+
+
 
 
 
 background:
+
 
 rgba(255,255,255,.18);
 
@@ -280,20 +524,36 @@ rgba(255,255,255,.18);
 color:white;
 
 
-font-size:25px;
 
-
-letter-spacing:6px;
+font-size:24px;
 
 
 
-backdrop-filter:blur(15px);
+letter-spacing:8px;
+
+
+
+backdrop-filter:
+
+blur(15px);
 
 
 
 box-shadow:
 
-0 15px 40px rgba(0,0,0,.4);
+
+0 20px 40px
+
+rgba(0,0,0,.35),
+
+
+
+inset
+
+0 0 20px
+
+rgba(255,255,255,.4);
+
 
 
 transition:.3s;
@@ -303,7 +563,9 @@ transition:.3s;
 
 
 
-.start-btn:hover{
+.start-btn:hover,
+
+.login-btn:hover{
 
 
 transform:scale(1.08);
@@ -315,105 +577,95 @@ transform:scale(1.08);
 
 
 
-.version{
-
-
-position:absolute;
-
-bottom:25px;
-
-
-opacity:.7;
-
-font-size:14px;
-
-
-}
-
-
-
-
-
-/* 登录界面 */
-
-
-.login-box{
-
-
-display:none;
-
-
-width:100%;
-
-height:100%;
-
-
-flex-direction:column;
-
-align-items:center;
-
-justify-content:center;
-
-
-}
-
-
+/* =========================
+登录界面
+========================= */
 
 
 .login-title{
 
 
-font-size:40px;
+font-size:
 
 
-letter-spacing:8px;
-
-
-}
-
-
-
-.input{
-
-
-margin-top:25px;
-
-
-width:70%;
-
-
-max-width:400px;
-
-
-height:55px;
-
-
-border-radius:30px;
-
-
-
-border:
-
-1px solid rgba(255,255,255,.5);
-
-
-
-background:
-
-rgba(255,255,255,.15);
+clamp(30px,5vw,50px);
 
 
 
 color:white;
 
 
-font-size:20px;
+
+letter-spacing:8px;
 
 
-padding-left:25px;
+
+}
+
+
+
+
+.input{
+
+
+margin-top:40px;
+
+
+
+width:
+
+
+70%;
+
+
+
+max-width:400px;
+
+
+
+height:60px;
+
+
+
+border-radius:40px;
+
+
+
+border:
+
+
+1px solid
+
+rgba(255,255,255,.6);
+
+
+
+background:
+
+
+rgba(255,255,255,.15);
+
 
 
 outline:none;
+
+
+
+padding-left:30px;
+
+
+
+font-size:20px;
+
+
+
+color:white;
+
+
+
+backdrop-filter:
+
+blur(15px);
 
 
 }
@@ -423,48 +675,10 @@ outline:none;
 
 .input::placeholder{
 
-color:rgba(255,255,255,.7);
 
-}
+color:
 
-
-
-
-
-.login-btn{
-
-
-margin-top:40px;
-
-
-width:250px;
-
-
-height:60px;
-
-
-border-radius:40px;
-
-
-background:
-
-rgba(255,255,255,.3);
-
-
-
-border:
-
-1px solid white;
-
-
-
-color:white;
-
-
-font-size:22px;
-
-
-letter-spacing:5px;
+rgba(255,255,255,.7);
 
 
 }
@@ -476,16 +690,24 @@ letter-spacing:5px;
 .back-btn{
 
 
-margin-top:20px;
+margin-top:25px;
 
-
-background:none;
 
 
 border:none;
 
 
+
+background:none;
+
+
+
 color:white;
+
+
+
+font-size:16px;
+
 
 
 opacity:.7;
@@ -497,6 +719,172 @@ opacity:.7;
 
 
 
+/* =========================
+版本信息
+========================= */
+
+
+.version{
+
+
+position:absolute;
+
+
+
+bottom:25px;
+
+
+
+color:white;
+
+
+
+font-size:14px;
+
+
+
+opacity:.65;
+
+
+
+}
+
+
+
+
+
+/* =========================
+游戏弹窗
+========================= */
+
+
+.notice-layer{
+
+
+display:none;
+
+
+position:fixed;
+
+
+
+top:0;
+
+left:0;
+
+
+
+width:100vw;
+
+height:100vh;
+
+
+
+background:
+
+rgba(0,0,0,.35);
+
+
+
+justify-content:center;
+
+align-items:center;
+
+
+
+z-index:100;
+
+
+}
+
+
+
+
+
+.notice-box{
+
+
+width:320px;
+
+
+
+min-height:130px;
+
+
+
+padding:35px;
+
+
+
+border-radius:35px;
+
+
+
+background:
+
+
+linear-gradient(
+
+145deg,
+
+rgba(255,255,255,.45),
+
+rgba(255,255,255,.12)
+
+);
+
+
+
+border:
+
+
+1px solid
+
+rgba(255,255,255,.6);
+
+
+
+backdrop-filter:
+
+blur(25px);
+
+
+
+box-shadow:
+
+
+0 30px 70px
+
+rgba(0,0,0,.5);
+
+
+
+color:white;
+
+
+
+font-size:22px;
+
+
+
+text-align:center;
+
+
+
+letter-spacing:3px;
+
+
+}
+
+
+
+
+
+/* =========================
+手机适配
+========================= */
+
+
 @media(max-width:600px){
 
 
@@ -504,20 +892,14 @@ opacity:.7;
 .glass-panel{
 
 
-height:82%;
+width:92%;
+
+
+height:85%;
+
 
 
 border-radius:30px;
-
-
-}
-
-
-
-.login-title{
-
-
-font-size:30px;
 
 
 }
@@ -531,6 +913,22 @@ width:85%;
 
 
 }
+
+
+
+.start-btn,
+
+.login-btn{
+
+
+height:60px;
+
+
+font-size:20px;
+
+
+}
+
 
 
 }
@@ -547,7 +945,9 @@ width:85%;
 <body>
 
 
+
 <div class="game-screen">
+
 
 
 <div class="light"></div>
@@ -558,10 +958,15 @@ width:85%;
 
 
 
-<!-- 开始界面 -->
 
 
-<div id="startPage">
+<!-- ======================
+启动页面
+====================== -->
+
+
+<div class="page start-page"
+id="startPage">
 
 
 <div class="title">
@@ -569,6 +974,7 @@ width:85%;
 动车组接线员
 
 </div>
+
 
 
 <div class="subtitle">
@@ -579,10 +985,15 @@ HIGH SPEED TRAIN OPERATOR
 
 
 
-<button class="start-btn"
+<button
+
+class="start-btn"
+
 onclick="openLogin()">
 
+
 开始运行
+
 
 </button>
 
@@ -593,68 +1004,124 @@ onclick="openLogin()">
 
 
 
-<!-- 登录界面 -->
 
 
-<div class="login-box" id="loginPage">
+<!-- ======================
+登录页面
+====================== -->
+
+
+<div class="page login-page"
+
+id="loginPage">
 
 
 <div class="login-title">
 
-系统登录
+
+操作员登录
+
 
 </div>
 
 
 
-<input 
-class="input"
+
+<input
+
 id="account"
-placeholder="输入账号">
 
-
-<input 
 class="input"
-id="password"
-type="password"
-placeholder="输入密码">
+
+placeholder="请输入操作员编号">
 
 
 
-<button class="login-btn"
+
+
+<button
+
+class="login-btn"
+
 onclick="login()">
+
+
 
 进入系统
 
+
+
 </button>
 
 
 
-<button class="back-btn"
-onclick="backStart()">
+
+<button
+
+class="back-btn"
+
+onclick="backHome()">
+
+
 
 返回首页
+
+
 
 </button>
 
 
 
 </div>
+
+
+
 
 
 
 <div class="version">
 
+
 内测版本01
 
-</div>
-
-
 
 </div>
 
 
+
 </div>
+
+
+
+
+
+
+
+
+<!-- ======================
+游戏提示窗口
+====================== -->
+
+
+<div class="notice-layer"
+
+id="notice">
+
+
+<div class="notice-box"
+
+id="noticeText">
+
+
+提示
+
+
+</div>
+
+
+</div>
+
+
 
 
 
@@ -663,29 +1130,25 @@ onclick="backStart()">
 <script>
 
 
-/*
 
-========================
+/*
+=================================
 
 账号管理区域
 
-以后你只需要修改这里
-
-增加账号：
+以后增加账号：
 
 {
-account:"xxx",
-password:"xxx"
+account:"新账号"
 }
 
 
 删除账号：
 
-直接删除对应行
+直接删除对应项目
 
 
-========================
-
+=================================
 */
 
 
@@ -694,20 +1157,26 @@ let accounts=[
 
 {
 
-account:"admin",
-
-password:"123456"
+account:"admin"
 
 },
 
 
+
 {
 
-account:"tester01",
+account:"operator001"
 
-password:"test001"
+},
+
+
+
+{
+
+account:"tester01"
 
 }
+
 
 
 ];
@@ -718,14 +1187,24 @@ password:"test001"
 
 
 
+// 打开登录
+
 function openLogin(){
 
 
-document.getElementById("startPage")
+
+document
+
+.getElementById("startPage")
+
 .style.display="none";
 
 
-document.getElementById("loginPage")
+
+document
+
+.getElementById("loginPage")
+
 .style.display="flex";
 
 
@@ -735,15 +1214,26 @@ document.getElementById("loginPage")
 
 
 
-function backStart(){
+
+// 返回首页
 
 
-document.getElementById("loginPage")
+function backHome(){
+
+
+document
+
+.getElementById("loginPage")
+
 .style.display="none";
 
 
-document.getElementById("startPage")
-.style.display="block";
+
+document
+
+.getElementById("startPage")
+
+.style.display="flex";
 
 
 }
@@ -754,50 +1244,70 @@ document.getElementById("startPage")
 
 
 
+
+// 登录验证
+
+
 function login(){
 
 
 
 let user=
-document.getElementById("account").value;
 
 
-let pass=
-document.getElementById("password").value;
+document
+
+.getElementById("account")
+
+.value
+
+.trim();
 
 
 
-let result=
-accounts.find(item=>
+
+let check=
+
+
+accounts.find(
+
+item=>
 
 item.account===user
-&&
-item.password===pass
 
 );
 
 
 
 
-if(result){
+
+if(check){
 
 
-alert(
-"登录成功\n欢迎进入动车组调度系统"
+
+showNotice(
+
+"登录成功<br>正在进入系统"
+
 );
+
+
+
+
+setTimeout(()=>{
 
 
 /*
 
-下一阶段替换：
+正式版本：
 
-window.location.href="main.html";
-
-
-进入正式游戏
+location.href="main.html";
 
 
 */
+
+
+},1500);
 
 
 
@@ -806,13 +1316,64 @@ window.location.href="main.html";
 else{
 
 
-alert(
-"账号或密码错误"
+
+showNotice(
+
+"操作员编号错误<br>请重新输入"
+
 );
+
 
 
 }
 
+
+
+}
+
+
+
+
+
+
+
+
+// 游戏内弹窗
+
+
+function showNotice(message){
+
+
+
+let box=
+
+document.getElementById("notice");
+
+
+
+document
+
+.getElementById("noticeText")
+
+.innerHTML=
+
+message;
+
+
+
+box.style.display="flex";
+
+
+
+
+
+setTimeout(()=>{
+
+
+box.style.display="none";
+
+
+},2000);
 
 
 
@@ -824,6 +1385,8 @@ alert(
 </script>
 
 
+
 </body>
+
 
 </html>

@@ -40,7 +40,7 @@
         /* 轨道光效装饰线 */
         .track-line {
             position: absolute;
-            background: linear-gradient(90deg, transparent, rgba(0, 242, 254, 0.3), transparent);
+            background: linear-gradient(90deg, transparent, rgba(0, 242, 254, 0.2), transparent);
             height: 1px;
             width: 100%;
             z-index: 2;
@@ -66,15 +66,16 @@
             z-index: 10;
         }
 
-        /* 固态高光拟真玻璃 UI 核心样式 */
+        /* 固态高光拟真玻璃 UI 核心样式（已柔化高光线条，告别生硬感） */
         .glass-panel {
-            background: rgba(255, 255, 255, 0.05);
+            background: rgba(255, 255, 255, 0.04);
             backdrop-filter: blur(16px);
             -webkit-backdrop-filter: blur(16px);
-            border: 1px solid rgba(255, 255, 255, 0.12);
-            border-top: 1px solid rgba(255, 255, 255, 0.25); /* 顶部高光 */
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            /* 柔和的渐变顶部高光，模拟环境光反射 */
+            border-top: 1px solid rgba(255, 255, 255, 0.18); 
             box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4), 
-                        inset 0 1px 0 rgba(255, 255, 255, 0.2);
+                        inset 0 1px 2px rgba(255, 255, 255, 0.1);
             border-radius: 20px;
         }
 
@@ -90,7 +91,7 @@
             color: #00f2fe;
             text-transform: uppercase;
             margin-bottom: 8px;
-            text-shadow: 0 0 10px rgba(0, 242, 254, 0.5);
+            text-shadow: 0 0 10px rgba(0, 242, 254, 0.4);
         }
 
         .game-title {
@@ -116,9 +117,10 @@
         .status-item {
             display: flex;
             justify-content: space-between;
+            align-items: center;
             font-size: 0.9rem;
             color: #cbd5e1;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
             padding-bottom: 8px;
         }
 
@@ -126,6 +128,18 @@
             color: #38bdf8;
             font-family: monospace;
             font-weight: bold;
+        }
+
+        /* 可选择区段的点击触发样式 */
+        .selectable-area {
+            cursor: pointer;
+            color: #00f2fe;
+            text-decoration: underline;
+            text-underline-offset: 3px;
+            transition: opacity 0.2s;
+        }
+        .selectable-area:hover {
+            opacity: 0.8;
         }
 
         /* 底部：操作菜单与按钮区 */
@@ -143,8 +157,9 @@
             width: 100%;
             padding: 16px;
             border-radius: 14px;
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-top: 1px solid rgba(255, 255, 255, 0.2); /* 柔化按钮顶部高光 */
+            background: rgba(255, 255, 255, 0.06);
             color: #ffffff;
             font-size: 1.1rem;
             font-weight: 600;
@@ -154,11 +169,11 @@
             backdrop-filter: blur(10px);
             -webkit-backdrop-filter: blur(10px);
             box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2),
-                        inset 0 1px 0 rgba(255, 255, 255, 0.3);
+                        inset 0 1px 1px rgba(255, 255, 255, 0.15);
             overflow: hidden;
         }
 
-        /* 按钮高光扫过效果 */
+        /* 按钮光泽扫过效果（柔和化） */
         .glass-btn::after {
             content: '';
             position: absolute;
@@ -166,7 +181,7 @@
             left: -100%;
             width: 100%;
             height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
             transition: 0.5s;
         }
 
@@ -175,10 +190,10 @@
         }
 
         .glass-btn:hover {
-            background: rgba(255, 255, 255, 0.15);
-            border-color: rgba(0, 242, 254, 0.6);
-            box-shadow: 0 0 20px rgba(0, 242, 254, 0.3),
-                        inset 0 1px 0 rgba(255, 255, 255, 0.4);
+            background: rgba(255, 255, 255, 0.12);
+            border-color: rgba(0, 242, 254, 0.4);
+            box-shadow: 0 0 20px rgba(0, 242, 254, 0.2),
+                        inset 0 1px 2px rgba(255, 255, 255, 0.3);
             transform: translateY(-2px);
         }
 
@@ -187,11 +202,11 @@
         }
 
         .btn-primary {
-            background: linear-gradient(135deg, rgba(0, 242, 254, 0.2), rgba(79, 172, 254, 0.2));
-            border-color: rgba(0, 242, 254, 0.4);
+            background: linear-gradient(135deg, rgba(0, 242, 254, 0.15), rgba(79, 172, 254, 0.15));
+            border-color: rgba(0, 242, 254, 0.3);
         }
 
-        /* 作者与联系按钮栏 */
+        /* 作者与联系区 */
         .footer-info {
             width: 100%;
             max-width: 420px;
@@ -265,7 +280,7 @@
             font-size: 1.2rem;
             font-weight: 700;
             color: #00f2fe;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
             padding-bottom: 8px;
         }
 
@@ -278,10 +293,10 @@
 
         .modal-close-btn {
             margin-top: 8px;
-            padding: 10px;
+            padding: 12px;
             border-radius: 10px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            background: rgba(255, 255, 255, 0.08);
             color: #ffffff;
             font-weight: 600;
             cursor: pointer;
@@ -289,7 +304,27 @@
         }
 
         .modal-close-btn:hover {
-            background: rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        /* 选项列表按钮（用于区段选择） */
+        .option-item {
+            width: 100%;
+            padding: 12px 16px;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.05);
+            color: #e2e8f0;
+            font-size: 0.95rem;
+            text-align: left;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .option-item:hover {
+            background: rgba(0, 242, 254, 0.15);
+            border-color: rgba(0, 242, 254, 0.4);
+            color: #ffffff;
         }
     </style>
 </head>
@@ -314,15 +349,15 @@
         <div class="glass-panel center-display">
             <div class="status-item">
                 <span>系统状态</span>
-                <span class="status-value" id="sys-status">🟢 内部测试就绪</span>
+                <span class="status-value">🟢 测试终端就绪</span>
             </div>
             <div class="status-item">
-                <span>调度区段</span>
-                <span class="status-value" id="ip-dispatch-area">正在定位最近铁路线...</span>
+                <span>当前调度区段</span>
+                <span class="status-value selectable-area" id="current-dispatch-area" onclick="openAreaSelector()">京沪高铁 - 03号枢纽 (点击切换)</span>
             </div>
             <div class="status-item">
                 <span>当前版本</span>
-                <span class="status-value">内部测试版01</span>
+                <span class="status-value">内部版本02</span>
             </div>
         </div>
 
@@ -345,57 +380,28 @@
         <div class="modal-box glass-panel" onclick="event.stopPropagation()">
             <div class="modal-title" id="modal-title">提示</div>
             <div class="modal-body" id="modal-content">弹窗内容...</div>
-            <button class="modal-close-btn" onclick="closeModalDirect()">确定</button>
+            <div id="modal-actions">
+                <button class="modal-close-btn" style="width:100%;" onclick="closeModalDirect()" id="modal-btn-text">确定</button>
+            </div>
         </div>
     </div>
 
     <script>
-        // 1. IP 智能匹配铁路线逻辑
-        async function initIPDispatcher() {
-            const areaEl = document.getElementById('ip-dispatch-area');
-            try {
-                // 调用免费 IP 地理位置接口获取用户所在城市/省份
-                const response = await fetch('https://ipapi.co/json/');
-                if (!response.ok) throw new Error('Network error');
-                const data = await response.json();
-                
-                const city = data.city || '';
-                const region = data.region || '';
-                const country = data.country_name || '';
+        // 当前选择的调度区段
+        let selectedArea = "京沪高铁 - 03号枢纽";
 
-                // 根据地理位置智能匹配最近铁路/高铁干线
-                let matchedArea = "京沪高铁 - 华东调度枢纽"; // 默认回退
-                
-                if (country !== 'China' && country !== 'CN') {
-                    matchedArea = "国际联运线 - 边境调度中心";
-                } else if (region.includes('广东') || region.includes('深圳') || region.includes('广州') || city.includes('广州') || city.includes('深圳')) {
-                    matchedArea = "京广/广深港高铁 - 华南枢纽";
-                } else if (region.includes('四川') || region.includes('重庆') || city.includes('成都') || city.includes('重庆')) {
-                    matchedArea = "成渝客专 - 西南调度中心";
-                } else if (region.includes('浙江') || region.includes('江苏') || region.includes('上海') || city.includes('上海') || city.includes('杭州')) {
-                    matchedArea = "沪昆/京沪线 - 长三角枢纽";
-                } else if (region.includes('陕西') || region.includes('甘肃') || region.includes('西安')) {
-                    matchedArea = "徐兰客专 - 西北调度中心";
-                } else if (region.includes('湖北') || city.includes('武汉')) {
-                    matchedArea = "京广高铁 - 武汉核心枢纽";
-                } else if (region.includes('北京') || region.includes('天津') || region.includes('河北')) {
-                    matchedArea = "京津冀城际 - 北京调度中心";
-                }
-
-                areaEl.innerText = matchedArea;
-            } catch (e) {
-                // 如果定位失败（如无网络或受防火墙限制），显示默认调度区段
-                areaEl.innerText = "京沪高铁 - 03号核心枢纽";
-            }
-        }
-
-        // 初始化时运行 IP 定位
-        initIPDispatcher();
-
-        // 2. 弹窗控制函数
-        function showModal(title, content) {
+        // 弹窗控制函数
+        function showModal(title, content, customActionsHTML = null) {
             document.getElementById('modal-title').innerText = title;
             document.getElementById('modal-content').innerHTML = content;
+            
+            const actionsContainer = document.getElementById('modal-actions');
+            if (customActionsHTML) {
+                actionsContainer.innerHTML = customActionsHTML;
+            } else {
+                actionsContainer.innerHTML = `<button class="modal-close-btn" style="width:100%;" onclick="closeModalDirect()">确定</button>`;
+            }
+
             document.getElementById('modal-overlay').classList.add('active');
         }
 
@@ -409,23 +415,48 @@
             }
         }
 
-        // 3. 按钮交互响应
+        // 1. 玩家自定义选择调度区段功能
+        function openAreaSelector() {
+            const areas = [
+                "京沪高铁 - 华东调度枢纽",
+                "京广高铁 - 武汉核心枢纽",
+                "沪昆高铁 - 东南调度中心",
+                "成渝客专 - 西南调度中心",
+                "徐兰客专 - 西北调度中心",
+                "京津冀城际 - 北京调度中心"
+            ];
+
+            let html = '<div style="display:flex; flex-direction:column; gap:8px; max-height:240px; overflow-y:auto;">';
+            areas.forEach(area => {
+                html += `<button class="option-item" onclick="selectArea('${area}')">${area}</button>`;
+            });
+            html += '</div>';
+
+            showModal("选择调度区段", "请选择您要接管的高铁干线调度枢纽：", html);
+        }
+
+        function selectArea(areaName) {
+            selectedArea = areaName;
+            document.getElementById('current-dispatch-area').innerText = areaName + " (点击切换)";
+            closeModalDirect();
+        }
+
+        // 2. 按钮交互响应
         function startGame() {
-            showModal("提示", "【开始接车】核心玩法正在加紧开发中，请期待后续版本更新！");
+            showModal("提示", `当前区段【${selectedArea}】接车程序正在紧急筹备中，核心玩法将在后续版本开放！`);
         }
 
         function openUpdates() {
-            showModal("更新日志 (内部测试版01)", 
-                "• <b>版本号</b>：更新为内部测试版01。<br>" +
-                "• <b>IP智能调度</b>：已接入基于IP地址的铁路干线自动适配。<br>" +
-                "• <b>UI升级</b>：将所有弹窗全面改写为游戏内拟真玻璃模态框。<br>" +
-                "• <b>版权归属</b>：标明 Lux作者制作与联系通道。"
+            showModal("更新日志 (内部版本02)", 
+                "• <b>版本升级</b>：正式更名为内部版本02。<br>" +
+                "• <b>视觉优化</b>：全面柔化高光线条，改用细腻自然的拟真玻璃光泽，告别生硬感。<br>" +
+                "• <b>自由调度</b>：新增调度区段自由选择功能，玩家可自主切换心仪的高铁干线。"
             );
         }
 
         function openContact() {
             showModal("联系作者", 
-                "如果您在测试过程中遇到任何问题或Bug，欢迎通过QQ邮箱与我联系：<br><br>" +
+                "如果您在测试过程中遇到任何Bug或有好的建议，欢迎通过QQ邮箱与我联系：<br><br>" +
                 "<b style='color:#00f2fe; font-size:1.05rem;'>2210380754@qq.com</b><br><br>" +
                 "<span style='color:#f87171; font-size:0.85rem;'>⚠️ 反馈请备注游戏反馈</span>"
             );

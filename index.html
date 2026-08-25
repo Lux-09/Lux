@@ -3,131 +3,135 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>反导小工厂 2.0：终极防御阵线</title>
+    <title>反导小工厂 3.0：钢铁天穹</title>
     <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Roboto, monospace; user-select: none; }
-        body { background: #0b0f19; color: #e2e8f0; height: 100vh; overflow: hidden; display: flex; flex-direction: column; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, monospace; user-select: none; }
+        body { background: #090d16; color: #e2e8f0; height: 100vh; overflow: hidden; display: flex; flex-direction: column; }
         
         /* 顶栏 HUD */
         header {
-            height: 54px; background: #111827; border-bottom: 2px solid #1e293b; display: flex;
+            height: 54px; background: #0f172a; border-bottom: 2px solid #1e293b; display: flex;
             align-items: center; justify-content: space-between; padding: 0 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.5);
         }
-        .logo { font-size: 1.3rem; font-weight: 900; color: #38bdf8; letter-spacing: 2px; text-shadow: 0 0 10px rgba(56,189,248,0.5); }
-        .hud-stats { display: flex; gap: 24px; font-weight: bold; font-size: 0.95rem; }
-        .stat-item { display: flex; align-items: center; gap: 8px; }
-        .stat-val { color: #f59e0b; font-size: 1.1rem; }
+        .logo { font-size: 1.2rem; font-weight: 900; color: #38bdf8; letter-spacing: 2px; }
+        .hud-stats { display: flex; gap: 20px; font-weight: bold; font-size: 0.9rem; }
+        .stat-val { color: #f59e0b; font-size: 1.05rem; }
         
-        /* 游戏主体 */
+        /* 主布局 */
         .game-layout { flex: 1; display: flex; height: calc(100vh - 54px); }
         
-        /* 左侧面板：科技与武器升级 */
-        .panel-left { width: 300px; background: #0f172a; border-right: 1px solid #1e293b; padding: 16px; display: flex; flex-direction: column; gap: 14px; overflow-y: auto; }
-        .panel-title { font-size: 0.85rem; text-transform: uppercase; color: #64748b; font-weight: 800; letter-spacing: 1px; border-bottom: 1px solid #334155; padding-bottom: 4px; }
+        /* 左侧面板 */
+        .panel-left { width: 280px; background: #0b1120; border-right: 1px solid #1e293b; padding: 14px; display: flex; flex-direction: column; gap: 12px; overflow-y: auto; }
+        .panel-title { font-size: 0.8rem; text-transform: uppercase; color: #64748b; font-weight: 800; border-bottom: 1px solid #1e293b; padding-bottom: 4px; }
         
-        .card { background: #1e293b; border: 1px solid #334155; border-radius: 8px; padding: 12px; transition: all 0.2s; }
+        .card { background: #1e293b; border: 1px solid #334155; border-radius: 6px; padding: 10px; transition: all 0.2s; }
         .card:hover { border-color: #38bdf8; }
-        .card-header { display: flex; justify-content: space-between; font-size: 0.9rem; font-weight: bold; margin-bottom: 6px; }
-        .card-desc { font-size: 0.75rem; color: #94a3b8; margin-bottom: 8px; line-height: 1.3; }
-        .btn-up { width: 100%; background: #0284c7; color: white; border: none; padding: 6px 12px; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 0.8rem; }
+        .card-header { display: flex; justify-content: space-between; font-size: 0.85rem; font-weight: bold; margin-bottom: 4px; }
+        .card-desc { font-size: 0.72rem; color: #94a3b8; margin-bottom: 6px; line-height: 1.3; }
+        .btn-up { width: 100%; background: #0284c7; color: white; border: none; padding: 6px; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 0.8rem; }
         .btn-up:hover { background: #0369a1; }
         .btn-up:disabled { background: #334155; color: #64748b; cursor: not-allowed; }
 
         /* 中间 Canvas 战场 */
-        .viewport { flex: 1; position: relative; background: #020617; }
+        .viewport { flex: 1; position: relative; background: #030712; cursor: crosshair; }
         canvas { width: 100%; height: 100%; display: block; }
-        .canvas-overlay { position: absolute; top: 16px; left: 50%; transform: translateX(-50%); text-align: center; pointer-events: none; }
-        .wave-banner { font-size: 1.5rem; font-weight: 900; color: #f43f5e; text-shadow: 0 0 12px rgba(244,63,94,0.6); }
+        .canvas-overlay { position: absolute; top: 12px; left: 50%; transform: translateX(-50%); text-align: center; pointer-events: none; }
+        .wave-banner { font-size: 1.4rem; font-weight: 900; color: #ef4444; text-shadow: 0 0 10px rgba(239,68,68,0.6); transition: opacity 0.5s; }
 
-        /* 右侧面板：战术大招与日志 */
-        .panel-right { width: 260px; background: #0f172a; border-left: 1px solid #1e293b; padding: 16px; display: flex; flex-direction: column; gap: 14px; }
-        .btn-tactic { width: 100%; background: #854d0e; color: #fef08a; border: 1px solid #ca8a04; padding: 10px; border-radius: 6px; font-weight: bold; cursor: pointer; text-align: left; font-size: 0.85rem; }
+        /* 右侧面板 */
+        .panel-right { width: 240px; background: #0b1120; border-left: 1px solid #1e293b; padding: 14px; display: flex; flex-direction: column; gap: 12px; }
+        .btn-tactic { width: 100%; background: #854d0e; color: #fef08a; border: 1px solid #ca8a04; padding: 8px; border-radius: 6px; font-weight: bold; cursor: pointer; text-align: left; font-size: 0.8rem; }
         .btn-tactic:hover { background: #a16207; }
         .btn-tactic:disabled { opacity: 0.4; cursor: not-allowed; }
-        .log-box { flex: 1; background: #020617; border: 1px solid #1e293b; border-radius: 6px; padding: 10px; font-size: 0.75rem; color: #94a3b8; overflow-y: auto; font-family: monospace; display: flex; flex-direction: column; gap: 6px; }
+        .log-box { flex: 1; background: #030712; border: 1px solid #1e293b; border-radius: 6px; padding: 8px; font-size: 0.72rem; color: #94a3b8; overflow-y: auto; font-family: monospace; display: flex; flex-direction: column; gap: 4px; }
 
-        /* 统一结算遮罩 */
-        .overlay-modal { position: absolute; inset: 0; background: rgba(2,6,23,0.85); display: flex; justify-content: center; align-items: center; z-index: 100; backdrop-filter: blur(4px); }
-        .modal-card { background: #0f172a; border: 2px solid #38bdf8; padding: 32px; border-radius: 12px; max-width: 450px; text-align: center; box-shadow: 0 0 30px rgba(56,189,248,0.3); }
-        .btn-primary { background: #10b981; color: white; border: none; padding: 12px 32px; font-weight: bold; font-size: 1rem; border-radius: 6px; cursor: pointer; margin-top: 16px; }
+        /* 弹窗遮罩 */
+        .overlay-modal { position: absolute; inset: 0; background: rgba(3,7,18,0.85); display: flex; justify-content: center; align-items: center; z-index: 100; backdrop-filter: blur(4px); }
+        .modal-card { background: #0f172a; border: 2px solid #38bdf8; padding: 28px; border-radius: 12px; max-width: 420px; text-align: center; box-shadow: 0 0 25px rgba(56,189,248,0.3); }
+        .btn-primary { background: #10b981; color: white; border: none; padding: 10px 28px; font-weight: bold; font-size: 0.95rem; border-radius: 6px; cursor: pointer; margin-top: 14px; }
         .btn-primary:hover { background: #059669; }
     </style>
 </head>
 <body>
 
     <header>
-        <div class="logo">⚡ 反导小工厂 2.0</div>
+        <div class="logo">🛡️ 反导小工厂 3.0：钢铁天穹</div>
         <div class="hud-stats">
-            <div class="stat-item">资金: <span class="stat-val" id="hud-gold">$100</span></div>
-            <div class="stat-item">波次: <span class="stat-val" id="hud-wave">1/10</span></div>
-            <div class="stat-item">城市耐久: <span class="stat-val" id="hud-hp" style="color:#10b981">100%</span></div>
+            <div>资金: <span class="stat-val" id="hud-gold">$100</span></div>
+            <div>波次: <span class="stat-val" id="hud-wave">1/10</span></div>
+            <div>城市防护: <span class="stat-val" id="hud-hp" style="color:#10b981">100%</span></div>
         </div>
     </header>
 
     <div class="game-layout">
         <!-- 左侧科技与炮台 -->
         <div class="panel-left">
-            <div class="panel-title">经济与设施</div>
+            <div class="panel-title">基地设施</div>
             <div class="card">
-                <div class="card-header"><span>印钞机工厂</span><span id="lvl-factory">Lv.1</span></div>
-                <div class="card-desc">自动产出资金 (当前 +$2/秒)</div>
-                <button class="btn-up" id="btn-up-factory" onclick="upgrade('factory')">升级 ($50)</button>
+                <div class="card-header"><span>军工工厂</span><span id="lvl-factory">Lv.1</span></div>
+                <div class="card-desc">自动产钱 (+Math.floor(Lv*3.5)/秒)</div>
+                <button class="btn-up" id="btn-up-factory" onclick="upgrade('factory')">升级 ($40)</button>
             </div>
 
-            <div class="panel-title">防御阵线 (自动开火)</div>
+            <div class="panel-title">自动防空系统</div>
             <div class="card">
                 <div class="card-header"><span>近防炮 (CIWS)</span><span id="lvl-ciws">Lv.1</span></div>
-                <div class="card-desc">射速极快，近程拦截小型导弹</div>
-                <button class="btn-up" id="btn-up-ciws" onclick="upgrade('ciws')">升级 ($40)</button>
+                <div class="card-desc">高频扫射近程导弹</div>
+                <button class="btn-up" id="btn-up-ciws" onclick="upgrade('ciws')">升级 ($35)</button>
             </div>
             <div class="card">
-                <div class="card-header"><span>防空导弹 (SAM)</span><span id="lvl-sam">Lv.1</span></div>
-                <div class="card-desc">远程追踪，造成范围爆炸损伤</div>
-                <button class="btn-up" id="btn-up-sam" onclick="upgrade('sam')">升级 ($60)</button>
+                <div class="card-header"><span>防空阵地 (SAM)</span><span id="lvl-sam">Lv.1</span></div>
+                <div class="card-desc">远程追踪并产生爆炸</div>
+                <button class="btn-up" id="btn-up-sam" onclick="upgrade('sam')">升级 ($50)</button>
             </div>
             <div class="card">
-                <div class="card-header"><span>战术激光炮</span><span id="lvl-laser">Lv.0</span></div>
-                <div class="card-desc">瞬时光束，对高压超音速目标特效</div>
-                <button class="btn-up" id="btn-up-laser" onclick="upgrade('laser')">解锁 ($100)</button>
+                <div class="card-header"><span>激光截击器</span><span id="lvl-laser">Lv.0</span></div>
+                <div class="card-desc">瞬间熔毁高速及高血量目标</div>
+                <button class="btn-up" id="btn-up-laser" onclick="upgrade('laser')">解锁 ($90)</button>
+            </div>
+            <div style="font-size:0.72rem; color:#64748b; line-height:1.4; margin-top:4px;">
+                💡 <b>手动提示：</b> 在战场画布上<b>点击鼠标</b>可直接发射手动拦截弹（每次 $3）。
             </div>
         </div>
 
         <!-- 中间战场 Canvas -->
-        <div class="viewport">
+        <div class="viewport" id="viewport">
             <div class="canvas-overlay">
-                <div class="wave-banner" id="wave-banner">准备发动防守</div>
+                <div class="wave-banner" id="wave-banner">准备部署防线</div>
             </div>
             <canvas id="canvas"></canvas>
 
-            <!-- 游戏开始/结束 遮罩 -->
             <div class="overlay-modal" id="start-modal">
                 <div class="modal-card">
-                    <h2 style="color:#38bdf8; margin-bottom:12px; font-size:1.8rem;">战术防空指挥中心</h2>
-                    <p style="color:#94a3b8; font-size:0.9rem; line-height:1.6; margin-bottom:20px;">
-                        敌方导弹即将来袭！建造并升级近防炮、地空导弹与战术激光，抵御包括<b>分导弹头</b>与<b>超音速导弹</b>在内的攻击。<br>保卫城市基础设施！
+                    <h2 style="color:#38bdf8; margin-bottom:10px; font-size:1.6rem;">防空战术指挥部</h2>
+                    <p style="color:#94a3b8; font-size:0.85rem; line-height:1.6; margin-bottom:16px;">
+                        敌方导弹部队即将发起高强度饱和攻击！<br>
+                        • 底部显示真实的<b>城市天际线</b>。<br>
+                        • 点击屏幕可<b>手动发射拦截弹</b>（$3/发），配合自动炮台防守。<br>
+                        • 谨慎应对分导弹头与超音速重型 ICBM。
                     </p>
-                    <button class="btn-primary" onclick="initGame()">启动全自动防空系统</button>
+                    <button class="btn-primary" onclick="initGame()">启动全面防守</button>
                 </div>
             </div>
         </div>
 
-        <!-- 右侧大招与系统日志 -->
+        <!-- 右侧战术与日志 -->
         <div class="panel-right">
-            <div class="panel-title">战术应急指令</div>
-            <button class="btn-tactic" id="btn-repair" onclick="useTactic('repair')">🛠️ 紧急修补城市 ($60)</button>
-            <button class="btn-tactic" id="btn-emp" onclick="useTactic('emp')">⚡ 全域 EMP 脉冲 ($120)</button>
-            <button class="btn-tactic" id="btn-shield" onclick="useTactic('shield')">🛡️ 铁穹立场 (5秒无敌) ($150)</button>
+            <div class="panel-title">战术大招</div>
+            <button class="btn-tactic" id="btn-repair" onclick="useTactic('repair')">🛠️ 紧急修补城市 ($50)</button>
+            <button class="btn-tactic" id="btn-emp" onclick="useTactic('emp')">⚡ 全域 EMP 清场 ($100)</button>
+            <button class="btn-tactic" id="btn-shield" onclick="useTactic('shield')">🛡️ 铁穹护罩 (5秒) ($130)</button>
 
-            <div class="panel-title" style="margin-top:10px;">战术日志</div>
+            <div class="panel-title" style="margin-top:8px;">实时日志</div>
             <div class="log-box" id="log-box"></div>
         </div>
     </div>
 
     <script>
-        // Web Audio 音效引擎
+        // 音效引擎
         const AudioContext = window.AudioContext || window.webkitAudioContext;
         let audioCtx;
-        function playTone(freq, type, duration, vol=0.1) {
+        function playTone(freq, type, duration, vol=0.08) {
             if (!audioCtx) audioCtx = new AudioContext();
             try {
                 const osc = audioCtx.createOscillator();
@@ -135,7 +139,7 @@
                 osc.type = type;
                 osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
                 gain.gain.setValueAtTime(vol, audioCtx.currentTime);
-                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + duration);
+                gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
                 osc.connect(gain);
                 gain.connect(audioCtx.destination);
                 osc.start();
@@ -143,12 +147,6 @@
             } catch(e){}
         }
 
-        function playExplosionSFX() {
-            playTone(120, 'sawtooth', 0.3, 0.2);
-            playTone(60, 'square', 0.4, 0.3);
-        }
-
-        // 游戏全局状态
         const state = {
             gold: 100,
             cityHp: 100,
@@ -165,15 +163,38 @@
             projectiles: [],
             particles: [],
             lasers: [],
+            buildings: [],
             lastTime: performance.now()
         };
 
         const canvas = document.getElementById('canvas');
         const ctx = canvas.getContext('2d');
 
+        function generateCitySkyline() {
+            state.buildings = [];
+            const width = canvas.width || 800;
+            let curX = 10;
+            while (curX < width - 10) {
+                const bWidth = 24 + Math.random() * 32;
+                const bHeight = 40 + Math.random() * 70;
+                // 窗口布局
+                const windows = [];
+                for (let wx = 6; wx < bWidth - 8; wx += 8) {
+                    for (let wy = 8; wy < bHeight - 10; wy += 12) {
+                        if (Math.random() > 0.3) {
+                            windows.push({ x: wx, y: wy, color: Math.random() > 0.4 ? '#fde047' : '#38bdf8' });
+                        }
+                    }
+                }
+                state.buildings.push({ x: curX, w: bWidth, h: bHeight, windows });
+                curX += bWidth + 6 + Math.random() * 8;
+            }
+        }
+
         function resize() {
             canvas.width = canvas.parentElement.clientWidth;
             canvas.height = canvas.parentElement.clientHeight;
+            generateCitySkyline();
         }
         window.addEventListener('resize', resize);
 
@@ -197,96 +218,121 @@
             document.getElementById('lvl-sam').innerText = `Lv.${state.samLvl}`;
             document.getElementById('lvl-laser').innerText = state.laserLvl > 0 ? `Lv.${state.laserLvl}` : '未解锁';
 
-            document.getElementById('btn-up-factory').innerText = `升级 ($${state.factoryLvl * 50})`;
-            document.getElementById('btn-up-factory').disabled = state.gold < state.factoryLvl * 50;
+            document.getElementById('btn-up-factory').innerText = `升级 ($${state.factoryLvl * 40})`;
+            document.getElementById('btn-up-factory').disabled = state.gold < state.factoryLvl * 40;
 
-            document.getElementById('btn-up-ciws').innerText = `升级 ($${state.ciwsLvl * 40})`;
-            document.getElementById('btn-up-ciws').disabled = state.gold < state.ciwsLvl * 40;
+            document.getElementById('btn-up-ciws').innerText = `升级 ($${state.ciwsLvl * 35})`;
+            document.getElementById('btn-up-ciws').disabled = state.gold < state.ciwsLvl * 35;
 
-            document.getElementById('btn-up-sam').innerText = `升级 ($${state.samLvl * 60})`;
-            document.getElementById('btn-up-sam').disabled = state.gold < state.samLvl * 60;
+            document.getElementById('btn-up-sam').innerText = `升级 ($${state.samLvl * 50})`;
+            document.getElementById('btn-up-sam').disabled = state.gold < state.samLvl * 50;
 
-            const laserCost = state.laserLvl === 0 ? 100 : state.laserLvl * 80;
-            document.getElementById('btn-up-laser').innerText = state.laserLvl === 0 ? `解锁 ($100)` : `升级 ($${laserCost})`;
+            const laserCost = state.laserLvl === 0 ? 90 : state.laserLvl * 75;
+            document.getElementById('btn-up-laser').innerText = state.laserLvl === 0 ? `解锁 ($90)` : `升级 ($${laserCost})`;
             document.getElementById('btn-up-laser').disabled = state.gold < laserCost;
 
-            document.getElementById('btn-repair').disabled = state.gold < 60 || state.cityHp >= 100;
-            document.getElementById('btn-emp').disabled = state.gold < 120 || state.enemies.length === 0;
-            document.getElementById('btn-shield').disabled = state.gold < 150 || state.shieldActive;
+            document.getElementById('btn-repair').disabled = state.gold < 50 || state.cityHp >= 100;
+            document.getElementById('btn-emp').disabled = state.gold < 100 || state.enemies.length === 0;
+            document.getElementById('btn-shield').disabled = state.gold < 130 || state.shieldActive;
         }
 
         function upgrade(type) {
-            if (type === 'factory' && state.gold >= state.factoryLvl * 50) {
-                state.gold -= state.factoryLvl * 50;
+            if (type === 'factory' && state.gold >= state.factoryLvl * 40) {
+                state.gold -= state.factoryLvl * 40;
                 state.factoryLvl++;
                 playTone(440, 'sine', 0.15);
                 log(`印钞工厂升级至 Lv.${state.factoryLvl}`);
-            } else if (type === 'ciws' && state.gold >= state.ciwsLvl * 40) {
-                state.gold -= state.ciwsLvl * 40;
+            } else if (type === 'ciws' && state.gold >= state.ciwsLvl * 35) {
+                state.gold -= state.ciwsLvl * 35;
                 state.ciwsLvl++;
                 playTone(520, 'sine', 0.15);
-                log(`近防炮射速与伤害升级！`);
-            } else if (type === 'sam' && state.gold >= state.samLvl * 60) {
-                state.gold -= state.samLvl * 60;
+                log(`近防炮射速提高！`);
+            } else if (type === 'sam' && state.gold >= state.samLvl * 50) {
+                state.gold -= state.samLvl * 50;
                 state.samLvl++;
                 playTone(600, 'sine', 0.15);
-                log(`防空导弹覆盖范围提升！`);
+                log(`SAM 防空导弹威力提升！`);
             } else if (type === 'laser') {
-                const cost = state.laserLvl === 0 ? 100 : state.laserLvl * 80;
+                const cost = state.laserLvl === 0 ? 90 : state.laserLvl * 75;
                 if (state.gold >= cost) {
                     state.gold -= cost;
                     state.laserLvl++;
                     playTone(800, 'triangle', 0.2);
-                    log(`战术激光炮升级完成！`);
+                    log(`战术激光炮升级！`);
                 }
             }
             updateUI();
         }
 
         function useTactic(type) {
-            if (type === 'repair' && state.gold >= 60) {
-                state.gold -= 60;
-                state.cityHp = Math.min(100, state.cityHp + 35);
+            if (type === 'repair' && state.gold >= 50) {
+                state.gold -= 50;
+                state.cityHp = Math.min(100, state.cityHp + 30);
                 playTone(300, 'sine', 0.3);
-                log(`加固维修！城市耐久增加 35%`);
-            } else if (type === 'emp' && state.gold >= 120) {
-                state.gold -= 120;
-                playTone(150, 'sawtooth', 0.6, 0.4);
+                log(`紧急修补！城市耐久 +30%`);
+            } else if (type === 'emp' && state.gold >= 100) {
+                state.gold -= 100;
+                playTone(150, 'sawtooth', 0.5, 0.3);
                 state.enemies.forEach(e => {
-                    e.hp -= 40;
+                    e.hp -= 50;
                     createExplosion(e.x, e.y, '#38bdf8', 15);
                 });
-                log(`⚡ 释放全域电磁脉冲，重创所有入境敌弹！`);
-            } else if (type === 'shield' && state.gold >= 150) {
-                state.gold -= 150;
+                log(`⚡ 释放 EMP 脉冲，全场导弹受创！`);
+            } else if (type === 'shield' && state.gold >= 130) {
+                state.gold -= 130;
                 state.shieldActive = true;
                 state.shieldTimer = 5;
                 playTone(700, 'sine', 0.4);
-                log(`🛡️ 铁穹力场启动，5秒内免受伤害！`);
+                log(`🛡️ 铁穹护照启动，5秒免伤！`);
             }
             updateUI();
         }
 
+        // 手动点击发射拦截弹
+        document.getElementById('viewport').addEventListener('click', (evt) => {
+            if (!state.inWave || state.gold < 3) return;
+            const rect = canvas.getBoundingClientRect();
+            const clickX = evt.clientX - rect.left;
+            const clickY = evt.clientY - rect.top;
+
+            if (clickY > canvas.height - 40) return; // 不在地面点击
+
+            state.gold -= 3;
+            playTone(400, 'sawtooth', 0.1, 0.05);
+            
+            // 从基站发射手动弹
+            state.projectiles.push({
+                x: canvas.width / 2,
+                y: canvas.height - 35,
+                targetX: clickX,
+                targetY: clickY,
+                isManual: true,
+                speed: 7,
+                damage: 35
+            });
+            updateUI();
+        });
+
         function initGame() {
             document.getElementById('start-modal').style.display = 'none';
             resize();
-            log(`防御系统上线。迎接第 1 波次挑战。`);
+            log(`系统就绪。准备防御第 1 波次。`);
             startNextWave();
             requestAnimationFrame(gameLoop);
         }
 
         function startNextWave() {
             state.inWave = true;
-            document.getElementById('wave-banner').innerText = `⚠️ 第 ${state.wave} 波次敌人来袭！`;
+            document.getElementById('wave-banner').innerText = `⚠️ 第 ${state.wave} 波导弹来袭！`;
             document.getElementById('wave-banner').style.opacity = 1;
             setTimeout(() => document.getElementById('wave-banner').style.opacity = 0, 2500);
 
-            // 产生导弹列表
-            const count = 4 + state.wave * 3;
+            // 难度随波次递增
+            const count = 5 + state.wave * 4;
             for (let i = 0; i < count; i++) {
                 setTimeout(() => {
-                    if (state.cityHp > 0) spawnEnemy();
-                }, i * (2200 - Math.min(1500, state.wave * 120)));
+                    if (state.cityHp > 0 && state.inWave) spawnEnemy();
+                }, i * Math.max(400, (1800 - state.wave * 140)));
             }
         }
 
@@ -294,60 +340,71 @@
             const types = ['normal'];
             if (state.wave >= 2) types.push('fast');
             if (state.wave >= 3) types.push('cluster');
+            if (state.wave >= 4) types.push('stealth');
             if (state.wave >= 5) types.push('icbm');
 
             const type = types[Math.floor(Math.random() * types.length)];
-            const startX = Math.random() * (canvas.width - 100) + 50;
-            const targetX = Math.random() * (canvas.width - 200) + 100;
+            const startX = Math.random() * (canvas.width - 80) + 40;
+            const targetX = Math.random() * (canvas.width - 120) + 60;
+            const targetY = canvas.height - 30;
 
-            let enemy = {
+            let speed = (1.5 + Math.random() * 0.6) * (1 + state.wave * 0.08);
+            let hp = 15 + state.wave * 3;
+            let color = '#ef4444';
+            let radius = 4;
+
+            if (type === 'fast') {
+                speed *= 1.8;
+                color = '#f59e0b';
+                hp = 12;
+            } else if (type === 'cluster') {
+                color = '#a855f7';
+                hp = 30;
+            } else if (type === 'stealth') {
+                speed *= 1.2;
+                color = '#64748b'; // 暗灰色
+                hp = 18;
+            } else if (type === 'icbm') {
+                speed *= 0.6;
+                color = '#dc2626';
+                radius = 8;
+                hp = 70 + state.wave * 10;
+            }
+
+            // 安全求角度与速度向量，避免 NaN 导致消失 Bug
+            const angle = Math.atan2(targetY - (-10), targetX - startX);
+
+            state.enemies.push({
                 x: startX,
                 y: -10,
                 targetX: targetX,
-                targetY: canvas.height - 30,
-                speed: 1.2 + Math.random() * 0.5,
-                hp: 15,
-                maxHp: 15,
+                targetY: targetY,
+                vx: Math.cos(angle) * speed,
+                vy: Math.sin(angle) * speed,
+                hp: hp,
+                maxHp: hp,
                 type: type,
-                color: '#ef4444',
-                radius: 4,
+                color: color,
+                radius: radius,
                 split: false
-            };
-
-            if (type === 'fast') {
-                enemy.speed *= 2.0;
-                enemy.color = '#f59e0b';
-                enemy.hp = 10;
-            } else if (type === 'cluster') {
-                enemy.color = '#a855f7';
-                enemy.hp = 25;
-            } else if (type === 'icbm') {
-                enemy.speed *= 0.6;
-                enemy.color = '#dc2626';
-                enemy.radius = 8;
-                enemy.hp = 80;
-                enemy.maxHp = 80;
-            }
-
-            state.enemies.push(enemy);
+            });
         }
 
-        function createExplosion(x, y, color, count=10) {
-            playExplosionSFX();
+        function createExplosion(x, y, color, count=12) {
+            playTone(100, 'sawtooth', 0.2, 0.15);
             for (let i = 0; i < count; i++) {
                 const angle = Math.random() * Math.PI * 2;
-                const spd = Math.random() * 3 + 1;
+                const spd = Math.random() * 3.5 + 0.5;
                 state.particles.push({
                     x, y,
                     vx: Math.cos(angle) * spd,
                     vy: Math.sin(angle) * spd,
-                    life: 1,
+                    life: 1.0,
                     color: color
                 });
             }
         }
 
-        // 炮台自动攻击逻辑
         let ciwsCooldown = 0;
         let samCooldown = 0;
         let laserCooldown = 0;
@@ -355,57 +412,56 @@
         function updateTurrets(dt) {
             if (state.enemies.length === 0) return;
 
-            // 1. CIWS 自动扫射最接近地面的敌弹
+            // 1. CIWS 扫射
             ciwsCooldown -= dt;
             if (ciwsCooldown <= 0 && state.ciwsLvl > 0) {
-                const target = state.enemies.reduce((prev, curr) => (curr.y > prev.y ? curr : prev), state.enemies[0]);
-                if (target && target.y > canvas.height * 0.3) {
-                    target.hp -= 4 + state.ciwsLvl * 2;
-                    playTone(800, 'square', 0.04, 0.05);
-                    state.particles.push({ x: target.x, y: target.y, vx: 0, vy: 0, life: 0.2, color: '#fde047' });
-                    ciwsCooldown = Math.max(0.08, 0.4 - state.ciwsLvl * 0.05);
+                const target = state.enemies.find(e => e.y > canvas.height * 0.35);
+                if (target) {
+                    target.hp -= 5 + state.ciwsLvl * 3;
+                    playTone(900, 'square', 0.03, 0.04);
+                    state.particles.push({ x: target.x, y: target.y, vx: 0, vy: 0, life: 0.15, color: '#fde047' });
+                    ciwsCooldown = Math.max(0.06, 0.35 - state.ciwsLvl * 0.04);
                 }
             }
 
-            // 2. SAM 自动发射范围追踪导弹
+            // 2. SAM 防空导弹
             samCooldown -= dt;
             if (samCooldown <= 0 && state.samLvl > 0) {
                 const target = state.enemies[Math.floor(Math.random() * state.enemies.length)];
                 if (target) {
                     state.projectiles.push({
-                        x: 100,
-                        y: canvas.height - 40,
+                        x: 80,
+                        y: canvas.height - 35,
                         target: target,
-                        speed: 4 + state.samLvl,
-                        damage: 25 + state.samLvl * 10
+                        speed: 5 + state.samLvl * 0.5,
+                        damage: 30 + state.samLvl * 12
                     });
-                    playTone(300, 'sawtooth', 0.1, 0.1);
-                    samCooldown = Math.max(0.8, 2.5 - state.samLvl * 0.3);
+                    playTone(350, 'sawtooth', 0.08, 0.08);
+                    samCooldown = Math.max(0.6, 2.2 - state.samLvl * 0.25);
                 }
             }
 
-            // 3. 激光炮持续高额输出
+            // 3. 激光炮
             laserCooldown -= dt;
             if (laserCooldown <= 0 && state.laserLvl > 0) {
-                const target = state.enemies.find(e => e.type === 'fast' || e.type === 'icbm') || state.enemies[0];
+                const target = state.enemies.find(e => e.type === 'icbm' || e.type === 'fast') || state.enemies[0];
                 if (target) {
-                    target.hp -= 15 + state.laserLvl * 12;
-                    state.lasers.push({ x1: canvas.width - 100, y1: canvas.height - 40, x2: target.x, y2: target.y, life: 0.15 });
-                    playTone(1200, 'sine', 0.1, 0.08);
-                    laserCooldown = 1.2 - Math.min(0.6, state.laserLvl * 0.1);
+                    target.hp -= 20 + state.laserLvl * 15;
+                    state.lasers.push({ x1: canvas.width - 80, y1: canvas.height - 35, x2: target.x, y2: target.y, life: 0.12 });
+                    playTone(1100, 'sine', 0.08, 0.06);
+                    laserCooldown = 1.1 - Math.min(0.5, state.laserLvl * 0.08);
                 }
             }
         }
 
-        // 主逻辑循环
         function gameLoop(now) {
-            const dt = (now - state.lastTime) / 1000;
+            const dt = Math.min(0.1, (now - state.lastTime) / 1000);
             state.lastTime = now;
 
-            // 自动产钱
-            state.gold += (2 + state.factoryLvl * 2) * dt;
+            // 工厂自动产金
+            state.gold += (2 + state.factoryLvl * 2.5) * dt;
 
-            // 护盾倒计时
+            // 护照计时
             if (state.shieldActive) {
                 state.shieldTimer -= dt;
                 if (state.shieldTimer <= 0) state.shieldActive = false;
@@ -413,77 +469,104 @@
 
             updateTurrets(dt);
 
-            // 更新敌方导弹
+            const newEnemies = [];
+
+            // 敌方导弹更新
             for (let i = state.enemies.length - 1; i >= 0; i--) {
                 const e = state.enemies[i];
-                const dx = e.targetX - e.x;
-                const dy = e.targetY - e.y;
-                const dist = Math.hypot(dx, dy);
+                e.x += e.vx;
+                e.y += e.vy;
 
-                if (dist > 5) {
-                    e.x += (dx / dist) * e.speed;
-                    e.y += (dy / dist) * e.speed;
-
-                    // 分导弹头逻辑
-                    if (e.type === 'cluster' && !e.split && e.y > canvas.height * 0.35) {
-                        e.split = true;
-                        log("⚠️ 敌方发射分导弹头，散开子弹头！");
-                        for (let k = -1; k <= 1; k += 2) {
-                            state.enemies.push({
-                                x: e.x, y: e.y, targetX: Math.max(50, Math.min(canvas.width - 50, e.x + k * 120)),
-                                targetY: canvas.height - 30, speed: e.speed * 1.2, hp: 10, maxHp: 10,
-                                type: 'normal', color: '#c084fc', radius: 3
-                            });
-                        }
+                // 分导弹头处理 (分离出新导弹并加入临时数组)
+                if (e.type === 'cluster' && !e.split && e.y > canvas.height * 0.4) {
+                    e.split = true;
+                    log("⚠️ 敌弹发生分裂！");
+                    for (let k of [-80, 80]) {
+                        const targetX = Math.max(30, Math.min(canvas.width - 30, e.x + k));
+                        const angle = Math.atan2(e.targetY - e.y, targetX - e.x);
+                        newEnemies.push({
+                            x: e.x, y: e.y, targetX, targetY: e.targetY,
+                            vx: Math.cos(angle) * (e.vy * 1.2), vy: Math.sin(angle) * (e.vy * 1.2),
+                            hp: 10, maxHp: 10, type: 'normal', color: '#c084fc', radius: 3, split: true
+                        });
                     }
-                } else {
-                    // 击中地面
+                }
+
+                // 击中地面
+                if (e.y >= canvas.height - 30) {
                     if (!state.shieldActive) {
-                        const dmg = e.type === 'icbm' ? 30 : 10;
+                        const dmg = e.type === 'icbm' ? 25 : 8;
                         state.cityHp -= dmg;
                     }
-                    createExplosion(e.x, e.y, '#f43f5e', 20);
+                    createExplosion(e.x, e.y, '#f43f5e', 16);
                     state.enemies.splice(i, 1);
                     continue;
                 }
 
-                // 被消灭
+                // 血量清零死亡 (触发明确爆炸)
                 if (e.hp <= 0) {
-                    state.gold += e.type === 'icbm' ? 40 : 12;
-                    createExplosion(e.x, e.y, e.color, 12);
+                    state.gold += e.type === 'icbm' ? 35 : 10;
+                    createExplosion(e.x, e.y, e.color, 14);
                     state.enemies.splice(i, 1);
                 }
             }
 
-            // 更新防空导弹
+            if (newEnemies.length > 0) {
+                state.enemies.push(...newEnemies);
+            }
+
+            // 防空导弹/手动弹更新
             for (let i = state.projectiles.length - 1; i >= 0; i--) {
                 const p = state.projectiles[i];
-                if (!p.target || p.target.hp <= 0) {
-                    state.projectiles.splice(i, 1);
-                    continue;
-                }
-                const dx = p.target.x - p.x;
-                const dy = p.target.y - p.y;
-                const dist = Math.hypot(dx, dy);
 
-                if (dist < 10) {
-                    p.target.hp -= p.damage;
-                    createExplosion(p.x, p.y, '#38bdf8', 15);
-                    state.projectiles.splice(i, 1);
+                if (p.isManual) {
+                    const dx = p.targetX - p.x;
+                    const dy = p.targetY - p.y;
+                    const dist = Math.hypot(dx, dy);
+
+                    if (dist < 8) {
+                        // 产生手动范围爆炸，对周围所有敌人造伤
+                        createExplosion(p.targetX, p.targetY, '#38bdf8', 20);
+                        state.enemies.forEach(e => {
+                            if (Math.hypot(e.x - p.targetX, e.y - p.targetY) < 45) {
+                                e.hp -= p.damage;
+                            }
+                        });
+                        state.projectiles.splice(i, 1);
+                    } else {
+                        p.x += (dx / dist) * p.speed;
+                        p.y += (dy / dist) * p.speed;
+                    }
                 } else {
-                    p.x += (dx / dist) * p.speed;
-                    p.y += (dy / dist) * p.speed;
+                    // 自动 SAM 追踪
+                    if (!p.target || p.target.hp <= 0) {
+                        createExplosion(p.x, p.y, '#38bdf8', 6);
+                        state.projectiles.splice(i, 1);
+                        continue;
+                    }
+                    const dx = p.target.x - p.x;
+                    const dy = p.target.y - p.y;
+                    const dist = Math.hypot(dx, dy);
+
+                    if (dist < 10) {
+                        p.target.hp -= p.damage;
+                        createExplosion(p.x, p.y, '#38bdf8', 12);
+                        state.projectiles.splice(i, 1);
+                    } else {
+                        p.x += (dx / dist) * p.speed;
+                        p.y += (dy / dist) * p.speed;
+                    }
                 }
             }
 
-            // 波次检测与结算
+            // 波次推进
             if (state.inWave && state.enemies.length === 0) {
                 state.inWave = false;
                 if (state.wave < state.maxWave) {
                     state.wave++;
-                    log(`🎉 第 ${state.wave - 1} 波防守成功！奖励资金 +$50`);
-                    state.gold += 50;
-                    setTimeout(startNextWave, 3000);
+                    log(`🎉 顺利守住第 ${state.wave - 1} 波！奖金 +$45`);
+                    state.gold += 45;
+                    setTimeout(startNextWave, 2500);
                 } else {
                     showGameOver(true);
                     return;
@@ -500,61 +583,82 @@
             requestAnimationFrame(gameLoop);
         }
 
-        // Canvas 画面渲染
         function render() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-            // 雷达网格与扫描线
-            ctx.strokeStyle = '#1e293b';
+            // 天空雷达背景网格
+            ctx.strokeStyle = '#0f172a';
             ctx.lineWidth = 1;
-            for (let x = 0; x < canvas.width; x += 60) {
-                ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, canvas.height); ctx.stroke();
-            }
-            for (let y = 0; y < canvas.height; y += 60) {
-                ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(canvas.width, y); ctx.stroke();
+            for (let x = 0; x < canvas.width; x += 50) {
+                ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, canvas.height - 30); ctx.stroke();
             }
 
-            // 绘制城市防线
-            ctx.fillStyle = state.shieldActive ? '#0284c7' : '#334155';
-            ctx.fillRect(0, canvas.height - 25, canvas.width, 25);
-            
-            // 铁穹护盾光效
+            // 绘制城市天际线 (建筑物与窗户)
+            state.buildings.forEach(b => {
+                ctx.fillStyle = '#1e293b';
+                ctx.fillRect(b.x, canvas.height - 30 - b.h, b.w, b.h);
+                // 窗口
+                b.windows.forEach(w => {
+                    ctx.fillStyle = w.color;
+                    ctx.fillRect(b.x + w.x, canvas.height - 30 - b.h + w.y, 4, 6);
+                });
+            });
+
+            // 地基线
+            ctx.fillStyle = '#0f172a';
+            ctx.fillRect(0, canvas.height - 30, canvas.width, 30);
+            ctx.strokeStyle = '#38bdf8';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(0, canvas.height - 30);
+            ctx.lineTo(canvas.width, canvas.height - 30);
+            ctx.stroke();
+
+            // 发射基站与雷达塔
+            ctx.fillStyle = '#10b981';
+            ctx.fillRect(canvas.width / 2 - 15, canvas.height - 42, 30, 12); // 中间手动发射台
+            ctx.fillStyle = '#0284c7';
+            ctx.fillRect(70, canvas.height - 45, 20, 15); // SAM 基站
+            ctx.fillStyle = '#a855f7';
+            ctx.fillRect(canvas.width - 90, canvas.height - 45, 20, 15); // 激光基站
+
+            // 铁穹护罩
             if (state.shieldActive) {
                 ctx.strokeStyle = '#38bdf8';
                 ctx.lineWidth = 3;
                 ctx.beginPath();
-                ctx.arc(canvas.width / 2, canvas.height, canvas.width / 1.8, Math.PI, 0);
+                ctx.arc(canvas.width / 2, canvas.height - 10, canvas.width / 1.6, Math.PI, 0);
                 ctx.stroke();
             }
 
-            // 绘制敌人
+            // 敌人
             state.enemies.forEach(e => {
                 ctx.fillStyle = e.color;
                 ctx.beginPath();
                 ctx.arc(e.x, e.y, e.radius, 0, Math.PI * 2);
                 ctx.fill();
 
-                // 轨迹线
+                // 尾迹线
                 ctx.strokeStyle = e.color;
-                ctx.globalAlpha = 0.3;
+                ctx.globalAlpha = 0.4;
                 ctx.beginPath();
                 ctx.moveTo(e.x, e.y);
-                ctx.lineTo(e.x - (e.targetX - e.x)*0.1, e.y - 20);
+                ctx.lineTo(e.x - e.vx * 4, e.y - e.vy * 4);
                 ctx.stroke();
                 ctx.globalAlpha = 1.0;
             });
 
-            // 绘制防空导弹
-            ctx.fillStyle = '#38bdf8';
+            // 拦截弹
             state.projectiles.forEach(p => {
+                ctx.fillStyle = p.isManual ? '#fde047' : '#38bdf8';
                 ctx.beginPath();
-                ctx.arc(p.x, p.y, 3, 0, Math.PI * 2);
+                ctx.arc(p.x, p.y, p.isManual ? 4 : 3, 0, Math.PI * 2);
                 ctx.fill();
             });
 
-            // 绘制激光
+            // 激光
             state.lasers.forEach((l, idx) => {
-                ctx.strokeStyle = '#67e8f9';
+                ctx.strokeStyle = '#38bdf8';
                 ctx.lineWidth = 3;
                 ctx.beginPath();
                 ctx.moveTo(l.x1, l.y1);
@@ -564,14 +668,14 @@
                 if (l.life <= 0) state.lasers.splice(idx, 1);
             });
 
-            // 绘制粒子爆炸
+            // 粒子火光
             state.particles.forEach((p, idx) => {
                 ctx.fillStyle = p.color;
                 ctx.globalAlpha = p.life;
-                ctx.fillRect(p.x, p.y, 2, 2);
+                ctx.fillRect(p.x, p.y, 2.5, 2.5);
                 p.x += p.vx;
                 p.y += p.vy;
-                p.life -= 0.04;
+                p.life -= 0.03;
                 if (p.life <= 0) state.particles.splice(idx, 1);
             });
             ctx.globalAlpha = 1.0;
@@ -581,19 +685,18 @@
             const modal = document.getElementById('start-modal');
             const card = modal.querySelector('.modal-card');
             if (isWin) {
-                card.innerHTML = `<h2 style="color:#10b981; font-size:1.8rem; margin-bottom:12px;">🏆 完胜！战术大师</h2>
-                <p style="color:#94a3b8; line-height:1.6; margin-bottom:20px;">
-                    你成功守住了 10 波次敌方弹道导弹的饱和打击！<br><br>
-                    💡 <b>总结科普：</b> 现代反导讲究“分层拦截”——近防炮负责近程末端，SAM导弹负责中段，激光针对高速目标。均衡提升兵种协同，才是打造“铁穹”的关键！
+                card.innerHTML = `<h2 style="color:#10b981; font-size:1.6rem; margin-bottom:10px;">🏆 铁穹防线胜利！</h2>
+                <p style="color:#94a3b8; font-size:0.85rem; line-height:1.6; margin-bottom:16px;">
+                    你成功守护了城市天际线，击退了 10 波密集的饱和式导弹打击！
                 </p>
-                <button class="btn-primary" onclick="location.reload()">重新战术部署</button>`;
+                <button class="btn-primary" onclick="location.reload()">重新开局</button>`;
             } else {
-                card.innerHTML = `<h2 style="color:#ef4444; font-size:1.8rem; margin-bottom:12px;">💥 阵地失守！</h2>
-                <p style="color:#94a3b8; line-height:1.6; margin-bottom:20px;">
-                    城市基础设施遭遇严重破坏...<br>
-                    <b>提示：</b> 记得及时升级“印钞机工厂”获取资金流，并在高压波次灵活使用“EMP”与“铁穹护盾”！
+                card.innerHTML = `<h2 style="color:#ef4444; font-size:1.6rem; margin-bottom:10px;">💥 城市沦陷</h2>
+                <p style="color:#94a3b8; font-size:0.85rem; line-height:1.6; margin-bottom:16px;">
+                    防线遭到突破，城市基础设施受损。<br>
+                    <b>防守建议：</b> 点击屏幕手动发射拦截弹能够有效救场，升级近防炮能快速清理靠近地面的残余导弹！
                 </p>
-                <button class="btn-primary" onclick="location.reload()">再次尝试</button>`;
+                <button class="btn-primary" onclick="location.reload()">再试一次</button>`;
             }
             modal.style.display = 'flex';
         }

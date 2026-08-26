@@ -25,11 +25,11 @@
             margin: 0;
             padding: 0;
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-            /* 新增：禁止文本选择，取消移动端点击高亮，取消默认焦点轮廓 */
-            user-select: none;
+            /* 基础禁止选择 */
             -webkit-user-select: none;
             -moz-user-select: none;
             -ms-user-select: none;
+            user-select: none;
             -webkit-tap-highlight-color: transparent;
             outline: none;
         }
@@ -349,6 +349,49 @@
             .ball { width: 54px; height: 54px; font-size: 1.3rem; }
             .stats-grid { grid-template-columns: 1fr 1fr; }
             .history-container { max-height: 300px; }
+        }
+
+        /* ========== 强制移除所有系统高亮和选择 ========== */
+        * {
+            -webkit-user-select: none !important;
+            -moz-user-select: none !important;
+            -ms-user-select: none !important;
+            user-select: none !important;
+            -webkit-tap-highlight-color: transparent !important;
+            outline: none !important;
+            box-shadow: none !important; /* 移除某些浏览器焦点时的阴影 */
+        }
+
+        /* 覆盖选中文本的背景色（即使意外被选中也不显示蓝色） */
+        ::selection {
+            background: transparent !important;
+            color: inherit !important;
+        }
+        ::-moz-selection {
+            background: transparent !important;
+            color: inherit !important;
+        }
+
+        /* 针对所有获得焦点的元素，彻底清除轮廓 */
+        :focus,
+        :focus-visible {
+            outline: none !important;
+            box-shadow: none !important;
+        }
+
+        /* 针对 range 滑块的特殊处理，确保 Chrome 不显示蓝色边框 */
+        input[type=range]:focus,
+        input[type=range]:focus-visible {
+            outline: none !important;
+            box-shadow: none !important;
+            border: 1px solid var(--card-border); /* 保持原有边框不变 */
+        }
+
+        /* 按钮和可点击元素同样清除焦点样式 */
+        button:focus,
+        button:focus-visible {
+            outline: none !important;
+            box-shadow: none !important;
         }
     </style>
 </head>

@@ -2,1920 +2,649 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
-    <title>理性抉择 · 彩票警示模拟器</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>欲望深渊 - 彩票模拟器</title>
     <style>
-        /* ============================================
-           全局样式与CSS变量
-           ============================================ */
         :root {
-            --primary-red: #B71C1C;
-            --deep-red: #7F1D1D;
-            --dark-red: #4A0E0E;
-            --gold: #D4A94E;
-            --light-gold: #E8C87A;
-            --dark-gold: #A07828;
-            --bg-dark: #1A1210;
-            --bg-panel: #2C1F18;
-            --bg-content: #F7F3EC;
-            --bg-card: #FFFFFF;
-            --bg-muted: #F0EAE0;
-            --text-light: #F5F0E6;
-            --text-dark: #2C2C2C;
-            --text-muted: #6B5D4F;
-            --border-gold: #D4A94E;
-            --border-red: #B71C1C;
-            --shadow-dark: rgba(0, 0, 0, 0.7);
-            --shadow-gold: rgba(212, 169, 78, 0.35);
-            --shadow-red: rgba(183, 28, 28, 0.3);
-            --font-family: "SimSun", "STSong", "Noto Serif SC", "Source Han Serif SC", "宋体", serif;
-            --font-size-base: 16px;
-            --container-max-width: 1200px;
-            --header-height: 70px;
-            --footer-height: 50px;
-        }
-
-        @media (max-width: 768px) {
-            :root {
-                --font-size-base: 13px;
-                --header-height: 55px;
-                --footer-height: 40px;
-                --container-max-width: 100%;
-            }
-        }
-        @media (max-width: 480px) {
-            :root {
-                --font-size-base: 11px;
-                --header-height: 45px;
-                --footer-height: 35px;
-            }
+            --primary: #d4af37;
+            --primary-glow: rgba(212, 175, 55, 0.6);
+            --bg-dark: #0f0f13;
+            --card-bg: rgba(30, 30, 38, 0.8);
+            --danger: #ff4757;
+            --success: #2ed573;
+            --text-main: #f1f2f6;
+            --text-muted: #a4b0be;
         }
 
         * {
+            box-sizing: border-box;
             margin: 0;
             padding: 0;
-            box-sizing: border-box;
+            font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            user-select: none;
         }
-        html {
-            font-size: var(--font-size-base);
-            scroll-behavior: smooth;
-        }
+
         body {
-            font-family: var(--font-family);
             background-color: var(--bg-dark);
-            color: var(--text-dark);
+            color: var(--text-main);
             min-height: 100vh;
             display: flex;
             flex-direction: column;
-            align-items: center;
-            justify-content: center;
+            background-image: radial-gradient(circle at 50% 0%, #2a2a35 0%, #0f0f13 60%);
             overflow-x: hidden;
-            background-image:
-                radial-gradient(ellipse at center, rgba(183, 28, 28, 0.2) 0%, rgba(26, 18, 16, 0.97) 70%),
-                repeating-linear-gradient(0deg, transparent, transparent 60px, rgba(212, 169, 78, 0.02) 60px, rgba(212, 169, 78, 0.02) 61px),
-                repeating-linear-gradient(90deg, transparent, transparent 60px, rgba(212, 169, 78, 0.02) 60px, rgba(212, 169, 78, 0.02) 61px);
-        }
-        #game-container {
-            width: var(--container-max-width);
-            max-width: 1200px;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            background-color: var(--bg-panel);
-            box-shadow: 0 0 80px rgba(0, 0, 0, 0.9), 0 0 160px rgba(183, 28, 28, 0.3);
-            position: relative;
-            border-left: 3px solid var(--border-gold);
-            border-right: 3px solid var(--border-gold);
-        }
-        @media (max-width: 768px) {
-            #game-container {
-                width: 100%;
-                border-left: none;
-                border-right: none;
-                box-shadow: none;
-            }
         }
 
-        /* ============================================
-           顶部标题栏
-           ============================================ */
-        .game-header {
-            background: linear-gradient(180deg, #5C0E0E 0%, #3D0808 50%, #5C0E0E 100%);
-            color: var(--text-light);
-            padding: 0.8rem 1.5rem;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            border-bottom: 3px solid var(--border-gold);
-            min-height: var(--header-height);
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            box-shadow: 0 4px 25px rgba(0, 0, 0, 0.6);
-        }
-        .game-header::before {
-            content: "";
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 3px;
-            background: linear-gradient(90deg, transparent, var(--gold), transparent);
-        }
-        .header-left {
-            display: flex;
-            align-items: center;
-            gap: 0.8rem;
-        }
-        .header-emblem {
-            width: 2.8rem;
-            height: 2.8rem;
-            border: 2px solid var(--gold);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.5rem;
-            color: var(--gold);
-            background: radial-gradient(circle, rgba(183, 28, 28, 0.6), rgba(74, 14, 14, 0.9));
-            flex-shrink: 0;
-            user-select: none;
-            font-weight: 700;
-        }
-        .header-title {
-            font-size: 1.6rem;
-            font-weight: 700;
-            letter-spacing: 0.3em;
-            color: var(--light-gold);
-            text-shadow: 0 2px 12px rgba(0, 0, 0, 0.7);
-            user-select: none;
-        }
-        .header-subtitle {
-            font-size: 0.7rem;
-            letter-spacing: 0.5em;
-            color: rgba(245, 240, 230, 0.65);
-            margin-top: 0.1rem;
-            user-select: none;
-        }
-        .header-right {
-            display: flex;
-            align-items: center;
-            gap: 1.2rem;
-            font-size: 0.9rem;
-            color: var(--light-gold);
-        }
-        .header-info-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 0.1rem;
-        }
-        .header-info-label {
-            font-size: 0.6rem;
-            letter-spacing: 0.25em;
-            color: rgba(245, 240, 230, 0.55);
-            text-transform: uppercase;
-        }
-        .header-info-value {
-            font-size: 1.05rem;
-            font-weight: 700;
-            color: var(--light-gold);
-            letter-spacing: 0.05em;
-        }
-        .header-funds {
-            font-size: 1.4rem;
-            font-weight: 900;
-            color: #FFD700;
-            text-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
-        }
-        @media (max-width: 768px) {
-            .header-title {
-                font-size: 1.1rem;
-                letter-spacing: 0.2em;
-            }
-            .header-subtitle {
-                font-size: 0.5rem;
-                letter-spacing: 0.3em;
-            }
-            .header-emblem {
-                width: 2rem;
-                height: 2rem;
-                font-size: 1rem;
-                border-width: 1.5px;
-            }
-            .header-info-item {
-                font-size: 0.65rem;
-            }
-            .header-info-value {
-                font-size: 0.8rem;
-            }
-            .header-funds {
-                font-size: 1.1rem;
-            }
-            .game-header {
-                padding: 0.5rem 0.7rem;
-            }
-            .header-right {
-                gap: 0.6rem;
-            }
-        }
-        @media (max-width: 480px) {
-            .header-title {
-                font-size: 0.9rem;
-                letter-spacing: 0.12em;
-            }
-            .header-subtitle {
-                display: none;
-            }
-            .header-emblem {
-                width: 1.6rem;
-                height: 1.6rem;
-                font-size: 0.8rem;
-                border-width: 1px;
-            }
-            .header-info-label {
-                font-size: 0.45rem;
-                letter-spacing: 0.15em;
-            }
-            .header-info-value {
-                font-size: 0.65rem;
-            }
-            .header-funds {
-                font-size: 0.9rem;
-            }
-            .game-header {
-                padding: 0.35rem 0.4rem;
-            }
-            .header-right {
-                gap: 0.35rem;
-            }
-        }
-
-        /* ============================================
-           底部状态栏
-           ============================================ */
-        .game-footer {
-            background: linear-gradient(0deg, #3D0808 0%, #5C0E0E 100%);
-            color: rgba(245, 240, 230, 0.75);
-            padding: 0.5rem 1.5rem;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            border-top: 2px solid var(--border-gold);
-            min-height: var(--footer-height);
-            font-size: 0.7rem;
-            letter-spacing: 0.1em;
-            position: sticky;
-            bottom: 0;
-            z-index: 100;
-        }
-        .footer-left,
-        .footer-right {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-        .footer-divider {
-            width: 1px;
-            height: 1.1rem;
-            background: rgba(212, 169, 78, 0.4);
-            margin: 0 0.4rem;
-        }
-        @media (max-width: 768px) {
-            .game-footer {
-                font-size: 0.55rem;
-                padding: 0.35rem 0.5rem;
-                letter-spacing: 0.05em;
-            }
-            .footer-divider {
-                margin: 0 0.25rem;
-                height: 0.8rem;
-            }
-        }
-        @media (max-width: 480px) {
-            .game-footer {
-                font-size: 0.45rem;
-                padding: 0.25rem 0.3rem;
-            }
-            .footer-divider {
-                margin: 0 0.2rem;
-                height: 0.6rem;
-            }
-        }
-
-        /* ============================================
-           主内容区域
-           ============================================ */
-        .game-main {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            background-color: var(--bg-content);
-            position: relative;
-            overflow-y: auto;
-            overflow-x: hidden;
-            min-height: calc(100vh - var(--header-height) - var(--footer-height));
-        }
-        .view {
-            display: none;
-            flex-direction: column;
-            padding: 1.5rem;
-            gap: 1rem;
-            flex: 1;
-            animation: fadeIn 0.35s ease-out;
-        }
-        .view.active {
-            display: flex;
-        }
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(12px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-        @media (max-width: 768px) {
-            .view {
-                padding: 0.8rem;
-                gap: 0.7rem;
-            }
-        }
-        @media (max-width: 480px) {
-            .view {
-                padding: 0.4rem;
-                gap: 0.4rem;
-            }
-        }
-
-        /* ============================================
-           通用组件
-           ============================================ */
-        .panel {
-            background: var(--bg-card);
-            border: 2px solid #D4C8B8;
-            border-radius: 0.35rem;
-            padding: 1.2rem 1.4rem;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.07);
-            position: relative;
-        }
-        .panel::before {
-            content: "";
-            position: absolute;
-            top: -2px;
-            left: -2px;
-            right: -2px;
-            bottom: -2px;
-            border: 1px solid rgba(212, 169, 78, 0.25);
-            border-radius: 0.35rem;
-            pointer-events: none;
-        }
-        .panel-title {
-            font-size: 1.15rem;
-            font-weight: 700;
-            color: var(--deep-red);
-            border-bottom: 2px solid var(--border-gold);
-            padding-bottom: 0.45rem;
-            margin-bottom: 0.9rem;
-            letter-spacing: 0.15em;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-        .panel-title::before {
-            content: "◆";
-            color: var(--gold);
-            font-size: 0.8rem;
-        }
-        @media (max-width: 768px) {
-            .panel {
-                padding: 0.75rem 0.8rem;
-                border-width: 1.5px;
-                border-radius: 0.25rem;
-            }
-            .panel-title {
-                font-size: 0.9rem;
-                margin-bottom: 0.55rem;
-                padding-bottom: 0.3rem;
-                letter-spacing: 0.1em;
-            }
-        }
-        @media (max-width: 480px) {
-            .panel {
-                padding: 0.5rem 0.5rem;
-                border-width: 1px;
-                border-radius: 0.2rem;
-            }
-            .panel-title {
-                font-size: 0.75rem;
-                margin-bottom: 0.35rem;
-                padding-bottom: 0.2rem;
-                letter-spacing: 0.05em;
-            }
-        }
-
-        /* 按钮样式 */
-        .btn {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            padding: 0.65rem 1.4rem;
-            font-family: var(--font-family);
-            font-size: 0.9rem;
-            font-weight: 600;
-            letter-spacing: 0.08em;
-            border: 2px solid var(--border-red);
-            border-radius: 0.3rem;
-            cursor: pointer;
-            transition: all 0.25s ease;
-            user-select: none;
+        /* 顶部资产看板 */
+        header {
+            padding: 30px 20px;
             text-align: center;
-            background-color: var(--bg-card);
-            color: var(--deep-red);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            background: rgba(15, 15, 19, 0.8);
+            backdrop-filter: blur(10px);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .title {
+            font-size: 1.2rem;
+            color: var(--text-muted);
+            letter-spacing: 2px;
+            margin-bottom: 10px;
+        }
+
+        .balance-container {
+            font-size: 3.5rem;
+            font-weight: 900;
+            color: var(--primary);
+            text-shadow: 0 0 20px var(--primary-glow);
+            transition: color 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .currency {
+            font-size: 1.5rem;
+            color: var(--text-muted);
+        }
+
+        .target-hint {
+            margin-top: 10px;
+            font-size: 0.9rem;
+            color: var(--danger);
+            opacity: 0.8;
+        }
+
+        /* 游戏主体区域 */
+        main {
+            flex: 1;
+            padding: 40px 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .section-title {
+            text-align: center;
+            font-size: 1.8rem;
+            margin-bottom: 30px;
+            position: relative;
+        }
+
+        .section-title::after {
+            content: '';
+            display: block;
+            width: 60px;
+            height: 3px;
+            background: var(--primary);
+            margin: 10px auto 0;
+            border-radius: 2px;
+        }
+
+        /* 彩票卡片网格 */
+        .tickets-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 25px;
+        }
+
+        .ticket-card {
+            background: var(--card-bg);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 25px 20px;
+            text-align: center;
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            cursor: pointer;
             position: relative;
             overflow: hidden;
-            min-width: 110px;
-            white-space: nowrap;
+            backdrop-filter: blur(5px);
         }
-        .btn:hover {
-            background-color: var(--deep-red);
-            color: var(--light-gold);
-            border-color: var(--gold);
-            box-shadow: 0 4px 24px var(--shadow-gold);
-            transform: translateY(-2px);
+
+        .ticket-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: -100%; width: 50%; height: 100%;
+            background: linear-gradient(to right, transparent, rgba(255,255,255,0.1), transparent);
+            transform: skewX(-25deg);
+            transition: 0.5s;
         }
-        .btn:active {
-            transform: translateY(0);
-            box-shadow: 0 2px 12px var(--shadow-gold);
+
+        .ticket-card:hover {
+            transform: translateY(-8px);
+            border-color: var(--primary);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.6), 0 0 15px var(--primary-glow);
         }
-        .btn-primary {
-            background: linear-gradient(180deg, var(--primary-red), var(--deep-red));
-            color: var(--light-gold);
-            border-color: var(--gold);
-            box-shadow: 0 4px 18px rgba(183, 28, 28, 0.35);
+
+        .ticket-card:hover::before {
+            left: 200%;
         }
-        .btn-primary:hover {
-            background: linear-gradient(180deg, var(--deep-red), var(--dark-red));
-            box-shadow: 0 6px 30px rgba(212, 169, 78, 0.45);
-        }
-        .btn-secondary {
-            background-color: transparent;
-            border-color: var(--gold);
-            color: var(--dark-gold);
-        }
-        .btn-secondary:hover {
-            background-color: rgba(212, 169, 78, 0.12);
-            border-color: var(--light-gold);
-            color: var(--gold);
-        }
-        .btn-danger {
-            border-color: #6B1A1A;
-            color: #6B1A1A;
-        }
-        .btn-danger:hover {
-            background-color: #6B1A1A;
-            color: #F5F0E6;
-            border-color: #8B2A2A;
-        }
-        .btn-small {
-            padding: 0.4rem 0.7rem;
-            font-size: 0.75rem;
-            min-width: 60px;
-            border-width: 1.5px;
-        }
-        .btn-large {
-            padding: 0.9rem 2.2rem;
-            font-size: 1.05rem;
-            min-width: 160px;
-            letter-spacing: 0.15em;
-        }
-        .btn:disabled {
+
+        .ticket-card.disabled {
             opacity: 0.5;
             cursor: not-allowed;
-            transform: none;
-            box-shadow: none;
-        }
-        .btn:disabled:hover {
-            background-color: var(--bg-card);
-            color: var(--deep-red);
-            border-color: var(--border-red);
-            transform: none;
-            box-shadow: none;
-        }
-        .btn-group {
-            display: flex;
-            gap: 0.6rem;
-            flex-wrap: wrap;
-            align-items: center;
-        }
-        @media (max-width: 768px) {
-            .btn {
-                padding: 0.45rem 0.9rem;
-                font-size: 0.75rem;
-                min-width: 70px;
-                border-width: 1.5px;
-                border-radius: 0.25rem;
-            }
-            .btn-large {
-                padding: 0.6rem 1.4rem;
-                font-size: 0.85rem;
-                min-width: 110px;
-            }
-            .btn-small {
-                padding: 0.3rem 0.5rem;
-                font-size: 0.6rem;
-                min-width: 45px;
-            }
-            .btn-group {
-                gap: 0.4rem;
-            }
-        }
-        @media (max-width: 480px) {
-            .btn {
-                padding: 0.35rem 0.6rem;
-                font-size: 0.65rem;
-                min-width: 50px;
-                border-width: 1px;
-                border-radius: 0.2rem;
-            }
-            .btn-large {
-                padding: 0.5rem 1rem;
-                font-size: 0.7rem;
-                min-width: 80px;
-                letter-spacing: 0.08em;
-            }
-            .btn-small {
-                padding: 0.25rem 0.4rem;
-                font-size: 0.55rem;
-                min-width: 35px;
-            }
-            .btn-group {
-                gap: 0.3rem;
-            }
-        }
-
-        /* 彩票卡片 */
-        .lottery-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
-            gap: 0.8rem;
-        }
-        .lottery-card {
-            background: var(--bg-card);
-            border: 2px solid #D4C8B8;
-            border-radius: 0.3rem;
-            padding: 0.9rem;
-            cursor: pointer;
-            transition: all 0.25s ease;
-            user-select: none;
-            position: relative;
-            text-align: center;
-        }
-        .lottery-card:hover {
-            border-color: var(--border-red);
-            box-shadow: 0 4px 20px rgba(183, 28, 28, 0.15);
-            transform: translateY(-3px);
-        }
-        .lottery-card.selected {
-            border-color: var(--border-red);
-            background-color: #FDF5F0;
-            box-shadow: 0 0 0 3px rgba(183, 28, 28, 0.15);
-        }
-        .lottery-card-name {
-            font-weight: 700;
-            color: var(--deep-red);
-            font-size: 0.9rem;
-            letter-spacing: 0.05em;
-            margin-bottom: 0.25rem;
-        }
-        .lottery-card-price {
-            font-size: 0.75rem;
-            color: var(--text-muted);
-            margin-bottom: 0.2rem;
-        }
-        .lottery-card-prize {
-            font-size: 0.7rem;
-            color: var(--dark-gold);
-            font-weight: 600;
-        }
-        .lottery-card-desc {
-            font-size: 0.65rem;
-            color: var(--text-muted);
-            margin-top: 0.3rem;
-            line-height: 1.4;
-        }
-        @media (max-width: 768px) {
-            .lottery-grid {
-                grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
-                gap: 0.5rem;
-            }
-            .lottery-card {
-                padding: 0.6rem;
-                border-width: 1.5px;
-                border-radius: 0.25rem;
-            }
-            .lottery-card-name {
-                font-size: 0.75rem;
-            }
-            .lottery-card-price {
-                font-size: 0.65rem;
-            }
-            .lottery-card-prize {
-                font-size: 0.6rem;
-            }
-            .lottery-card-desc {
-                font-size: 0.55rem;
-            }
-        }
-        @media (max-width: 480px) {
-            .lottery-grid {
-                grid-template-columns: repeat(2, 1fr);
-                gap: 0.35rem;
-            }
-            .lottery-card {
-                padding: 0.4rem;
-                border-width: 1px;
-                border-radius: 0.2rem;
-            }
-            .lottery-card-name {
-                font-size: 0.65rem;
-            }
-            .lottery-card-price {
-                font-size: 0.55rem;
-            }
-            .lottery-card-prize {
-                font-size: 0.5rem;
-            }
-            .lottery-card-desc {
-                font-size: 0.45rem;
-                display: none;
-            }
-        }
-
-        /* 输入框 */
-        .input-field {
-            display: flex;
-            flex-direction: column;
-            gap: 0.3rem;
-        }
-        .input-field label {
-            font-size: 0.8rem;
-            font-weight: 600;
-            color: var(--deep-red);
-            letter-spacing: 0.08em;
-        }
-        .input-field input,
-        .input-field select {
-            padding: 0.5rem 0.7rem;
-            font-family: var(--font-family);
-            font-size: 0.9rem;
-            border: 2px solid #D4C8B8;
-            border-radius: 0.25rem;
-            background-color: #FDFCFA;
-            color: var(--text-dark);
-            transition: border-color 0.25s ease;
-            outline: none;
-            width: 100%;
-        }
-        .input-field input:focus,
-        .input-field select:focus {
-            border-color: var(--border-red);
-            box-shadow: 0 0 0 3px rgba(183, 28, 28, 0.1);
-        }
-        @media (max-width: 768px) {
-            .input-field input,
-            .input-field select {
-                padding: 0.35rem 0.5rem;
-                font-size: 0.75rem;
-                border-width: 1.5px;
-            }
-            .input-field label {
-                font-size: 0.65rem;
-            }
-        }
-        @media (max-width: 480px) {
-            .input-field input,
-            .input-field select {
-                padding: 0.25rem 0.35rem;
-                font-size: 0.65rem;
-                border-width: 1px;
-                border-radius: 0.2rem;
-            }
-            .input-field label {
-                font-size: 0.55rem;
-            }
-        }
-
-        /* 结果展示区 */
-        .result-display {
-            background: #FDF8F0;
-            border: 2px solid var(--border-gold);
-            border-radius: 0.3rem;
-            padding: 1rem 1.2rem;
-            min-height: 80px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-            gap: 0.4rem;
-        }
-        .result-display .result-text {
-            font-size: 1.1rem;
-            font-weight: 700;
-            color: var(--deep-red);
-            letter-spacing: 0.08em;
-        }
-        .result-display .result-detail {
-            font-size: 0.8rem;
-            color: var(--text-muted);
-        }
-        .result-display .result-amount {
-            font-size: 1.6rem;
-            font-weight: 900;
-            color: #FF6600;
-        }
-        @media (max-width: 768px) {
-            .result-display {
-                padding: 0.7rem 0.8rem;
-                min-height: 60px;
-                border-width: 1.5px;
-            }
-            .result-display .result-text {
-                font-size: 0.9rem;
-            }
-            .result-display .result-detail {
-                font-size: 0.65rem;
-            }
-            .result-display .result-amount {
-                font-size: 1.2rem;
-            }
-        }
-        @media (max-width: 480px) {
-            .result-display {
-                padding: 0.5rem 0.5rem;
-                min-height: 45px;
-                border-width: 1px;
-                border-radius: 0.2rem;
-            }
-            .result-display .result-text {
-                font-size: 0.75rem;
-            }
-            .result-display .result-detail {
-                font-size: 0.55rem;
-            }
-            .result-display .result-amount {
-                font-size: 1rem;
-            }
-        }
-
-        /* 统计面板 */
-        .stats-row {
-            display: flex;
-            gap: 0.6rem;
-            flex-wrap: wrap;
-        }
-        .stat-item {
-            flex: 1;
-            min-width: 90px;
-            background: var(--bg-muted);
-            border: 1px solid #D4C8B8;
-            border-radius: 0.25rem;
-            padding: 0.6rem 0.7rem;
-            text-align: center;
-            transition: all 0.2s ease;
-        }
-        .stat-item-value {
-            font-size: 1.3rem;
-            font-weight: 900;
-            color: var(--deep-red);
-        }
-        .stat-item-label {
-            font-size: 0.65rem;
-            color: var(--text-muted);
-            letter-spacing: 0.08em;
-            margin-top: 0.15rem;
-        }
-        @media (max-width: 768px) {
-            .stat-item {
-                min-width: 65px;
-                padding: 0.4rem 0.5rem;
-                border-radius: 0.2rem;
-            }
-            .stat-item-value {
-                font-size: 0.95rem;
-            }
-            .stat-item-label {
-                font-size: 0.55rem;
-                margin-top: 0.08rem;
-            }
-            .stats-row {
-                gap: 0.4rem;
-            }
-        }
-        @media (max-width: 480px) {
-            .stat-item {
-                min-width: 48px;
-                padding: 0.3rem 0.35rem;
-                border-width: 0.5px;
-            }
-            .stat-item-value {
-                font-size: 0.75rem;
-            }
-            .stat-item-label {
-                font-size: 0.45rem;
-                letter-spacing: 0.05em;
-            }
-            .stats-row {
-                gap: 0.25rem;
-            }
-        }
-
-        /* 历史记录 */
-        .history-list {
-            max-height: 200px;
-            overflow-y: auto;
-            background: #FDFCFA;
-            border: 1px solid #D4C8B8;
-            border-radius: 0.25rem;
-            padding: 0.5rem 0.6rem;
-            font-size: 0.7rem;
-            line-height: 1.7;
-        }
-        .history-entry {
-            padding: 0.3rem 0.35rem;
-            border-bottom: 1px solid #F0E8DC;
-            color: var(--text-dark);
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-        .history-entry:last-child {
-            border-bottom: none;
-        }
-        .history-time {
-            color: var(--deep-red);
-            font-weight: 700;
-            white-space: nowrap;
-        }
-        .history-type {
-            display: inline-block;
-            padding: 0.05rem 0.4rem;
-            border-radius: 0.1rem;
-            font-size: 0.6rem;
-            font-weight: 700;
-            letter-spacing: 0.05em;
-            white-space: nowrap;
-        }
-        .history-win {
-            background-color: #E8F5E9;
-            color: #1B5E20;
-        }
-        .history-lose {
-            background-color: #FBE9E7;
-            color: #B71C1C;
-        }
-        .history-amount {
-            font-weight: 700;
-            margin-left: auto;
-        }
-        .history-amount.win {
-            color: #2E7D32;
-        }
-        .history-amount.lose {
-            color: #C62828;
-        }
-        @media (max-width: 768px) {
-            .history-list {
-                max-height: 150px;
-                font-size: 0.6rem;
-                padding: 0.35rem 0.4rem;
-            }
-            .history-entry {
-                padding: 0.2rem 0.25rem;
-                gap: 0.3rem;
-                font-size: 0.55rem;
-            }
-            .history-type {
-                font-size: 0.5rem;
-                padding: 0.03rem 0.25rem;
-            }
-        }
-        @media (max-width: 480px) {
-            .history-list {
-                max-height: 110px;
-                font-size: 0.5rem;
-                padding: 0.25rem 0.3rem;
-            }
-            .history-entry {
-                padding: 0.15rem 0.15rem;
-                gap: 0.2rem;
-                font-size: 0.45rem;
-            }
-            .history-type {
-                font-size: 0.4rem;
-                padding: 0.02rem 0.2rem;
-            }
-        }
-
-        /* ============================================
-           主菜单视图
-           ============================================ */
-        #view-menu {
-            justify-content: center;
-            align-items: center;
-            text-align: center;
-            background:
-                radial-gradient(ellipse at center, rgba(183, 28, 28, 0.5) 0%, rgba(26, 18, 16, 0.97) 70%),
-                linear-gradient(180deg, #1A1210 0%, #2C1F18 50%, #1A1210 100%);
-            min-height: 100%;
-            padding: 2rem;
-        }
-        .menu-emblem-large {
-            font-size: 4rem;
-            color: var(--gold);
-            border: 4px solid var(--gold);
-            border-radius: 50%;
-            width: 7rem;
-            height: 7rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto 1.2rem;
-            background: radial-gradient(circle, rgba(183, 28, 28, 0.4), rgba(74, 14, 14, 0.7));
-            box-shadow: 0 0 70px rgba(212, 169, 78, 0.35);
-            animation: pulseGlow 3s ease-in-out infinite;
-            user-select: none;
-            font-weight: 900;
-        }
-        @keyframes pulseGlow {
-            0%,
-            100% {
-                box-shadow: 0 0 45px rgba(212, 169, 78, 0.3);
-            }
-            50% {
-                box-shadow: 0 0 90px rgba(212, 169, 78, 0.55);
-            }
-        }
-        .menu-title {
-            font-size: 2.6rem;
-            font-weight: 900;
-            color: var(--light-gold);
-            letter-spacing: 0.35em;
-            text-shadow: 0 4px 25px rgba(0, 0, 0, 0.8), 0 0 60px rgba(212, 169, 78, 0.3);
-            margin-bottom: 0.4rem;
-            user-select: none;
-        }
-        .menu-subtitle {
-            font-size: 0.9rem;
-            color: rgba(245, 240, 230, 0.65);
-            letter-spacing: 0.55em;
-            margin-bottom: 1.5rem;
-            user-select: none;
-        }
-        .menu-divider {
-            width: 55%;
-            max-width: 380px;
-            height: 2px;
-            background: linear-gradient(90deg, transparent, var(--gold), transparent);
-            margin: 0 auto 1.5rem;
-        }
-        .menu-buttons {
-            display: flex;
-            flex-direction: column;
-            gap: 0.8rem;
-            align-items: center;
-        }
-        .menu-btn {
-            width: 260px;
-            padding: 0.9rem 1.8rem;
-            font-size: 1rem;
-            letter-spacing: 0.28em;
-            background: linear-gradient(180deg, rgba(183, 28, 28, 0.3), rgba(127, 29, 29, 0.5));
-            color: var(--light-gold);
-            border: 2px solid var(--gold);
-            border-radius: 0.3rem;
-            cursor: pointer;
-            font-family: var(--font-family);
-            font-weight: 600;
-            transition: all 0.3s ease;
-            user-select: none;
-        }
-        .menu-btn:hover {
-            background: linear-gradient(180deg, rgba(183, 28, 28, 0.55), rgba(127, 29, 29, 0.75));
-            box-shadow: 0 6px 35px rgba(212, 169, 78, 0.5);
-            transform: translateY(-3px);
-            letter-spacing: 0.38em;
-        }
-        .menu-warning {
-            margin-top: 2rem;
-            font-size: 0.65rem;
-            color: rgba(245, 240, 230, 0.4);
-            letter-spacing: 0.2em;
-            user-select: none;
-            max-width: 400px;
-            line-height: 1.8;
-        }
-        @media (max-width: 768px) {
-            .menu-emblem-large {
-                font-size: 3rem;
-                width: 5rem;
-                height: 5rem;
-                border-width: 3px;
-                margin-bottom: 0.8rem;
-            }
-            .menu-title {
-                font-size: 1.8rem;
-                letter-spacing: 0.22em;
-            }
-            .menu-subtitle {
-                font-size: 0.65rem;
-                letter-spacing: 0.35em;
-                margin-bottom: 1rem;
-            }
-            .menu-btn {
-                width: 190px;
-                padding: 0.65rem 1.1rem;
-                font-size: 0.8rem;
-                letter-spacing: 0.2em;
-            }
-            .menu-warning {
-                font-size: 0.5rem;
-                margin-top: 1.2rem;
-            }
-        }
-        @media (max-width: 480px) {
-            .menu-emblem-large {
-                font-size: 2rem;
-                width: 3.5rem;
-                height: 3.5rem;
-                border-width: 2px;
-                margin-bottom: 0.5rem;
-            }
-            .menu-title {
-                font-size: 1.2rem;
-                letter-spacing: 0.12em;
-            }
-            .menu-subtitle {
-                font-size: 0.5rem;
-                letter-spacing: 0.2em;
-                margin-bottom: 0.7rem;
-            }
-            .menu-btn {
-                width: 140px;
-                padding: 0.5rem 0.8rem;
-                font-size: 0.65rem;
-                letter-spacing: 0.15em;
-                border-width: 1.5px;
-            }
-            .menu-warning {
-                font-size: 0.4rem;
-                margin-top: 0.8rem;
-                letter-spacing: 0.1em;
-            }
-            .menu-divider {
-                margin-bottom: 0.8rem;
-            }
-            #view-menu {
-                padding: 1rem;
-            }
-        }
-
-        /* ============================================
-           游戏主界面
-           ============================================ */
-        #view-game {
-            display: none;
-            flex-direction: column;
-            gap: 0.8rem;
-        }
-        #view-game.active {
-            display: flex;
-        }
-        .game-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 0.8rem;
-        }
-        .game-grid-full {
-            grid-column: 1 / -1;
-        }
-        .warning-banner {
-            background: #FFF8E1;
-            border-left: 5px solid #FF8F00;
-            padding: 0.6rem 0.9rem;
-            font-size: 0.75rem;
-            color: #6D4C00;
-            letter-spacing: 0.05em;
-            line-height: 1.6;
-            border-radius: 0.2rem;
-        }
-        @media (max-width: 768px) {
-            #view-game {
-                gap: 0.55rem;
-            }
-            .game-grid {
-                gap: 0.55rem;
-            }
-            .warning-banner {
-                padding: 0.4rem 0.6rem;
-                font-size: 0.6rem;
-                border-left-width: 3px;
-            }
-        }
-        @media (max-width: 480px) {
-            #view-game {
-                gap: 0.35rem;
-            }
-            .game-grid {
-                grid-template-columns: 1fr;
-                gap: 0.35rem;
-            }
-            .warning-banner {
-                padding: 0.3rem 0.4rem;
-                font-size: 0.5rem;
-                border-left-width: 2px;
-            }
-        }
-
-        /* 刮刮乐Canvas样式 */
-        .scratch-container {
-            position: relative;
-            width: 100%;
-            max-width: 300px;
-            margin: 0 auto;
-            aspect-ratio: 3/2;
-            border-radius: 0.3rem;
-            overflow: hidden;
-            border: 2px solid var(--border-gold);
-            cursor: pointer;
-            user-select: none;
-        }
-        .scratch-container canvas {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            touch-action: none;
-        }
-        .scratch-result {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            background: #FDF8F0;
-            z-index: 1;
-            font-weight: 700;
-            color: var(--deep-red);
-            font-size: 1.2rem;
-            letter-spacing: 0.05em;
+            filter: grayscale(100%);
             pointer-events: none;
         }
-        @media (max-width: 768px) {
-            .scratch-container {
-                max-width: 240px;
-                border-width: 1.5px;
-            }
-            .scratch-result {
-                font-size: 0.95rem;
-            }
-        }
-        @media (max-width: 480px) {
-            .scratch-container {
-                max-width: 180px;
-                border-width: 1px;
-            }
-            .scratch-result {
-                font-size: 0.75rem;
-            }
+
+        .ticket-name {
+            font-size: 1.4rem;
+            font-weight: bold;
+            margin-bottom: 5px;
         }
 
-        /* 结局视图 */
-        #view-ending {
-            justify-content: center;
-            align-items: center;
-            text-align: center;
-            background: linear-gradient(180deg, #1A1210 0%, #2C1F18 40%, #1A1210 100%);
-            min-height: 100%;
-            padding: 1.5rem;
+        .ticket-desc {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-bottom: 20px;
         }
-        .ending-card {
-            max-width: 600px;
+
+        .ticket-cost {
+            font-size: 1.2rem;
+            color: var(--danger);
+            font-weight: bold;
+            margin-bottom: 20px;
+            background: rgba(255, 71, 87, 0.1);
+            padding: 8px;
+            border-radius: 8px;
+        }
+
+        .btn-buy {
+            background: linear-gradient(135deg, #d4af37, #aa8929);
+            color: #000;
+            border: none;
+            padding: 12px 0;
             width: 100%;
-            background: var(--bg-card);
-            border: 4px solid var(--border-gold);
-            border-radius: 0.5rem;
-            padding: 2rem 2.2rem;
-            box-shadow: 0 0 80px rgba(212, 169, 78, 0.25);
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.2s;
         }
-        .ending-title {
+
+        .btn-buy:active {
+            transform: scale(0.95);
+        }
+
+        /* 刮奖动画遮罩层 */
+        .scratch-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(5px);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s;
+        }
+
+        .scratch-overlay.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .scratch-card-visual {
+            width: 300px;
+            height: 400px;
+            background: linear-gradient(135deg, #444, #222);
+            border-radius: 15px;
+            border: 3px solid var(--primary);
+            box-shadow: 0 0 30px var(--primary-glow);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .scratch-coating {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" opacity="0.1"><rect width="100" height="100" fill="%23fff"/></svg>'), #888;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             font-size: 2rem;
-            font-weight: 900;
-            letter-spacing: 0.2em;
-            margin-bottom: 0.8rem;
+            color: #555;
+            font-weight: bold;
+            transition: opacity 1.5s ease-out;
         }
-        .ending-title.win {
-            color: #FFD700;
-            text-shadow: 0 0 30px rgba(255, 215, 0, 0.5);
+
+        .scratch-coating.revealed {
+            opacity: 0;
         }
-        .ending-title.lose {
-            color: var(--deep-red);
+
+        .scratch-result {
+            font-size: 2.5rem;
+            font-weight: bold;
+            text-align: center;
+            padding: 20px;
+            transform: scale(0.5);
+            opacity: 0;
+            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
-        .ending-divider {
-            width: 60%;
-            height: 2px;
-            background: linear-gradient(90deg, transparent, var(--gold), transparent);
-            margin: 0.8rem auto;
+
+        .scratch-result.show {
+            transform: scale(1);
+            opacity: 1;
         }
-        .ending-message {
-            font-size: 0.9rem;
-            color: var(--text-dark);
-            line-height: 2;
-            letter-spacing: 0.06em;
+
+        .win-text { color: var(--success); text-shadow: 0 0 15px rgba(46, 213, 115, 0.6); }
+        .lose-text { color: var(--text-muted); }
+
+        /* 结局模态框 */
+        .modal {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.95);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.5s;
+        }
+
+        .modal.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .modal-content {
+            background: var(--card-bg);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 600px;
+            width: 90%;
+            text-align: center;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.8);
+            transform: translateY(50px);
+            transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .modal.active .modal-content {
+            transform: translateY(0);
+        }
+
+        .ending-icon {
+            font-size: 5rem;
+            margin-bottom: 20px;
+        }
+
+        .ending-title {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+        }
+
+        .title-win { color: var(--primary); text-shadow: 0 0 20px var(--primary-glow); }
+        .title-lose { color: var(--danger); text-shadow: 0 0 20px rgba(255, 71, 87, 0.5); }
+
+        .ending-desc {
+            font-size: 1.1rem;
+            color: var(--text-muted);
+            margin-bottom: 30px;
+            line-height: 1.6;
+        }
+
+        /* 核心：反赌劝退教育板块 */
+        .educational-warning {
+            background: rgba(255, 71, 87, 0.1);
+            border-left: 5px solid var(--danger);
+            padding: 20px;
             text-align: left;
-            margin: 1rem 0;
+            border-radius: 0 8px 8px 0;
+            margin-bottom: 30px;
         }
-        .ending-lesson {
-            background: #FFF8E1;
-            border-left: 5px solid #FF8F00;
-            padding: 1rem 1.2rem;
-            font-size: 0.8rem;
-            color: #6D4C00;
-            line-height: 2;
-            text-align: left;
-            border-radius: 0.2rem;
-            letter-spacing: 0.04em;
+
+        .warning-title {
+            color: var(--danger);
+            font-weight: bold;
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
-        .ending-lesson strong {
-            color: #B71C1C;
-            font-size: 0.9rem;
+
+        .warning-text {
+            color: #ddd;
+            font-size: 0.95rem;
+            line-height: 1.7;
         }
-        @media (max-width: 768px) {
-            .ending-card {
-                padding: 1.2rem 1.3rem;
-                border-width: 3px;
-            }
-            .ending-title {
-                font-size: 1.5rem;
-                letter-spacing: 0.12em;
-            }
-            .ending-message {
-                font-size: 0.7rem;
-                margin: 0.7rem 0;
-            }
-            .ending-lesson {
-                font-size: 0.6rem;
-                padding: 0.7rem 0.8rem;
-                border-left-width: 3px;
-            }
-            .ending-lesson strong {
-                font-size: 0.7rem;
-            }
+
+        .warning-highlight {
+            color: var(--danger);
+            font-weight: bold;
         }
-        @media (max-width: 480px) {
-            .ending-card {
-                padding: 0.8rem 0.7rem;
-                border-width: 2px;
-                border-radius: 0.35rem;
-            }
-            .ending-title {
-                font-size: 1.1rem;
-                letter-spacing: 0.08em;
-            }
-            .ending-message {
-                font-size: 0.55rem;
-                margin: 0.5rem 0;
-                line-height: 1.7;
-            }
-            .ending-lesson {
-                font-size: 0.5rem;
-                padding: 0.5rem 0.55rem;
-                border-left-width: 2px;
-                line-height: 1.6;
-            }
-            .ending-lesson strong {
-                font-size: 0.55rem;
-            }
+
+        .btn-restart {
+            background: transparent;
+            border: 2px solid var(--text-muted);
+            color: var(--text-main);
+            padding: 12px 40px;
+            font-size: 1.1rem;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: 0.3s;
         }
+
+        .btn-restart:hover {
+            background: var(--text-main);
+            color: var(--bg-dark);
+        }
+
     </style>
 </head>
 <body>
 
-    <div id="game-container">
-        <!-- 顶部标题栏 -->
-        <header class="game-header">
-            <div class="header-left">
-                <div class="header-emblem" aria-hidden="true">￥</div>
-                <div>
-                    <div class="header-title">理性抉择</div>
-                    <div class="header-subtitle">彩票警示模拟系统</div>
-                </div>
-            </div>
-            <div class="header-right" id="headerInfo">
-                <div class="header-info-item">
-                    <span class="header-info-label">当前资金</span>
-                    <span class="header-info-value header-funds" id="headerFunds">¥10,000</span>
-                </div>
-                <div class="header-info-item">
-                    <span class="header-info-label">购买次数</span>
-                    <span class="header-info-value" id="headerCount">0</span>
-                </div>
-                <div class="header-info-item">
-                    <span class="header-info-label">净收益</span>
-                    <span class="header-info-value" id="headerNet">¥0</span>
-                </div>
-            </div>
-        </header>
+    <header>
+        <div class="title">当前总资产</div>
+        <div class="balance-container">
+            <span class="currency">¥</span>
+            <span id="balance-display">10,000</span>
+        </div>
+        <div class="target-hint">人生目标：¥1,000,000,000 (十亿)</div>
+    </header>
 
-        <main class="game-main" id="gameMain">
-            <!-- ========== 视图：主菜单 ========== -->
-            <div class="view active" id="view-menu">
-                <div class="menu-emblem-large" aria-hidden="true">￥</div>
-                <h1 class="menu-title">理性抉择</h1>
-                <p class="menu-subtitle">彩票警示模拟器</p>
-                <div class="menu-divider"></div>
-                <div class="menu-buttons">
-                    <button class="menu-btn" onclick="startGame()">开 始 模 拟</button>
-                    <button class="menu-btn" onclick="showAboutInfo()">系 统 说 明</button>
-                </div>
-                <p class="menu-warning">
-                    本系统旨在通过模拟彩票购买行为，揭示赌博心理的陷阱。<br>
-                    请理性对待彩票，切勿沉迷。健康生活，远离赌博。
-                </p>
-            </div>
+    <main>
+        <h2 class="section-title">选择您的命运</h2>
+        <div class="tickets-grid" id="tickets-container">
+            <!-- 彩票卡片由 JS 动态生成 -->
+        </div>
+    </main>
 
-            <!-- ========== 视图：游戏主界面 ========== -->
-            <div class="view" id="view-game">
-                <!-- 警告横幅 -->
-                <div class="warning-banner">
-                    【警示】彩票中奖概率极低，长期购买将导致资金持续亏损。本模拟器旨在揭示赌博的危害，请理性对待。
-                </div>
+    <!-- 刮奖动画层 -->
+    <div class="scratch-overlay" id="scratch-overlay">
+        <h2 style="margin-bottom: 20px; color: white;">正在刮开涂层...</h2>
+        <div class="scratch-card-visual">
+            <div class="scratch-result" id="scratch-result-text">未中奖</div>
+            <div class="scratch-coating" id="scratch-coating">刮</div>
+        </div>
+    </div>
 
-                <!-- 统计面板 -->
-                <div class="stats-row" id="statPanel">
-                    <div class="stat-item">
-                        <div class="stat-item-value" id="statFunds">¥10,000</div>
-                        <div class="stat-item-label">当前资金</div>
-                    </div>
-                    <div class="stat-item">
-                        <div class="stat-item-value" id="statPurchases">0</div>
-                        <div class="stat-item-label">总购买次数</div>
-                    </div>
-                    <div class="stat-item">
-                        <div class="stat-item-value" id="statSpent">¥0</div>
-                        <div class="stat-item-label">总花费</div>
-                    </div>
-                    <div class="stat-item">
-                        <div class="stat-item-value" id="statWon">¥0</div>
-                        <div class="stat-item-label">总中奖</div>
-                    </div>
-                    <div class="stat-item">
-                        <div class="stat-item-value" id="statNet">¥0</div>
-                        <div class="stat-item-label">净收益</div>
-                    </div>
-                    <div class="stat-item">
-                        <div class="stat-item-value" id="statWinRate">0%</div>
-                        <div class="stat-item-label">中奖率</div>
-                    </div>
+    <!-- 结局模态框 -->
+    <div class="modal" id="game-over-modal">
+        <div class="modal-content">
+            <div class="ending-icon" id="ending-icon">💀</div>
+            <h1 class="ending-title" id="ending-title">很遗憾，您破产了</h1>
+            <p class="ending-desc" id="ending-desc">您的财富已清零，所有的美梦都在此刻破碎。这就是现实的残酷。</p>
+            
+            <!-- 反赌博核心教育版块 -->
+            <div class="educational-warning">
+                <div class="warning-title">
+                    ⚠️ 游戏开发组的劝退教导
                 </div>
-
-                <!-- 彩票选择 -->
-                <div class="panel">
-                    <div class="panel-title">选择彩票类型</div>
-                    <div class="lottery-grid" id="lotteryGrid">
-                        <!-- 由JS动态生成 -->
-                    </div>
-                </div>
-
-                <!-- 购买操作 -->
-                <div class="game-grid">
-                    <div class="panel">
-                        <div class="panel-title">购买设置</div>
-                        <div style="display:flex;flex-direction:column;gap:0.7rem;">
-                            <div class="input-field">
-                                <label for="quantity">购买数量</label>
-                                <input type="number" id="quantity" min="1" max="100" value="1">
-                            </div>
-                            <div class="btn-group">
-                                <button class="btn btn-primary" id="btnBuy" onclick="buyLottery()">购 买 并 开 奖</button>
-                                <button class="btn btn-secondary" onclick="resetToStart()">重 新 开 始</button>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="panel">
-                        <div class="panel-title">开奖结果</div>
-                        <div class="result-display" id="resultDisplay">
-                            <span class="result-text">请选择彩票类型并购买</span>
-                            <span class="result-detail">等待您的操作</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- 历史记录 -->
-                <div class="panel game-grid-full">
-                    <div class="panel-title">购买记录</div>
-                    <div class="history-list" id="historyList">
-                        <div class="history-entry">暂无记录。</div>
-                    </div>
-                </div>
-
-                <!-- 底部操作 -->
-                <div class="btn-group" style="justify-content:center; margin-top:0.2rem;">
-                    <button class="btn btn-danger" onclick="confirmReturnToMenu()">退出到主菜单</button>
+                <div class="warning-text">
+                    无论您在游戏中是偶然达成了十亿目标，还是输光了所有的本金，请务必清醒：<br><br>
+                    在现实世界中，所有的“彩票”、“盲盒”和“赌博”背后，都是由精密数学公式构建的<span class="warning-highlight">“庄家必赢”期望值陷阱</span>。您体验到的“差点就中奖”、“小赢一把”的快感，都是为了榨干您钱包而精心设计的心理学诱饵。<br><br>
+                    无数人为了虚无缥缈的一夜暴富梦，倾尽所有，最终换来的只有<span class="warning-highlight">债务缠身和家破人亡</span>。十赌十输，不赌才是真正的赢家。<br><br>
+                    <strong>请认清现实，远离一切形式的赌博。脚踏实地，珍惜当下的生活与家人，才是通往幸福的唯一捷径！</strong>
                 </div>
             </div>
 
-            <!-- ========== 视图：结局 ========== -->
-            <div class="view" id="view-ending">
-                <div class="ending-card">
-                    <div class="ending-title" id="endingTitle">结局</div>
-                    <div class="ending-divider"></div>
-                    <div class="ending-message" id="endingMessage"></div>
-                    <div class="ending-lesson" id="endingLesson"></div>
-                    <div class="btn-group" style="justify-content:center;margin-top:1.2rem;">
-                        <button class="btn btn-primary btn-large" onclick="resetToStart()">重 新 开 始</button>
-                        <button class="btn btn-secondary" onclick="switchView('view-menu')">返 回 主 菜 单</button>
-                    </div>
-                </div>
-            </div>
-        </main>
-
-        <footer class="game-footer">
-            <div class="footer-left">
-                <span>理性抉择 · 彩票警示模拟系统</span>
-            </div>
-            <div class="footer-right">
-                <span>版本 1.0</span>
-                <span class="footer-divider"></span>
-                <span>理性购彩 · 远离赌博</span>
-            </div>
-        </footer>
+            <button class="btn-restart" onclick="initGame()">重新审视人生</button>
+        </div>
     </div>
 
     <script>
-        (function() {
-            'use strict';
+        // 初始资金与目标
+        const INITIAL_BALANCE = 100000; // 10万初始资金
+        const TARGET_BALANCE = 1000000000; // 10亿目标
+        let currentBalance = INITIAL_BALANCE;
+        let isScratching = false;
 
-            // ============================================
-            // 彩票数据定义
-            // ============================================
-            const LOTTERY_TYPES = [
-                { id: 'ssq', name: '双色球', price: 2, maxPrize: 5000000, desc: '2元/注 · 最高500万',
-                    icon: '双' },
-                { id: 'dlt', name: '大乐透', price: 2, maxPrize: 10000000, desc: '2元/注 · 最高1000万',
-                    icon: '大' },
-                { id: 'ggl', name: '刮刮乐', price: 5, maxPrize: 100000, desc: '5元/张 · 最高10万', icon: '刮' },
-                { id: 'fc3d', name: '福彩3D', price: 2, maxPrize: 1040, desc: '2元/注 · 最高1040元', icon: '3' },
-                { id: 'pl5', name: '排列五', price: 2, maxPrize: 100000, desc: '2元/注 · 最高10万', icon: '排' },
-                { id: 'qlc', name: '七乐彩', price: 2, maxPrize: 5000000, desc: '2元/注 · 最高500万', icon: '七' }
-            ];
+        // 格式化数字工具 (如: 1,000,000)
+        const formatMoney = (num) => {
+            return Math.floor(num).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+        };
 
-            const INITIAL_FUNDS = 10000;
-            const TARGET_FUNDS = 1000000000; // 10亿
-
-            // 中奖概率表
-            const ODDS = {
-                ssq: [
-                    { prize: 5000000, prob: 1 / 17721088, label: '一等奖' },
-                    { prize: 200000, prob: 1 / 1107568, label: '二等奖' },
-                    { prize: 3000, prob: 1 / 37941, label: '三等奖' },
-                    { prize: 200, prob: 1 / 2429, label: '四等奖' },
-                    { prize: 10, prob: 1 / 223, label: '五等奖' },
-                    { prize: 5, prob: 1 / 16, label: '六等奖' }
-                ],
-                dlt: [
-                    { prize: 10000000, prob: 1 / 21425712, label: '一等奖' },
-                    { prize: 500000, prob: 1 / 1071286, label: '二等奖' },
-                    { prize: 10000, prob: 1 / 476127, label: '三等奖' },
-                    { prize: 3000, prob: 1 / 142838, label: '四等奖' },
-                    { prize: 300, prob: 1 / 7142, label: '五等奖' },
-                    { prize: 200, prob: 1 / 1930, label: '六等奖' },
-                    { prize: 100, prob: 1 / 1290, label: '七等奖' },
-                    { prize: 15, prob: 1 / 317, label: '八等奖' },
-                    { prize: 5, prob: 1 / 16.6, label: '九等奖' }
-                ],
-                ggl: [
-                    { prize: 100000, prob: 0.0001, label: '头奖' },
-                    { prize: 10000, prob: 0.0005, label: '大奖' },
-                    { prize: 1000, prob: 0.002, label: '一等奖' },
-                    { prize: 500, prob: 0.005, label: '二等奖' },
-                    { prize: 100, prob: 0.015, label: '三等奖' },
-                    { prize: 50, prob: 0.04, label: '四等奖' },
-                    { prize: 20, prob: 0.08, label: '五等奖' },
-                    { prize: 10, prob: 0.12, label: '六等奖' },
-                    { prize: 5, prob: 0.25, label: '末等奖' }
-                ],
-                fc3d: [
-                    { prize: 1040, prob: 1 / 1000, label: '直选' },
-                    { prize: 346, prob: 1 / 333, label: '组选三' },
-                    { prize: 173, prob: 1 / 167, label: '组选六' }
-                ],
-                pl5: [
-                    { prize: 100000, prob: 1 / 100000, label: '一等奖' },
-                    { prize: 5000, prob: 1 / 10000, label: '二等奖' },
-                    { prize: 500, prob: 1 / 1000, label: '三等奖' },
-                    { prize: 50, prob: 1 / 100, label: '四等奖' },
-                    { prize: 5, prob: 1 / 10, label: '五等奖' }
-                ],
-                qlc: [
-                    { prize: 5000000, prob: 1 / 2035800, label: '一等奖' },
-                    { prize: 100000, prob: 1 / 29083, label: '二等奖' },
-                    { prize: 10000, prob: 1 / 1328, label: '三等奖' },
-                    { prize: 200, prob: 1 / 312, label: '四等奖' },
-                    { prize: 50, prob: 1 / 53, label: '五等奖' },
-                    { prize: 10, prob: 1 / 17, label: '六等奖' },
-                    { prize: 5, prob: 1 / 3, label: '七等奖' }
+        // 彩票配置 (注意：期望值全部为负，模拟真实赌博的残酷)
+        const tickets = [
+            {
+                id: 1,
+                name: "青铜小试",
+                desc: "适合新手的刮刮乐，小赌怡情？",
+                cost: 1000,
+                color: "#cd7f32",
+                rewards: [
+                    { prize: 10000, chance: 0.02 },  // 2% 中 1万
+                    { prize: 2000, chance: 0.15 },   // 15% 中 2千
+                    { prize: 500, chance: 0.30 },    // 30% 中 5百 (依然亏)
+                    { prize: 0, chance: 0.53 }       // 53% 全亏
                 ]
-            };
+            },
+            {
+                id: 2,
+                name: "白银诱惑",
+                desc: "赔率上升，欲望开始膨胀",
+                cost: 10000,
+                color: "#c0c0c0",
+                rewards: [
+                    { prize: 200000, chance: 0.01 }, // 1% 中 20万
+                    { prize: 30000, chance: 0.08 },  // 8% 中 3万
+                    { prize: 5000, chance: 0.20 },   // 20% 中 5千
+                    { prize: 0, chance: 0.71 }       // 71% 全亏
+                ]
+            },
+            {
+                id: 3,
+                name: "黄金狂热",
+                desc: "高风险高回报，一念天堂",
+                cost: 100000,
+                color: "#ffd700",
+                rewards: [
+                    { prize: 5000000, chance: 0.005 },// 0.5% 中 500万
+                    { prize: 200000, chance: 0.05 },  // 5% 中 20万
+                    { prize: 0, chance: 0.945 }       // 94.5% 全亏
+                ]
+            },
+            {
+                id: 4,
+                name: "巅峰至尊盲盒",
+                desc: "孤注一掷！可能瞬间实现十亿目标",
+                cost: 5000000,
+                color: "#e55039",
+                rewards: [
+                    { prize: 1000000000, chance: 0.001 }, // 0.1% 直接达成10亿目标
+                    { prize: 20000000, chance: 0.02 },    // 2% 回血 2000万
+                    { prize: 0, chance: 0.979 }           // 97.9% 瞬间倾家荡产
+                ]
+            }
+        ];
 
-            // ============================================
-            // 游戏状态
-            // ============================================
-            let gameState = null;
-            let selectedLottery = 'ssq';
-            let scratchCanvasData = null;
+        // 初始化/重置游戏
+        function initGame() {
+            currentBalance = INITIAL_BALANCE;
+            updateBalanceDisplay();
+            document.getElementById('game-over-modal').classList.remove('active');
+            renderTickets();
+        }
 
-            const $ = (id) => document.getElementById(id);
-
-            // ============================================
-            // 视图切换
-            // ============================================
-            function switchView(viewId) {
-                const views = document.querySelectorAll('.view');
-                views.forEach(v => v.classList.remove('active'));
-                const target = $(viewId);
-                if (target) {
-                    target.classList.add('active');
-                    if (viewId === 'view-game' && gameState) {
-                        renderGameView();
-                    }
+        // 渲染彩票列表
+        function renderTickets() {
+            const container = document.getElementById('tickets-container');
+            container.innerHTML = '';
+            
+            tickets.forEach(ticket => {
+                const maxPrize = formatMoney(ticket.rewards[0].prize);
+                const card = document.createElement('div');
+                const canAfford = currentBalance >= ticket.cost;
+                
+                card.className = `ticket-card ${canAfford ? '' : 'disabled'}`;
+                card.style.borderTop = `4px solid ${ticket.color}`;
+                
+                card.innerHTML = `
+                    <div class="ticket-name" style="color: ${ticket.color}">${ticket.name}</div>
+                    <div class="ticket-desc">${ticket.desc}</div>
+                    <div style="font-size: 0.9rem; margin-bottom: 15px;">最高可中: <span style="color:var(--primary)">¥${maxPrize}</span></div>
+                    <div class="ticket-cost">售价: ¥${formatMoney(ticket.cost)}</div>
+                    <button class="btn-buy" style="${!canAfford ? 'background: #555;' : ''}">${canAfford ? '购买并刮开' : '资金不足'}</button>
+                `;
+                
+                if (canAfford) {
+                    card.onclick = () => buyTicket(ticket);
                 }
-                const mainEl = $('gameMain');
-                if (mainEl) mainEl.scrollTop = 0;
+                
+                container.appendChild(card);
+            });
+        }
+
+        // 更新余额显示并检查游戏结束状态
+        function updateBalanceDisplay() {
+            const display = document.getElementById('balance-display');
+            display.innerText = formatMoney(currentBalance);
+            
+            // 添加数字跳动动画效果
+            display.style.transform = 'scale(1.1)';
+            setTimeout(() => { display.style.transform = 'scale(1)'; }, 200);
+
+            // 检查结局
+            checkEndings();
+        }
+
+        // 抽奖核心逻辑
+        function getReward(ticket) {
+            const rand = Math.random();
+            let cumulativeChance = 0;
+            
+            for (let reward of ticket.rewards) {
+                cumulativeChance += reward.chance;
+                if (rand < cumulativeChance) {
+                    return reward.prize;
+                }
+            }
+            return 0; // 兜底
+        }
+
+        // 购买动作与动画流程
+        function buyTicket(ticket) {
+            if (isScratching || currentBalance < ticket.cost) return;
+            
+            // 扣钱
+            currentBalance -= ticket.cost;
+            isScratching = true;
+            renderTickets(); // 更新按钮状态
+            updateBalanceDisplay();
+
+            // 计算结果
+            const wonAmount = getReward(ticket);
+            
+            // 执行UI动画
+            showScratchAnimation(wonAmount, () => {
+                // 动画结束，结算奖金
+                if (wonAmount > 0) {
+                    currentBalance += wonAmount;
+                }
+                isScratching = false;
+                updateBalanceDisplay();
+                renderTickets();
+            });
+        }
+
+        // 刮刮乐视觉模拟
+        function showScratchAnimation(wonAmount, callback) {
+            const overlay = document.getElementById('scratch-overlay');
+            const coating = document.getElementById('scratch-coating');
+            const resultText = document.getElementById('scratch-result-text');
+            
+            // 初始化状态
+            coating.classList.remove('revealed');
+            resultText.classList.remove('show');
+            resultText.className = 'scratch-result';
+            
+            if (wonAmount > 0) {
+                resultText.innerHTML = `🎉 中奖了！<br><span style="font-size:1.5rem">¥${formatMoney(wonAmount)}</span>`;
+                resultText.classList.add('win-text');
+            } else {
+                resultText.innerHTML = `未中奖<br><span style="font-size:1rem; opacity:0.7">谢谢惠顾</span>`;
+                resultText.classList.add('lose-text');
             }
 
-            // ============================================
-            // 游戏初始化
-            // ============================================
-            function startGame() {
-                gameState = {
-                    funds: INITIAL_FUNDS,
-                    totalPurchases: 0,
-                    totalSpent: 0,
-                    totalWon: 0,
-                    netProfit: 0,
-                    history: [],
-                    isGameOver: false,
-                    gameResult: null,
-                    startFunds: INITIAL_FUNDS
-                };
-                selectedLottery = 'ssq';
-                switchView('view-game');
-                renderGameView();
-                updateHeaderInfo();
-            }
+            overlay.classList.add('active');
 
-            function resetToStart() {
-                if (gameState && !gameState.isGameOver) {
-                    if (!confirm('确定要重新开始吗？当前进度将丢失。')) return;
-                }
-                startGame();
-            }
+            // 模拟刮涂层的时间延迟 (1.2秒)
+            setTimeout(() => {
+                coating.classList.add('revealed');
+                resultText.classList.add('show');
+                
+                // 展示结果后停留一小段时间再关闭
+                setTimeout(() => {
+                    overlay.classList.remove('active');
+                    callback();
+                }, 1500);
+            }, 1200);
+        }
 
-            // ============================================
-            // 更新头部信息
-            // ============================================
-            function updateHeaderInfo() {
-                if (!gameState) {
-                    $('headerFunds').textContent = '¥10,000';
-                    $('headerCount').textContent = '0';
-                    $('headerNet').textContent = '¥0';
-                    return;
-                }
-                $('headerFunds').textContent = formatMoney(gameState.funds);
-                $('headerCount').textContent = gameState.totalPurchases;
-                const netColor = gameState.netProfit >= 0 ? '' : ' style="color:#FF6B6B;"';
-                $('headerNet').innerHTML = formatMoney(gameState.netProfit);
-            }
+        // 检查是否达成结局
+        function checkEndings() {
+            if (isScratching) return; // 动画期间不弹结算
 
-            function formatMoney(amount) {
-                if (amount >= 100000000) return '¥' + (amount / 100000000).toFixed(2) + '亿';
-                if (amount >= 10000) return '¥' + (amount / 10000).toFixed(2) + '万';
-                return '¥' + amount.toLocaleString('zh-CN');
-            }
-
-            // ============================================
-            // 渲染游戏视图
-            // ============================================
-            function renderGameView() {
-                if (!gameState) return;
-                // 统计面板
-                $('statFunds').textContent = formatMoney(gameState.funds);
-                $('statPurchases').textContent = gameState.totalPurchases;
-                $('statSpent').textContent = formatMoney(gameState.totalSpent);
-                $('statWon').textContent = formatMoney(gameState.totalWon);
-                $('statNet').textContent = formatMoney(gameState.netProfit);
-                const winRate = gameState.totalPurchases > 0 ? ((gameState.history.filter(h => h.won).length / gameState
-                    .totalPurchases) * 100).toFixed(1) + '%' : '0%';
-                $('statWinRate').textContent = winRate;
-
-                // 彩票选择
-                const grid = $('lotteryGrid');
-                if (grid) {
-                    let html = '';
-                    LOTTERY_TYPES.forEach(lt => {
-                        const cls = lt.id === selectedLottery ? 'lottery-card selected' : 'lottery-card';
-                        html += `<div class="${cls}" onclick="selectLotteryType('${lt.id}')">
-                                <div class="lottery-card-name">${lt.icon} ${lt.name}</div>
-                                <div class="lottery-card-price">${lt.desc}</div>
-                                <div class="lottery-card-prize">最高奖金 ${formatMoney(lt.maxPrize)}</div>
-                                <div class="lottery-card-desc">${lt.id === 'ggl' ? '即开型 · 刮开涂层查看结果' : '数字型 · 电脑开奖'}</div>
-                            </div>`;
-                    });
-                    grid.innerHTML = html;
-                }
-
-                // 历史记录
-                renderHistory();
-
-                // 更新购买按钮状态
-                const buyBtn = $('btnBuy');
-                if (buyBtn) {
-                    buyBtn.disabled = gameState.isGameOver;
-                }
-
-                updateHeaderInfo();
-            }
-
-            function selectLotteryType(id) {
-                selectedLottery = id;
-                renderGameView();
-            }
-
-            function renderHistory() {
-                const listEl = $('historyList');
-                if (!listEl || !gameState) return;
-                if (gameState.history.length === 0) {
-                    listEl.innerHTML = '<div class="history-entry">暂无记录。</div>';
-                    return;
-                }
-                const entries = gameState.history.slice(-30).reverse();
-                let html = '';
-                entries.forEach(h => {
-                    const typeCls = h.won ? 'history-win' : 'history-lose';
-                    const amountCls = h.won ? 'win' : 'lose';
-                    const amountStr = h.won ? '+' + formatMoney(h.prize) : '-' + formatMoney(h.cost);
-                    html += `<div class="history-entry">
-                            <span class="history-time">#${h.index}</span>
-                            <span class="history-type ${typeCls}">${h.lotteryName}</span>
-                            <span>${h.detail}</span>
-                            <span class="history-amount ${amountCls}">${amountStr}</span>
-                        </div>`;
-                });
-                listEl.innerHTML = html;
-            }
-
-            // ============================================
-            // 购买与开奖逻辑
-            // ============================================
-            function buyLottery() {
-                if (!gameState || gameState.isGameOver) return;
-                const quantity = Math.max(1, Math.min(100, parseInt($('quantity').value) || 1));
-                const lottery = LOTTERY_TYPES.find(l => l.id === selectedLottery);
-                if (!lottery) return;
-
-                const totalCost = lottery.price * quantity;
-                if (gameState.funds < totalCost) {
-                    alert('资金不足，无法购买。\n请减少购买数量或选择其他彩票。');
-                    return;
-                }
-
-                // 扣除资金
-                gameState.funds -= totalCost;
-                gameState.totalSpent += totalCost;
-                gameState.totalPurchases += quantity;
-
-                let totalPrize = 0;
-                let wonAny = false;
-                let details = [];
-
-                if (lottery.id === 'ggl') {
-                    // 刮刮乐
-                    for (let i = 0; i < quantity; i++) {
-                        const result = drawSingleLottery(lottery.id);
-                        totalPrize += result.prize;
-                        if (result.prize > 0) wonAny = true;
-                        details.push(result.label + (result.prize > 0 ? ' +¥' + result.prize : ''));
-                    }
-                } else {
-                    // 数字型彩票
-                    for (let i = 0; i < quantity; i++) {
-                        const result = drawSingleLottery(lottery.id);
-                        totalPrize += result.prize;
-                        if (result.prize > 0) wonAny = true;
-                        details.push(result.label + (result.prize > 0 ? ' +¥' + result.prize : ''));
-                    }
-                }
-
-                // 更新资金
-                gameState.funds += totalPrize;
-                gameState.totalWon += totalPrize;
-                gameState.netProfit = gameState.totalWon - gameState.totalSpent;
-
-                // 记录历史
-                const index = gameState.totalPurchases;
-                gameState.history.push({
-                    index: index,
-                    lotteryName: lottery.name,
-                    cost: totalCost,
-                    prize: totalPrize,
-                    won: totalPrize > 0,
-                    detail: details.join(' · ') + (totalPrize > 0 ? ' | 中奖 ¥' + totalPrize : ' | 未中奖')
-                });
-
-                // 显示结果
-                const resultDisplay = $('resultDisplay');
-                if (resultDisplay) {
-                    if (totalPrize > 0) {
-                        resultDisplay.innerHTML = `
-                            <span class="result-text" style="color:#2E7D32;">中奖！</span>
-                            <span class="result-amount">+${formatMoney(totalPrize)}</span>
-                            <span class="result-detail">${lottery.name} × ${quantity} | 花费 ${formatMoney(totalCost)} | 净收益 ${formatMoney(totalPrize - totalCost)}</span>
-                        `;
-                    } else {
-                        resultDisplay.innerHTML = `
-                            <span class="result-text" style="color:#B71C1C;">未中奖</span>
-                            <span class="result-detail">${lottery.name} × ${quantity} | 花费 ${formatMoney(totalCost)}</span>
-                        `;
-                    }
-                }
-
-                // 检查结局
-                if (gameState.funds >= TARGET_FUNDS) {
-                    endGame('win');
-                    return;
-                }
-                if (gameState.funds <= 0) {
-                    endGame('lose');
-                    return;
-                }
-
-                // 随机劝退提醒
-                if (gameState.totalPurchases > 10 && Math.random() < 0.3) {
-                    showWarningReminder();
-                }
-
-                renderGameView();
-                updateHeaderInfo();
-            }
-
-            function drawSingleLottery(lotteryId) {
-                const odds = ODDS[lotteryId];
-                if (!odds) return { prize: 0, label: '未中奖' };
-
-                let random = Math.random();
-                let cumulative = 0;
-                for (const tier of odds) {
-                    cumulative += tier.prob;
-                    if (random <= cumulative) {
-                        return { prize: tier.prize, label: tier.label };
-                    }
-                }
-                return { prize: 0, label: '未中奖' };
-            }
-
-            function showWarningReminder() {
-                const warnings = [
-                    '【提醒】您已连续购买多次，请注意控制购彩频率。',
-                    '【警示】彩票中奖纯属概率事件，切勿抱有侥幸心理。',
-                    '【忠告】理性购彩，量力而行。切勿将生活资金用于购买彩票。',
-                    '【心理健康】如感到无法控制购彩冲动，请及时寻求专业帮助。',
-                    '【法律提示】中国彩票为公益性质，严禁赌博。过度购买有害身心健康。'
-                ];
-                const msg = warnings[Math.floor(Math.random() * warnings.length)];
-                alert(msg);
-            }
-
-            // ============================================
-            // 结局系统
-            // ============================================
-            function endGame(type) {
-                if (!gameState || gameState.isGameOver) return;
-                gameState.isGameOver = true;
-                gameState.gameResult = type;
-
-                const endingTitle = $('endingTitle');
-                const endingMessage = $('endingMessage');
-                const endingLesson = $('endingLesson');
-
-                if (type === 'win') {
-                    endingTitle.textContent = '🏆 走向人生巅峰';
-                    endingTitle.className = 'ending-title win';
-                    endingMessage.textContent =
-                        `恭喜您！您的总金额已达到 ${formatMoney(TARGET_FUNDS)}，成功实现"财富自由"。\n\n` +
-                        `但这仅仅是模拟器中的极端概率事件。在现实生活中，彩票中得如此巨额大奖的概率微乎其微。` +
-                        `真正的财富积累依靠的是辛勤劳动、理性投资和持续学习，而非寄望于运气。` +
-                        `希望您能从这个模拟中认识到：彩票可以作为一种小额娱乐，但绝不能视为致富途径。`;
-                    endingLesson.innerHTML = `
-                        <strong>【警示教导】</strong><br>
-                        1. 彩票中奖是极端小概率事件，本次"成功"仅为模拟器效果。<br>
-                        2. 《中华人民共和国刑法》第303条规定：以营利为目的，聚众赌博或者以赌博为业的，处三年以下有期徒刑、拘役或者管制，并处罚金。<br>
-                        3. 过度沉迷彩票可能导致家庭破裂、债务缠身和心理疾病。<br>
-                        4. 请将时间和精力投入到工作、学习和家庭中，这才是真正的人生赢家之路。<br>
-                        5. 如果您或身边的人有赌博倾向，请拨打心理援助热线寻求帮助。
-                    `;
-                } else {
-                    endingTitle.textContent = '💸 您已破产';
-                    endingTitle.className = 'ending-title lose';
-                    endingMessage.textContent =
-                        `很遗憾，您的资金已全部耗尽，宣告破产。\n\n` +
-                        `在本次模拟中，您共购买 ${gameState.totalPurchases} 次彩票，总花费 ${formatMoney(gameState.totalSpent)}，` +
-                        `总中奖 ${formatMoney(gameState.totalWon)}，净亏损 ${formatMoney(Math.abs(gameState.netProfit))}。` +
-                        `这正是沉迷彩票的真实写照——绝大多数人最终都会以亏损告终。`;
-                    endingLesson.innerHTML = `
-                        <strong>【警示教导】</strong><br>
-                        1. 彩票的本质是公益性质的娱乐活动，而非投资或致富手段。<br>
-                        2. 数学上，彩票的期望收益为负值，长期购买必然亏损。<br>
-                        3. 《彩票管理条例》明确规定：彩票发行机构、彩票销售机构、彩票代销者不得向未成年人销售彩票。<br>
-                        4. 沉迷赌博式购彩会引发焦虑、抑郁等心理问题，严重时会导致家庭悲剧。<br>
-                        5. 请珍惜您的时间和金钱，远离赌博陷阱。如有需要，请向专业心理机构寻求帮助。
-                    `;
-                }
-
-                switchView('view-ending');
-            }
-
-            // ============================================
-            // 关于系统
-            // ============================================
-            function showAboutInfo() {
-                alert(
-                    '═══════════════════════════════\n' +
-                    '理 性 抉 择 · 彩票警示模拟器\n' +
-                    '═══════════════════════════════\n' +
-                    '版本：1.0\n' +
-                    '类型：商业级警示模拟系统\n\n' +
-                    '系统说明：\n' +
-                    '1. 初始资金10,000元，目标10亿元。\n' +
-                    '2. 可购买6种彩票，价格2-5元不等。\n' +
-                    '3. 中奖概率参照真实彩票设计。\n' +
-                    '4. 破产或达到10亿将触发结局。\n' +
-                    '5. 本系统旨在揭示赌博危害，倡导理性购彩。\n\n' +
-                    '【重要警示】\n' +
-                    '本模拟器的所有中奖均为程序随机生成，\n' +
-                    '不代表真实彩票中奖概率。\n' +
-                    '真实彩票中奖概率极低，请务必理性对待。\n' +
-                    '═══════════════════════════════'
+            const minCost = Math.min(...tickets.map(t => t.cost));
+            
+            // 结局1：走向人生巅峰
+            if (currentBalance >= TARGET_BALANCE) {
+                triggerEnding(
+                    "🎉",
+                    "恭喜您，总金额达到10亿！",
+                    "title-win",
+                    "您战胜了那微乎其微的概率，走向了人生的巅峰！但请记住，这仅仅是代码编写的童话。"
+                );
+            } 
+            // 结局2：破产清零 (资金小于最便宜的彩票即视为破产)
+            else if (currentBalance < minCost) {
+                triggerEnding(
+                    "💀",
+                    "很遗憾，您破产了",
+                    "title-lose",
+                    "您的财富已清零，所有的美梦都在此刻破碎。这就是现实的残酷。"
                 );
             }
+        }
 
-            function confirmReturnToMenu() {
-                if (gameState && !gameState.isGameOver) {
-                    if (!confirm('确定要退出到主菜单吗？当前进度将丢失。')) return;
-                }
-                switchView('view-menu');
-            }
+        function triggerEnding(icon, title, titleClass, desc) {
+            document.getElementById('ending-icon').innerText = icon;
+            const titleEl = document.getElementById('ending-title');
+            titleEl.innerText = title;
+            titleEl.className = `ending-title ${titleClass}`;
+            document.getElementById('ending-desc').innerText = desc;
+            
+            // 延迟一点点弹出，让玩家看清最后的余额
+            setTimeout(() => {
+                document.getElementById('game-over-modal').classList.add('active');
+            }, 500);
+        }
 
-            // ============================================
-            // 导出全局函数
-            // ============================================
-            window.switchView = switchView;
-            window.startGame = startGame;
-            window.resetToStart = resetToStart;
-            window.selectLotteryType = selectLotteryType;
-            window.buyLottery = buyLottery;
-            window.showAboutInfo = showAboutInfo;
-            window.confirmReturnToMenu = confirmReturnToMenu;
+        // 页面加载完毕初始化
+        window.onload = initGame;
 
-            // ============================================
-            // 初始化
-            // ============================================
-            function init() {
-                updateHeaderInfo();
-                switchView('view-menu');
-                // 监听数量输入
-                const qtyInput = $('quantity');
-                if (qtyInput) {
-                    qtyInput.addEventListener('change', function() {
-                        let v = parseInt(this.value) || 1;
-                        if (v < 1) v = 1;
-                        if (v > 100) v = 100;
-                        this.value = v;
-                    });
-                }
-            }
-
-            init();
-
-        })();
     </script>
 </body>
 </html>

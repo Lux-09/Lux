@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>彩票理性模拟器 - 液态玻璃版</title>
+    <title>彩票理性模拟器 - 音效玻璃版</title>
     <style>
         :root {
             --primary-glow: #6366f1;
@@ -142,7 +142,7 @@
             margin-bottom: 8px;
             display: flex;
             align-items: center;
-            gap: 6px;
+            justify-content: space-between;
         }
 
         .rules-grid {
@@ -426,7 +426,7 @@
         .txt-win { color: var(--win-color); font-weight: 700; }
         .txt-lose { color: var(--lose-color); }
 
-        /* 胜负劝解弹窗 */
+        /* 胜负结算弹窗 */
         .modal-overlay {
             position: fixed;
             top: 0; left: 0; right: 0; bottom: 0;
@@ -525,6 +525,7 @@
 </head>
 <body>
 
+<!-- 背景液态斑块 -->
 <div class="ambient-light">
     <div class="blob blob-1"></div>
     <div class="blob blob-2"></div>
@@ -532,13 +533,18 @@
 </div>
 
 <div class="container">
+    <!-- 头部 -->
     <header class="header">
         <h1>🎰 彩票理性模拟器</h1>
-        <p>液态玻璃体验版 · 沉浸模拟 · 理性看彩</p>
+        <p>液态玻璃体验版 · 纯音效渲染 · 理性看彩</p>
     </header>
 
+    <!-- 中奖规则说明卡片 -->
     <section class="rules-card">
-        <div class="rules-title">📜 游戏中奖规则（每注10元）</div>
+        <div class="rules-title">
+            <span>📜 游戏中奖规则（每注10元）</span>
+            <span style="font-size: 0.75rem; color: var(--accent-cyan); font-weight: normal;">🔊 Web Audio 原生音效已开启</span>
+        </div>
         <div class="rules-grid">
             <div>🎯 <strong>特等奖 (差值=0):</strong> 500元/注</div>
             <div>✨ <strong>二等奖 (差值≤5):</strong> 50元/注</div>
@@ -547,6 +553,7 @@
         </div>
     </section>
 
+    <!-- 资金与目标面板 -->
     <section class="dashboard">
         <div class="metric-card">
             <div class="metric-label">当前可用资金</div>
@@ -558,6 +565,7 @@
         </div>
     </section>
 
+    <!-- 目标进度条 -->
     <section class="progress-box">
         <div class="progress-header">
             <span>目标达成进度 (目标 10,000 元)</span>
@@ -568,6 +576,7 @@
         </div>
     </section>
 
+    <!-- 下注操作区 -->
     <section class="control-section">
         <div class="control-group">
             <span class="control-label">选择号码 (1 ~ 100)</span>
@@ -595,6 +604,7 @@
         <button class="btn-buy" id="buyBtn" onclick="playLottery()">购买彩票</button>
     </section>
 
+    <!-- 开奖区域 -->
     <section class="result-card">
         <div class="balls-container">
             <div class="ball-wrapper">
@@ -612,6 +622,7 @@
         </div>
     </section>
 
+    <!-- 历史记录 -->
     <section class="history-section">
         <h3>最近 10 次购买记录</h3>
         <table class="history-table">
@@ -634,6 +645,7 @@
     </section>
 </div>
 
+<!-- 胜负结算弹窗 -->
 <div class="modal-overlay" id="gameModal">
     <div class="modal">
         <div class="modal-title" id="modalTitle">提示标题</div>
@@ -652,7 +664,90 @@
 </div>
 
 <script>
-    // 游戏状态
+    // ==========================================
+    // Web Audio API 音效生成模块 (无外部资源依赖)
+    // ==========================================
+    let audioCtx = null;
+
+    function initAudio() {
+        if (!audioCtx) {
+            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        }
+        if (audioCtx.state === 'suspended') {
+            audioCtx.resume();
+        }
+    }
+
+    // 播放滚动跳动音效 (短促轻微的木质/嘀嗒声)
+    function playTickSound() {
+        if (!audioCtx) return;
+        try {
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+
+            osc.type = 'sine';
+            // 每次跳动微调音高，增强灵动感
+            const freq = 500 + Math.random() * 120;
+            osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+
+            gain.gain.setValueAtTime(0.04, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.035);
+
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.035);
+        } catch (e) { console.error(e); }
+    }
+
+    // 播放结果音效 (依据中奖等级合成和弦)
+    function playWinSound(tier) {
+        if (!audioCtx) return;
+        try {
+            let notes = [];
+            let waveType = 'triangle';
+
+            if (tier === 'grand') {
+                // 特等奖：欢快琶音 C5 -> E5 -> G5 -> C6
+                notes = [523.25, 659.25, 783.99, 1046.50];
+            } else if (tier === 'second') {
+                // 二等奖：清亮和弦 C5 -> G5 -> C6
+                notes = [523.25, 783.99, 1046.50];
+            } else if (tier === 'third') {
+                // 三等奖：双音提示 E5 -> G5
+                notes = [659.25, 783.99];
+            } else {
+                // 未中奖：低沉缓和音
+                notes = [261.63, 220.00];
+                waveType = 'sine';
+            }
+
+            notes.forEach((freq, idx) => {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+
+                osc.type = waveType;
+                const startTime = audioCtx.currentTime + idx * 0.08;
+                const duration = (tier === 'lose') ? 0.12 : 0.22;
+
+                osc.frequency.setValueAtTime(freq, startTime);
+
+                gain.gain.setValueAtTime(0.08, startTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, startTime + duration);
+
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+
+                osc.start(startTime);
+                osc.stop(startTime + duration);
+            });
+        } catch (e) { console.error(e); }
+    }
+
+    // ==========================================
+    // 游戏主逻辑
+    // ==========================================
     let balance = 100;
     let cumulativeSpent = 0;
     const TARGET_SPENT = 10000;
@@ -660,7 +755,7 @@
     let currentBets = 1;
     let roundCount = 0;
     let historyList = [];
-    let isRolling = false; // 正在开奖标记
+    let isRolling = false;
 
     // DOM 引用
     const elBalance = document.getElementById('balance');
@@ -677,18 +772,18 @@
     const elModal = document.getElementById('gameModal');
     const buyBtn = document.getElementById('buyBtn');
 
-    // 调整选号
     function adjustNumber(delta) {
         if (isRolling) return;
+        initAudio();
         currentNumber += delta;
         if (currentNumber < 1) currentNumber = 100;
         if (currentNumber > 100) currentNumber = 1;
         elSelectedNum.value = currentNumber;
     }
 
-    // 调整注数
     function adjustBets(delta) {
         if (isRolling) return;
+        initAudio();
         currentBets += delta;
         if (currentBets < 1) currentBets = 1;
         if (currentBets > 10) currentBets = 10;
@@ -712,7 +807,6 @@
         updateCost();
     }
 
-    // 设置按键启用/禁用状态
     function setControlsDisabled(disabled) {
         isRolling = disabled;
         buyBtn.disabled = disabled;
@@ -722,44 +816,42 @@
         document.getElementById('btnBetPlus').disabled = disabled;
     }
 
-    // 开奖主逻辑
     function playLottery() {
         if (isRolling) return;
 
+        // 初始化音频上下文
+        initAudio();
+
         const cost = currentBets * 10;
 
-        // 检查资金是否足够支付本次下注
         if (balance < cost) {
             triggerGameOver(false);
             return;
         }
 
-        // 禁用按键，开始摇奖动画
         setControlsDisabled(true);
 
-        // 扣除下注资金与增加累计消费
         balance -= cost;
         cumulativeSpent += cost;
         roundCount++;
         updateUI();
 
-        // 显示用户选择
         elDispUserNum.innerText = currentNumber;
         elResultStatus.innerText = "开奖中，幸运数字摇号中...";
         elResultStatus.style.color = "var(--text-muted)";
         elDispDrawnNum.classList.add('rolling');
 
-        // 生成最终中奖数字 (1~100)
         const finalDrawnNumber = Math.floor(Math.random() * 100) + 1;
 
-        // 数字跳动滚动动画 (持续 1.2 秒)
         let rollCounter = 0;
-        const totalRolls = 24; // 24次变幻
+        const totalRolls = 24;
         const rollInterval = setInterval(() => {
-            // 随机显示 1~100 的数字
             elDispDrawnNum.innerText = Math.floor(Math.random() * 100) + 1;
+            
+            // 播放跳动音效
+            playTickSound();
+            
             rollCounter++;
-
             if (rollCounter >= totalRolls) {
                 clearInterval(rollInterval);
                 finishDraw(finalDrawnNumber, cost);
@@ -767,7 +859,6 @@
         }, 50);
     }
 
-    // 动画结束，结算奖金
     function finishDraw(drawnNumber, cost) {
         elDispDrawnNum.classList.remove('rolling');
         elDispDrawnNum.innerText = drawnNumber;
@@ -776,33 +867,38 @@
         let prizePerBet = 0;
         let prizeTierName = "未中奖";
         let statusColor = "var(--lose-color)";
+        let soundTier = "lose";
 
         if (diff === 0) {
             prizePerBet = 500;
             prizeTierName = "🎉 特等大奖";
             statusColor = "var(--win-color)";
+            soundTier = "grand";
         } else if (diff <= 5) {
             prizePerBet = 50;
             prizeTierName = "✨ 二等奖";
             statusColor = "var(--win-color)";
+            soundTier = "second";
         } else if (diff <= 10) {
             prizePerBet = 10;
             prizeTierName = "👍 三等奖 (保本)";
             statusColor = "var(--accent-gold)";
+            soundTier = "third";
         }
 
         const totalPrize = currentBets * prizePerBet;
         const netProfit = totalPrize - cost;
         balance += totalPrize;
 
-        // 结果状态文本
+        // 播放对应的结果音效
+        playWinSound(soundTier);
+
         if (totalPrize > 0) {
             elResultStatus.innerHTML = `<span style="color:${statusColor}">${prizeTierName}！获得奖金 ${totalPrize} 元</span>`;
         } else {
             elResultStatus.innerHTML = `<span style="color:var(--lose-color)">未中奖 (号码差值: ${diff})</span>`;
         }
 
-        // 添加历史
         addHistory({
             round: roundCount,
             userNum: currentNumber,
@@ -812,17 +908,14 @@
             net: netProfit
         });
 
-        // 更新 UI
         updateUI();
         setControlsDisabled(false);
 
-        // 检查胜利条件 (累计花费≥10,000)
         if (cumulativeSpent >= TARGET_SPENT) {
             triggerGameOver(true);
             return;
         }
 
-        // 检查余额是否已不足支持下一次购买
         if (balance < cost) {
             triggerGameOver(false);
         }
@@ -868,6 +961,7 @@
                 <div><strong>最终可用资金：</strong>${balance} 元</div>
                 <div><strong>总共购买期数：</strong>${roundCount} 期</div>
             `;
+            playWinSound('grand');
         } else {
             modalTitle.innerText = "😔 资金不足，无法继续购买";
             modalTitle.style.color = "var(--lose-color)";
@@ -876,6 +970,7 @@
                 <div><strong>剩余可用资金：</strong>${balance} 元</div>
                 <div><strong>尝试购买开销：</strong>${currentBets * 10} 元</div>
             `;
+            playWinSound('lose');
         }
 
         elModal.classList.add('active');
@@ -903,7 +998,7 @@
         elModal.classList.remove('active');
     }
 
-    // 初始化
+    // 初始化 UI
     updateUI();
 </script>
 

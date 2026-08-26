@@ -12,7 +12,7 @@
             --accent-pink: #ec4899;
             --accent-gold: #f59e0b;
             --bg-dark: #0f172a;
-            --card-bg: rgba(30, 41, 59, 0.7);
+            --card-bg: rgba(30, 41, 59, 0.75);
             --card-border: rgba(255, 255, 255, 0.12);
             --text-main: #f8fafc;
             --text-muted: #94a3b8;
@@ -36,89 +36,93 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            padding: 16px;
+            padding: 12px;
         }
 
-        /* 动态背景 */
+        /* 动态背景光斑 */
         .bg-glow {
             position: fixed;
             top: 0; left: 0; width: 100vw; height: 100vh;
             z-index: -1;
             overflow: hidden;
-            filter: blur(90px);
-            opacity: 0.5;
+            filter: blur(100px);
+            opacity: 0.45;
         }
 
         .blob {
             position: absolute;
             border-radius: 50%;
-            animation: float 14s infinite alternate ease-in-out;
+            animation: float 16s infinite alternate ease-in-out;
         }
 
-        .blob-1 { width: 450px; height: 450px; background: var(--primary); top: -100px; left: -100px; }
-        .blob-2 { width: 400px; height: 400px; background: var(--accent-cyan); bottom: -100px; right: -100px; animation-delay: -7s; }
+        .blob-1 { width: 500px; height: 500px; background: var(--primary); top: -100px; left: -100px; }
+        .blob-2 { width: 450px; height: 450px; background: var(--accent-cyan); bottom: -100px; right: -100px; animation-delay: -8s; }
 
         @keyframes float {
             0% { transform: translate(0, 0) scale(1); }
-            100% { transform: translate(40px, 60px) scale(1.1); }
+            100% { transform: translate(50px, 70px) scale(1.1); }
         }
 
-        /* 主响应式容器 - 默认满屏铺开 */
+        /* 画面外层容器 - 充分拉伸铺满屏幕 */
         .app-wrapper {
             width: 100%;
-            max-width: 1280px;
-            min-height: calc(100vh - 32px);
+            max-width: 1600px;
+            min-height: calc(100vh - 24px);
             display: flex;
             flex-direction: column;
-            gap: 16px;
+            gap: 12px;
         }
 
-        /* 头部栏 */
+        /* 顶部栏 */
         .header {
             text-align: center;
             padding: 12px 16px;
             background: var(--card-bg);
             border: 1px solid var(--card-border);
-            border-radius: 16px;
+            border-radius: 14px;
             backdrop-filter: blur(16px);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
 
-        .header h1 {
-            font-size: 1.6rem;
+        .header-title h1 {
+            font-size: 1.5rem;
             letter-spacing: 1px;
             background: linear-gradient(135deg, #fff, var(--text-muted));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
+            text-align: left;
         }
 
-        .header p {
-            font-size: 0.85rem;
+        .header-title p {
+            font-size: 0.8rem;
             color: var(--text-muted);
-            margin-top: 4px;
         }
 
-        /* 网格主体布局 */
-        .main-grid {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 16px;
-            flex: 1;
+        .audio-status-tag {
+            font-size: 0.75rem;
+            color: var(--accent-cyan);
+            background: rgba(6, 182, 212, 0.12);
+            padding: 4px 10px;
+            border-radius: 20px;
+            border: 1px solid rgba(6, 182, 212, 0.3);
         }
 
-        /* 通用卡片样式 */
+        /* 通用面板卡片 */
         .panel {
             background: var(--card-bg);
             border: 1px solid var(--card-border);
             border-radius: 16px;
-            padding: 18px;
+            padding: 16px;
             backdrop-filter: blur(16px);
             display: flex;
             flex-direction: column;
-            gap: 16px;
+            gap: 14px;
         }
 
         .panel-title {
-            font-size: 1rem;
+            font-size: 0.95rem;
             font-weight: 700;
             color: var(--accent-gold);
             display: flex;
@@ -126,13 +130,16 @@
             align-items: center;
         }
 
-        /* 规则网格 */
+        /* 规则列表 */
         .rules-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-            gap: 8px;
-            font-size: 0.82rem;
+            grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+            gap: 6px;
+            font-size: 0.8rem;
             color: var(--text-muted);
+            background: rgba(0, 0, 0, 0.2);
+            padding: 10px;
+            border-radius: 10px;
         }
 
         .rules-grid strong { color: #fff; }
@@ -141,29 +148,29 @@
         .dashboard {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 12px;
+            gap: 10px;
         }
 
         .metric-card {
             background: rgba(0, 0, 0, 0.25);
             border: 1px solid var(--card-border);
             border-radius: 12px;
-            padding: 12px;
+            padding: 10px;
             text-align: center;
         }
 
-        .metric-label { font-size: 0.8rem; color: var(--text-muted); margin-bottom: 4px; }
-        .metric-value { font-size: 1.4rem; font-weight: 800; }
+        .metric-label { font-size: 0.78rem; color: var(--text-muted); margin-bottom: 2px; }
+        .metric-value { font-size: 1.35rem; font-weight: 800; }
         .metric-value.balance { color: var(--win-color); }
         .metric-value.spent { color: var(--accent-cyan); }
 
-        /* 目标进度条 */
-        .progress-box { display: flex; flex-direction: column; gap: 6px; }
-        .progress-header { display: flex; justify-content: space-between; font-size: 0.82rem; color: var(--text-muted); }
+        /* 进度条 */
+        .progress-box { display: flex; flex-direction: column; gap: 4px; }
+        .progress-header { display: flex; justify-content: space-between; font-size: 0.8rem; color: var(--text-muted); }
         .progress-bar-bg {
-            width: 100%; height: 10px;
+            width: 100%; height: 8px;
             background: rgba(0, 0, 0, 0.4);
-            border-radius: 6px;
+            border-radius: 4px;
             overflow: hidden;
             border: 1px solid var(--card-border);
         }
@@ -173,261 +180,169 @@
             transition: width 0.3s ease;
         }
 
-        /* 滑块控制区 */
-        .control-group {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-
-        .control-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-size: 0.9rem;
-            font-weight: 600;
-        }
-
+        /* 滑块控制器 */
+        .control-group { display: flex; flex-direction: column; gap: 6px; }
+        .control-header { display: flex; justify-content: space-between; align-items: center; font-size: 0.85rem; font-weight: 600; }
         .badge-value {
             background: var(--primary);
             color: white;
-            padding: 2px 10px;
-            border-radius: 12px;
-            font-size: 0.85rem;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 0.8rem;
             font-weight: 700;
         }
 
-        /* 原生滑块美化 */
-        input[type=range] {
-            -webkit-appearance: none;
-            width: 100%;
-            background: transparent;
-        }
-
+        input[type=range] { -webkit-appearance: none; width: 100%; background: transparent; }
         input[type=range]:focus { outline: none; }
-
         input[type=range]::-webkit-slider-runnable-track {
-            width: 100%;
-            height: 8px;
-            cursor: pointer;
-            background: rgba(255, 255, 255, 0.15);
-            border-radius: 4px;
-            border: 1px solid var(--card-border);
+            width: 100%; height: 8px; cursor: pointer;
+            background: rgba(255, 255, 255, 0.15); border-radius: 4px; border: 1px solid var(--card-border);
         }
-
         input[type=range]::-webkit-slider-thumb {
-            height: 20px;
-            width: 20px;
-            border-radius: 50%;
-            background: #ffffff;
-            cursor: pointer;
-            -webkit-appearance: none;
-            margin-top: -6px;
-            box-shadow: 0 0 10px var(--primary);
-            transition: transform 0.1s;
-        }
-
-        input[type=range]::-webkit-slider-thumb:hover {
-            transform: scale(1.15);
+            height: 20px; width: 20px; border-radius: 50%;
+            background: #ffffff; cursor: pointer; -webkit-appearance: none;
+            margin-top: -6px; box-shadow: 0 0 10px var(--primary);
         }
 
         .cost-summary {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-size: 0.9rem;
-            color: var(--text-muted);
-            padding-top: 6px;
+            display: flex; justify-content: space-between; align-items: center;
+            font-size: 0.85rem; color: var(--text-muted); padding-top: 4px;
         }
-
-        .cost-amount {
-            color: var(--lose-color);
-            font-weight: 800;
-            font-size: 1.1rem;
-        }
+        .cost-amount { color: var(--lose-color); font-weight: 800; font-size: 1.05rem; }
 
         .btn-buy {
-            width: 100%;
-            padding: 14px;
+            width: 100%; padding: 12px;
             background: linear-gradient(135deg, var(--primary), var(--accent-cyan));
-            color: #ffffff;
-            border: none;
-            border-radius: 12px;
-            font-size: 1.05rem;
-            font-weight: 700;
-            cursor: pointer;
-            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.35);
-            transition: all 0.2s;
+            color: #ffffff; border: none; border-radius: 10px;
+            font-size: 1.05rem; font-weight: 700; cursor: pointer;
+            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.35); transition: all 0.2s;
         }
-
-        .btn-buy:hover:not(:disabled) { opacity: 0.95; transform: translateY(-1px); }
+        .btn-buy:hover:not(:disabled) { transform: translateY(-1px); filter: brightness(1.1); }
         .btn-buy:disabled { opacity: 0.4; cursor: not-allowed; filter: grayscale(80%); }
 
-        /* 开奖区域 */
+        /* 开奖核心区域 */
         .result-card {
-            background: rgba(0, 0, 0, 0.2);
+            background: rgba(0, 0, 0, 0.3);
             border: 1px solid var(--card-border);
-            border-radius: 12px;
-            padding: 16px;
+            border-radius: 14px;
+            padding: 20px;
             text-align: center;
             display: flex;
             flex-direction: column;
-            gap: 12px;
-        }
-
-        .balls-container {
-            display: flex;
+            gap: 16px;
             justify-content: center;
             align-items: center;
-            gap: 32px;
+            flex: 1;
         }
 
-        .ball-wrapper { display: flex; flex-direction: column; align-items: center; gap: 4px; }
-        .ball-tag { font-size: 0.75rem; color: var(--text-muted); }
+        .balls-container { display: flex; justify-content: center; align-items: center; gap: 36px; }
+        .ball-wrapper { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+        .ball-tag { font-size: 0.8rem; color: var(--text-muted); }
 
         .ball {
-            width: 56px;
-            height: 56px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.4rem;
-            font-weight: 800;
-            color: white;
-            box-shadow: 0 6px 12px rgba(0,0,0,0.4);
+            width: 68px; height: 68px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.7rem; font-weight: 800; color: white;
+            box-shadow: 0 8px 18px rgba(0,0,0,0.5);
         }
-
         .ball-user { background: radial-gradient(circle at 30% 30%, #60a5fa, #1d4ed8); }
         .ball-drawn { background: radial-gradient(circle at 30% 30%, #fbbf24, #d97706); }
         .ball-drawn.rolling { animation: pulse 0.08s infinite alternate; }
 
-        @keyframes pulse { 0% { transform: scale(1); } 100% { transform: scale(1.08); } }
+        @keyframes pulse { 0% { transform: scale(1); } 100% { transform: scale(1.1); } }
 
-        .result-status { font-size: 1rem; font-weight: 700; min-height: 1.5em; }
+        .result-status { font-size: 1.1rem; font-weight: 700; min-height: 1.6em; }
+
+        /* 桌面端特有：实时概率统计卡片 */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+            width: 100%;
+        }
+
+        .sub-stat-card {
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid var(--card-border);
+            border-radius: 8px;
+            padding: 8px;
+            text-align: center;
+        }
+        .sub-stat-label { font-size: 0.72rem; color: var(--text-muted); }
+        .sub-stat-val { font-size: 0.95rem; font-weight: 700; margin-top: 2px; }
 
         /* 历史表格 */
         .history-container {
             overflow-x: auto;
-            max-height: 380px;
-            overflow-y: auto;
+            flex: 1;
+            min-height: 200px;
         }
 
-        .history-table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 0.82rem;
-        }
-
+        .history-table { width: 100%; border-collapse: collapse; font-size: 0.82rem; }
         .history-table th, .history-table td {
-            padding: 8px 6px;
-            text-align: center;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            padding: 8px 6px; text-align: center; border-bottom: 1px solid rgba(255, 255, 255, 0.08);
         }
-
-        .history-table th {
-            color: var(--text-muted);
-            background: rgba(0, 0, 0, 0.3);
-            position: sticky;
-            top: 0;
-        }
+        .history-table th { color: var(--text-muted); background: rgba(0, 0, 0, 0.3); position: sticky; top: 0; }
 
         .txt-win { color: var(--win-color); font-weight: 700; }
         .txt-lose { color: var(--lose-color); }
+        .txt-draw { color: var(--accent-gold); font-weight: 700; }
 
         /* 结算弹窗 */
         .modal-overlay {
-            position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(15, 23, 42, 0.85);
-            backdrop-filter: blur(12px);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 16px;
-            z-index: 1000;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.3s ease;
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(15, 23, 42, 0.85); backdrop-filter: blur(12px);
+            display: flex; justify-content: center; align-items: center;
+            padding: 16px; z-index: 1000; opacity: 0; pointer-events: none; transition: opacity 0.3s ease;
         }
-
         .modal-overlay.active { opacity: 1; pointer-events: auto; }
 
         .modal {
-            background: rgba(30, 41, 59, 0.95);
-            border: 1px solid var(--card-border);
-            border-radius: 20px;
-            max-width: 600px;
-            width: 100%;
-            max-height: 90vh;
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            gap: 14px;
-            overflow-y: auto;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+            background: rgba(30, 41, 59, 0.95); border: 1px solid var(--card-border);
+            border-radius: 20px; max-width: 650px; width: 100%; max-height: 90vh;
+            padding: 20px; display: flex; flex-direction: column; gap: 12px;
+            overflow-y: auto; box-shadow: 0 20px 40px rgba(0,0,0,0.6);
         }
 
         .modal-title { font-size: 1.3rem; font-weight: 800; text-align: center; }
-
-        .modal-stats {
-            background: rgba(0, 0, 0, 0.25);
-            padding: 12px;
-            border-radius: 12px;
-            font-size: 0.88rem;
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-        }
-
-        .modal-history-box {
-            max-height: 200px;
-            overflow-y: auto;
-            border: 1px solid var(--card-border);
-            border-radius: 8px;
-        }
+        .modal-stats { background: rgba(0, 0, 0, 0.25); padding: 10px 14px; border-radius: 10px; font-size: 0.85rem; display: flex; flex-direction: column; gap: 4px; }
+        .modal-history-box { max-height: 220px; overflow-y: auto; border: 1px solid var(--card-border); border-radius: 8px; }
 
         .advice-box {
-            background: rgba(245, 158, 11, 0.1);
-            border-left: 4px solid var(--accent-gold);
-            padding: 10px 12px;
-            border-radius: 6px;
-            font-size: 0.82rem;
-            line-height: 1.4;
-            color: #fef3c7;
+            background: rgba(245, 158, 11, 0.1); border-left: 4px solid var(--accent-gold);
+            padding: 10px 12px; border-radius: 6px; font-size: 0.82rem; line-height: 1.4; color: #fef3c7;
         }
 
         .btn-restart {
-            width: 100%;
-            padding: 12px;
-            background: linear-gradient(135deg, var(--primary), var(--accent-cyan));
-            color: white;
-            border: none;
-            border-radius: 10px;
-            font-size: 1rem;
-            font-weight: 700;
-            cursor: pointer;
+            width: 100%; padding: 12px; background: linear-gradient(135deg, var(--primary), var(--accent-cyan));
+            color: white; border: none; border-radius: 10px; font-size: 1rem; font-weight: 700; cursor: pointer;
         }
 
-        /* 独立桌面端与移动端适配规则 */
-        /* 电脑大屏 (Desktop) Layout */
-        @media (min-width: 900px) {
+        /* 响应式三列 / 单列布局隔离 */
+
+        /* 电脑大屏 Layout (≥ 1024px) - 充分占满屏幕的 3 列专业网格 */
+        @media (min-width: 1024px) {
             .main-grid {
-                grid-template-columns: 1fr 1fr;
-                align-items: start;
+                display: grid;
+                grid-template-columns: 320px 1fr 380px;
+                gap: 12px;
+                flex: 1;
             }
-            .panel-left { gap: 16px; }
-            .panel-right { height: 100%; }
-            .history-container { max-height: 500px; }
+            .panel-left { height: 100%; }
+            .panel-center { height: 100%; display: flex; flex-direction: column; }
+            .panel-right { height: 100%; display: flex; flex-direction: column; }
+            .history-container { max-height: calc(100vh - 180px); }
         }
 
-        /* 移动端 (Mobile) Layout */
-        @media (max-width: 899px) {
-            body { padding: 10px; }
-            .header h1 { font-size: 1.3rem; }
-            .balls-container { gap: 20px; }
-            .ball { width: 48px; height: 48px; font-size: 1.2rem; }
-            .history-container { max-height: 280px; }
+        /* 平板与手机端 Layout (< 1024px) - 独立单列高流畅体验 */
+        @media (max-width: 1023px) {
+            body { padding: 8px; }
+            .header h1 { font-size: 1.2rem; }
+            .main-grid { display: flex; flex-direction: column; gap: 12px; }
+            .balls-container { gap: 24px; }
+            .ball { width: 54px; height: 54px; font-size: 1.3rem; }
+            .stats-grid { grid-template-columns: 1fr 1fr; }
+            .history-container { max-height: 300px; }
         }
     </style>
 </head>
@@ -439,25 +354,29 @@
 </div>
 
 <div class="app-wrapper">
-    <!-- 头部栏 -->
+    <!-- 顶部栏 -->
     <header class="header">
-        <h1>🎰 彩票模拟器</h1>
-        <p>理性看彩 · 体验真实概率与期望值</p>
+        <div class="header-title">
+            <h1>🎰 彩票模拟器</h1>
+            <p>理性看彩 · 体验概率与期望值</p>
+        </div>
+        <div class="audio-status-tag">🔊 手机增强音效已开启</div>
     </header>
 
-    <!-- 网格内容 -->
+    <!-- 响应式主内容区 -->
     <div class="main-grid">
-        <!-- 左侧控制与开奖区 -->
+        
+        <!-- 左列：规则与下注控制中心 -->
         <div class="panel panel-left">
-            <!-- 规则 -->
+            <div class="panel-title">🎛️ 操作控制中心</div>
+
             <div class="rules-grid">
-                <div>🎯 <strong>特等奖 (差值=0):</strong> 500元/注</div>
-                <div>✨ <strong>二等奖 (差值≤5):</strong> 50元/注</div>
-                <div>👍 <strong>三等奖 (差值≤10):</strong> 10元/注</div>
-                <div>❌ <strong>未中奖 (差值>10):</strong> 0元</div>
+                <div>🎯 <strong>特等:</strong> 差值=0 (500元)</div>
+                <div>✨ <strong>二等:</strong> 差值≤5 (50元)</div>
+                <div>👍 <strong>三等:</strong> 差值≤10 (10元)</div>
+                <div>❌ <strong>未中:</strong> 差值>10 (0元)</div>
             </div>
 
-            <!-- 数据仪表盘 -->
             <div class="dashboard">
                 <div class="metric-card">
                     <div class="metric-label">当前拥有资金</div>
@@ -469,10 +388,9 @@
                 </div>
             </div>
 
-            <!-- 按拥有资金计算的进度条 -->
             <div class="progress-box">
                 <div class="progress-header">
-                    <span>目标金额达成进度 (目标 10,000 元)</span>
+                    <span>目标资金达成率 (目标 10,000 元)</span>
                     <span id="progressPercent">1.0%</span>
                 </div>
                 <div class="progress-bar-bg">
@@ -480,7 +398,6 @@
                 </div>
             </div>
 
-            <!-- 滑块控制面板 -->
             <div class="control-group">
                 <div class="control-header">
                     <span>选择号码 (1 ~ 100)</span>
@@ -491,7 +408,7 @@
 
             <div class="control-group">
                 <div class="control-header">
-                    <span>选择注数 (根据当前资金限制)</span>
+                    <span>选择注数 (基于资金上限)</span>
                     <span class="badge-value" id="dispBetVal">1 注</span>
                 </div>
                 <input type="range" id="betRange" min="1" max="10" value="1" oninput="onBetSliderChange(this.value)">
@@ -503,31 +420,58 @@
             </div>
 
             <button class="btn-buy" id="buyBtn" onclick="playLottery()">购买彩票</button>
+        </div>
 
-            <!-- 开奖 display -->
+        <!-- 中列：大屏开奖舞台与实时概率大盘 -->
+        <div class="panel panel-center">
+            <div class="panel-title">
+                <span>🎲 开奖大舞台</span>
+                <span style="font-size: 0.75rem; color: var(--text-muted);">第 <span id="dispRoundCount">0</span> 期</span>
+            </div>
+
             <div class="result-card">
                 <div class="balls-container">
                     <div class="ball-wrapper">
                         <span class="ball-tag">你的号码</span>
                         <div class="ball ball-user" id="dispUserNum">--</div>
                     </div>
-                    <div style="font-weight: 800; color: rgba(255,255,255,0.3); font-size: 1.1rem;">VS</div>
+                    <div style="font-weight: 800; color: rgba(255,255,255,0.25); font-size: 1.2rem;">VS</div>
                     <div class="ball-wrapper">
                         <span class="ball-tag">开奖号码</span>
                         <div class="ball ball-drawn" id="dispDrawnNum">--</div>
                     </div>
                 </div>
                 <div class="result-status" id="resultStatus" style="color: var(--text-muted);">
-                    拖动滑块选择参数后开始购买
+                    拖动左侧滑块选择参数后开始下注
+                </div>
+            </div>
+
+            <!-- 实时统计面板（桌面端拉满体验） -->
+            <div class="stats-grid">
+                <div class="sub-stat-card">
+                    <div class="sub-stat-label">综合胜率</div>
+                    <div class="sub-stat-val" id="statWinRate" style="color:var(--win-color)">0.0%</div>
+                </div>
+                <div class="sub-stat-card">
+                    <div class="sub-stat-label">中奖 / 未中</div>
+                    <div class="sub-stat-val" id="statWinLoss">0 / 0</div>
+                </div>
+                <div class="sub-stat-card">
+                    <div class="sub-stat-label">投资回报率 (ROI)</div>
+                    <div class="sub-stat-val" id="statROI" style="color:var(--accent-cyan)">0.0%</div>
+                </div>
+                <div class="sub-stat-card">
+                    <div class="sub-stat-label">单期最高收益</div>
+                    <div class="sub-stat-val" id="statMaxWin" style="color:var(--accent-gold)">0元</div>
                 </div>
             </div>
         </div>
 
-        <!-- 右侧历史面板 -->
+        <!-- 右列：全量购买流水记录 -->
         <div class="panel panel-right">
             <div class="panel-title">
-                <span>📜 购买历史记录</span>
-                <span style="font-size: 0.75rem; color: var(--text-muted); font-weight: normal;">仅保留最近记录</span>
+                <span>📜 购买历史明细</span>
+                <span style="font-size: 0.75rem; color: var(--text-muted);">实时流水</span>
             </div>
 
             <div class="history-container">
@@ -550,16 +494,17 @@
                 </table>
             </div>
         </div>
+
     </div>
 </div>
 
-<!-- 结束总结弹窗 -->
+<!-- 结算总结弹窗 -->
 <div class="modal-overlay" id="gameModal">
     <div class="modal">
-        <div class="modal-title" id="modalTitle">总结标题</div>
+        <div class="modal-title" id="modalTitle">体验总结</div>
         <div class="modal-stats" id="modalStats"></div>
         
-        <div style="font-weight: 700; font-size: 0.9rem; color: var(--text-main);">📊 本次体验全量购买记录：</div>
+        <div style="font-weight: 700; font-size: 0.88rem; color: var(--text-main); margin-top: 4px;">📊 本次体验完整购买记录：</div>
         <div class="modal-history-box">
             <table class="history-table">
                 <thead>
@@ -567,6 +512,7 @@
                         <th>期数</th>
                         <th>所选</th>
                         <th>开奖</th>
+                        <th>差值</th>
                         <th>结果</th>
                         <th>收益</th>
                     </tr>
@@ -576,7 +522,7 @@
         </div>
 
         <div class="advice-box">
-            <p><strong>💡 理性警示：</strong>彩票属于典型<strong>负期望值</strong>游戏。开奖完全随机且独立，不存在追号补偿或规律。请理性看待，切勿沉迷。</p>
+            <p><strong>💡 理性警示：</strong>彩票属于典型<strong>负期望值</strong>游戏。开奖完全随机且独立，不存在追号补偿或规律。请理性对待，珍惜财富。</p>
         </div>
 
         <button class="btn-restart" onclick="resetGame()">重新开始模拟</button>
@@ -585,11 +531,12 @@
 
 <script>
     // ==========================================
-    // Web Audio API 音效生成 (提升音量与音质)
+    // Web Audio API 手机端声音增强引擎
     // ==========================================
     let audioCtx = null;
 
-    function initAudio() {
+    // 触摸/点击解锁 AudioContext (解决手机静音及挂起问题)
+    function unlockAudioContext() {
         if (!audioCtx) {
             audioCtx = new (window.AudioContext || window.webkitAudioContext)();
         }
@@ -598,29 +545,41 @@
         }
     }
 
-    // 播放滚动跳动音效 (增加音量至 0.2)
+    window.addEventListener('touchstart', unlockAudioContext, { passive: true });
+    window.addEventListener('click', unlockAudioContext, { passive: true });
+
+    // 播放摇号跳动音效 (手机扬声器增强：混合波形与高音量)
     function playTickSound() {
         if (!audioCtx) return;
         try {
-            const osc = audioCtx.createOscillator();
+            const osc1 = audioCtx.createOscillator();
+            const osc2 = audioCtx.createOscillator();
             const gain = audioCtx.createGain();
 
-            osc.type = 'sine';
-            const freq = 520 + Math.random() * 140;
-            osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+            // 双振荡器合成清脆木质敲击声
+            osc1.type = 'sine';
+            osc2.type = 'triangle';
 
-            gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
-            gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.04);
+            const baseFreq = 600 + Math.random() * 180;
+            osc1.frequency.setValueAtTime(baseFreq, audioCtx.currentTime);
+            osc2.frequency.setValueAtTime(baseFreq * 1.5, audioCtx.currentTime);
 
-            osc.connect(gain);
+            // 提升 Gain 增益系数至 0.65，适应手机小喇叭
+            gain.gain.setValueAtTime(0.65, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.045);
+
+            osc1.connect(gain);
+            osc2.connect(gain);
             gain.connect(audioCtx.destination);
 
-            osc.start();
-            osc.stop(audioCtx.currentTime + 0.04);
+            osc1.start();
+            osc2.start();
+            osc1.stop(audioCtx.currentTime + 0.045);
+            osc2.stop(audioCtx.currentTime + 0.045);
         } catch (e) { console.error(e); }
     }
 
-    // 播放中奖/未中奖音效 (增加音量至 0.35)
+    // 播放开奖结果音效 (提升整体音量至 0.8)
     function playWinSound(tier) {
         if (!audioCtx) return;
         try {
@@ -628,14 +587,14 @@
             let waveType = 'triangle';
 
             if (tier === 'grand') {
-                notes = [523.25, 659.25, 783.99, 1046.50]; // C5, E5, G5, C6
+                notes = [523.25, 659.25, 783.99, 1046.50]; // C5, E5, G5, C6 欢快和弦
             } else if (tier === 'second') {
                 notes = [523.25, 783.99, 1046.50];
             } else if (tier === 'third') {
                 notes = [659.25, 783.99];
             } else {
-                notes = [261.63, 207.65]; // 低音沉闷未中奖
-                waveType = 'sine';
+                notes = [261.63, 196.00]; // 未中奖低音
+                waveType = 'sawtooth';
             }
 
             notes.forEach((freq, idx) => {
@@ -643,12 +602,13 @@
                 const gain = audioCtx.createGain();
 
                 osc.type = waveType;
-                const startTime = audioCtx.currentTime + idx * 0.08;
-                const duration = (tier === 'lose') ? 0.15 : 0.25;
+                const startTime = audioCtx.currentTime + idx * 0.09;
+                const duration = (tier === 'lose') ? 0.18 : 0.28;
 
                 osc.frequency.setValueAtTime(freq, startTime);
 
-                gain.gain.setValueAtTime(0.35, startTime);
+                // 提升增益系数至 0.8
+                gain.gain.setValueAtTime(0.8, startTime);
                 gain.gain.exponentialRampToValueAtTime(0.001, startTime + duration);
 
                 osc.connect(gain);
@@ -672,6 +632,11 @@
     let historyList = [];
     let isRolling = false;
 
+    // 统计数据变量
+    let winCount = 0;
+    let lossCount = 0;
+    let maxSingleWin = 0;
+
     // DOM 元素引用
     const elBalance = document.getElementById('balance');
     const elSpent = document.getElementById('cumulativeSpent');
@@ -690,14 +655,21 @@
     const elModal = document.getElementById('gameModal');
     const buyBtn = document.getElementById('buyBtn');
 
+    // 统计 DOM
+    const elDispRoundCount = document.getElementById('dispRoundCount');
+    const elStatWinRate = document.getElementById('statWinRate');
+    const elStatWinLoss = document.getElementById('statWinLoss');
+    const elStatROI = document.getElementById('statROI');
+    const elStatMaxWin = document.getElementById('statMaxWin');
+
     function onNumSliderChange(val) {
-        initAudio();
+        unlockAudioContext();
         currentNumber = parseInt(val);
         elDispNumVal.innerText = currentNumber;
     }
 
     function onBetSliderChange(val) {
-        initAudio();
+        unlockAudioContext();
         currentBets = parseInt(val);
         elDispBetVal.innerText = `${currentBets} 注`;
         updateCostDisplay();
@@ -709,20 +681,19 @@
     }
 
     function updateUI() {
-        // 1. 更新可用资金与消费总额
+        // 1. 更新资金与下注
         elBalance.innerText = `${balance} 元`;
         elSpent.innerText = `${cumulativeSpent} 元`;
 
-        // 2. 按拥有资金计算目标达成进度 (目标 10,000 元)
+        // 2. 按拥有资金计算目标进度 (目标 10,000 元)
         const percent = Math.min(100, Math.max(0, (balance / TARGET_BALANCE) * 100));
         elProgressBar.style.width = `${percent}%`;
         elProgressPercent.innerText = `${percent.toFixed(1)}%`;
 
-        // 3. 动态调整注数上限（依据当前剩余资金）
+        // 3. 动态注数上限（依据当前剩余资金）
         const maxAffordableBets = Math.floor(balance / 10);
         
         if (maxAffordableBets <= 0) {
-            // 资金已不足购买 1 注
             elBetRange.max = 1;
             elBetRange.value = 1;
             currentBets = 1;
@@ -732,8 +703,6 @@
             elBetRange.disabled = isRolling;
             buyBtn.disabled = isRolling;
             elBetRange.max = maxAffordableBets;
-            
-            // 如果当前选择注数超过可负担上限，自动下调
             if (currentBets > maxAffordableBets) {
                 currentBets = maxAffordableBets;
             }
@@ -742,15 +711,26 @@
 
         elDispBetVal.innerText = `${currentBets} 注`;
         updateCostDisplay();
+
+        // 4. 更新大盘统计数据
+        elDispRoundCount.innerText = roundCount;
+        const totalGames = winCount + lossCount;
+        const winRate = totalGames > 0 ? ((winCount / totalGames) * 100).toFixed(1) : "0.0";
+        elStatWinRate.innerText = `${winRate}%`;
+        elStatWinLoss.innerText = `${winCount} / ${lossCount}`;
+        
+        const netTotal = balance - 100;
+        const roi = cumulativeSpent > 0 ? ((netTotal / cumulativeSpent) * 100).toFixed(1) : "0.0";
+        elStatROI.innerText = `${roi}%`;
+        elStatROI.style.color = netTotal >= 0 ? "var(--win-color)" : "var(--lose-color)";
+        elStatMaxWin.innerText = `${maxSingleWin}元`;
     }
 
     function playLottery() {
         if (isRolling) return;
-        initAudio();
+        unlockAudioContext();
 
         const cost = currentBets * 10;
-
-        // 确保资金足够
         if (balance < cost || cost <= 0) {
             triggerGameOver(false);
             return;
@@ -793,37 +773,51 @@
 
         const diff = Math.abs(currentNumber - drawnNumber);
         let prizePerBet = 0;
-        let prizeTierName = "未中奖";
-        let statusColor = "var(--lose-color)";
+        let prizeTierName = "";
+        let resultLabel = "未中奖"; // 明确标注 中奖 / 保本 / 未中奖
         let soundTier = "lose";
 
         if (diff === 0) {
             prizePerBet = 500;
-            prizeTierName = "🎉 特等大奖";
-            statusColor = "var(--win-color)";
+            prizeTierName = "特等奖";
+            resultLabel = "中奖";
             soundTier = "grand";
+            winCount++;
         } else if (diff <= 5) {
             prizePerBet = 50;
-            prizeTierName = "✨ 二等奖";
-            statusColor = "var(--win-color)";
+            prizeTierName = "二等奖";
+            resultLabel = "中奖";
             soundTier = "second";
+            winCount++;
         } else if (diff <= 10) {
             prizePerBet = 10;
-            prizeTierName = "👍 三等奖";
-            statusColor = "var(--accent-gold)";
+            prizeTierName = "三等奖";
+            resultLabel = "保本";
             soundTier = "third";
+            winCount++;
+        } else {
+            prizeTierName = "无奖项";
+            resultLabel = "未中奖";
+            soundTier = "lose";
+            lossCount++;
         }
 
         const totalPrize = currentBets * prizePerBet;
         const netProfit = totalPrize - cost;
         balance += totalPrize;
 
+        if (totalPrize > maxSingleWin) {
+            maxSingleWin = totalPrize;
+        }
+
         playWinSound(soundTier);
 
-        if (totalPrize > 0) {
-            elResultStatus.innerHTML = `<span style="color:${statusColor}">${prizeTierName}！获得奖金 ${totalPrize} 元</span>`;
+        if (resultLabel === "中奖") {
+            elResultStatus.innerHTML = `<span style="color:var(--win-color)">🎉 恭喜中奖（${prizeTierName}）！获得 ${totalPrize} 元</span>`;
+        } else if (resultLabel === "保本") {
+            elResultStatus.innerHTML = `<span style="color:var(--accent-gold)">👍 保本中奖（三等奖）！退回 ${totalPrize} 元</span>`;
         } else {
-            elResultStatus.innerHTML = `<span style="color:var(--lose-color)">未中奖 (号码差值: ${diff})</span>`;
+            elResultStatus.innerHTML = `<span style="color:var(--lose-color)">❌ 未中奖 (差值: ${diff})</span>`;
         }
 
         addHistory({
@@ -831,7 +825,8 @@
             userNum: currentNumber,
             drawnNum: drawnNumber,
             diff: diff,
-            tier: prizeTierName,
+            resultLabel: resultLabel,
+            tierName: prizeTierName,
             net: netProfit
         });
 
@@ -840,13 +835,12 @@
         
         updateUI();
 
-        // 胜负终局判定
         if (balance >= TARGET_BALANCE) {
             triggerGameOver(true);
             return;
         }
 
-        // 只有当可用资金不足 10 元（连 1 注都买不起）时才结束游戏
+        // 仅在可用资金不足 10 元（连 1 注都买不起）时才结束游戏
         if (balance < 10) {
             triggerGameOver(false);
         }
@@ -857,6 +851,7 @@
         renderHistory();
     }
 
+    // 渲染历史表格（明确标注 中奖 / 未中奖 / 保本）
     function renderHistory() {
         if (historyList.length === 0) {
             elHistoryBody.innerHTML = `<tr><td colspan="6" style="color: var(--text-muted); padding: 16px;">暂无历史记录</td></tr>`;
@@ -865,15 +860,24 @@
 
         elHistoryBody.innerHTML = historyList.map(h => {
             const netText = h.net > 0 ? `+${h.net}` : `${h.net}`;
-            const netClass = h.net >= 0 ? 'txt-win' : 'txt-lose';
+            let resultTag = '';
+            
+            if (h.resultLabel === '中奖') {
+                resultTag = `<span class="txt-win">中奖 (${h.tierName})</span>`;
+            } else if (h.resultLabel === '保本') {
+                resultTag = `<span class="txt-draw">保本 (${h.tierName})</span>`;
+            } else {
+                resultTag = `<span class="txt-lose">未中奖</span>`;
+            }
+
             return `
                 <tr>
                     <td>第${h.round}期</td>
                     <td>${h.userNum}</td>
                     <td>${h.drawnNum}</td>
                     <td>${h.diff}</td>
-                    <td>${h.tier.replace(/^[^\s]+/, '')}</td>
-                    <td class="${netClass}">${netText}元</td>
+                    <td>${resultTag}</td>
+                    <td class="${h.net >= 0 ? 'txt-win' : 'txt-lose'}">${netText}元</td>
                 </tr>
             `;
         }).join('');
@@ -890,6 +894,7 @@
                 <div><strong>最终拥有资金：</strong>${balance} 元</div>
                 <div><strong>累计花费总额：</strong>${cumulativeSpent} 元</div>
                 <div><strong>总计购买期数：</strong>${roundCount} 期</div>
+                <div><strong>中奖次数 / 未中次数：</strong>${winCount} 次 / ${lossCount} 次</div>
             `;
             playWinSound('grand');
         } else {
@@ -899,21 +904,32 @@
                 <div><strong>剩余资金：</strong>${balance} 元（不足支付 1 注）</div>
                 <div><strong>累计消费总额：</strong>${cumulativeSpent} 元</div>
                 <div><strong>总计购买期数：</strong>${roundCount} 期</div>
+                <div><strong>中奖次数 / 未中次数：</strong>${winCount} 次 / ${lossCount} 次</div>
             `;
             playWinSound('lose');
         }
 
-        // 在弹窗中渲染全量历史记录
+        // 渲染总结弹窗的全量历史明细（明确标注 中奖 / 未中奖）
         elModalHistoryBody.innerHTML = historyList.map(h => {
             const netText = h.net > 0 ? `+${h.net}` : `${h.net}`;
-            const netClass = h.net >= 0 ? 'txt-win' : 'txt-lose';
+            let resultTag = '';
+            
+            if (h.resultLabel === '中奖') {
+                resultTag = `<span class="txt-win">中奖 (${h.tierName})</span>`;
+            } else if (h.resultLabel === '保本') {
+                resultTag = `<span class="txt-draw">保本 (${h.tierName})</span>`;
+            } else {
+                resultTag = `<span class="txt-lose">未中奖</span>`;
+            }
+
             return `
                 <tr>
                     <td>第${h.round}期</td>
                     <td>${h.userNum}</td>
                     <td>${h.drawnNum}</td>
-                    <td>${h.tier.replace(/^[^\s]+/, '')}</td>
-                    <td class="${netClass}">${netText}元</td>
+                    <td>${h.diff}</td>
+                    <td>${resultTag}</td>
+                    <td class="${h.net >= 0 ? 'txt-win' : 'txt-lose'}">${netText}元</td>
                 </tr>
             `;
         }).join('');
@@ -927,6 +943,9 @@
         currentNumber = 50;
         currentBets = 1;
         roundCount = 0;
+        winCount = 0;
+        lossCount = 0;
+        maxSingleWin = 0;
         historyList = [];
 
         elNumRange.value = 50;
@@ -934,7 +953,7 @@
         elDispNumVal.innerText = 50;
         elDispUserNum.innerText = "--";
         elDispDrawnNum.innerText = "--";
-        elResultStatus.innerText = "拖动滑块选择参数后开始购买";
+        elResultStatus.innerText = "拖动左侧滑块选择参数后开始下注";
         elResultStatus.style.color = "var(--text-muted)";
 
         renderHistory();
@@ -943,7 +962,7 @@
         elModal.classList.remove('active');
     }
 
-    // 初始化运行
+    // 初始化画面
     updateUI();
 </script>
 

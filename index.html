@@ -3,648 +3,729 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>欲望深渊 - 彩票模拟器</title>
+    <title>彩票理性模拟器</title>
     <style>
         :root {
-            --primary: #d4af37;
-            --primary-glow: rgba(212, 175, 55, 0.6);
-            --bg-dark: #0f0f13;
-            --card-bg: rgba(30, 30, 38, 0.8);
-            --danger: #ff4757;
-            --success: #2ed573;
-            --text-main: #f1f2f6;
-            --text-muted: #a4b0be;
+            --primary-color: #4f46e5;
+            --primary-hover: #4338ca;
+            --bg-color: #f8fafc;
+            --card-bg: #ffffff;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --win-color: #10b981;
+            --lose-color: #ef4444;
+            --accent-gold: #f59e0b;
         }
 
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
-            user-select: none;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
         }
 
         body {
-            background-color: var(--bg-dark);
+            background-color: var(--bg-color);
             color: var(--text-main);
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
             min-height: 100vh;
+            padding: 16px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 520px;
+            background: var(--card-bg);
+            border-radius: 16px;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.01);
+            padding: 20px;
             display: flex;
             flex-direction: column;
-            background-image: radial-gradient(circle at 50% 0%, #2a2a35 0%, #0f0f13 60%);
-            overflow-x: hidden;
+            gap: 20px;
         }
 
-        /* 顶部资产看板 */
-        header {
-            padding: 30px 20px;
+        /* Header */
+        .header {
             text-align: center;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-            background: rgba(15, 15, 19, 0.8);
-            backdrop-filter: blur(10px);
-            position: sticky;
-            top: 0;
-            z-index: 10;
+            border-bottom: 1px solid #e2e8f0;
+            padding-bottom: 12px;
         }
 
-        .title {
-            font-size: 1.2rem;
-            color: var(--text-muted);
-            letter-spacing: 2px;
-            margin-bottom: 10px;
-        }
-
-        .balance-container {
-            font-size: 3.5rem;
-            font-weight: 900;
-            color: var(--primary);
-            text-shadow: 0 0 20px var(--primary-glow);
-            transition: color 0.3s;
+        .header h1 {
+            font-size: 1.5rem;
+            color: var(--primary-color);
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 10px;
+            gap: 8px;
         }
 
-        .currency {
-            font-size: 1.5rem;
-            color: var(--text-muted);
-        }
-
-        .target-hint {
-            margin-top: 10px;
-            font-size: 0.9rem;
-            color: var(--danger);
-            opacity: 0.8;
-        }
-
-        /* 游戏主体区域 */
-        main {
-            flex: 1;
-            padding: 40px 20px;
-            max-width: 1200px;
-            margin: 0 auto;
-            width: 100%;
-        }
-
-        .section-title {
-            text-align: center;
-            font-size: 1.8rem;
-            margin-bottom: 30px;
-            position: relative;
-        }
-
-        .section-title::after {
-            content: '';
-            display: block;
-            width: 60px;
-            height: 3px;
-            background: var(--primary);
-            margin: 10px auto 0;
-            border-radius: 2px;
-        }
-
-        /* 彩票卡片网格 */
-        .tickets-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 25px;
-        }
-
-        .ticket-card {
-            background: var(--card-bg);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 16px;
-            padding: 25px 20px;
-            text-align: center;
-            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-            cursor: pointer;
-            position: relative;
-            overflow: hidden;
-            backdrop-filter: blur(5px);
-        }
-
-        .ticket-card::before {
-            content: '';
-            position: absolute;
-            top: 0; left: -100%; width: 50%; height: 100%;
-            background: linear-gradient(to right, transparent, rgba(255,255,255,0.1), transparent);
-            transform: skewX(-25deg);
-            transition: 0.5s;
-        }
-
-        .ticket-card:hover {
-            transform: translateY(-8px);
-            border-color: var(--primary);
-            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.6), 0 0 15px var(--primary-glow);
-        }
-
-        .ticket-card:hover::before {
-            left: 200%;
-        }
-
-        .ticket-card.disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-            filter: grayscale(100%);
-            pointer-events: none;
-        }
-
-        .ticket-name {
-            font-size: 1.4rem;
-            font-weight: bold;
-            margin-bottom: 5px;
-        }
-
-        .ticket-desc {
+        .header p {
             font-size: 0.85rem;
             color: var(--text-muted);
-            margin-bottom: 20px;
+            margin-top: 4px;
         }
 
-        .ticket-cost {
-            font-size: 1.2rem;
-            color: var(--danger);
-            font-weight: bold;
-            margin-bottom: 20px;
-            background: rgba(255, 71, 87, 0.1);
-            padding: 8px;
-            border-radius: 8px;
+        /* Dashboard Metrics */
+        .dashboard {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
         }
 
-        .btn-buy {
-            background: linear-gradient(135deg, #d4af37, #aa8929);
-            color: #000;
-            border: none;
-            padding: 12px 0;
+        .metric-card {
+            background: #f1f5f9;
+            padding: 12px 16px;
+            border-radius: 12px;
+            text-align: center;
+        }
+
+        .metric-label {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-bottom: 4px;
+        }
+
+        .metric-value {
+            font-size: 1.4rem;
+            font-weight: 700;
+        }
+
+        .metric-value.balance { color: var(--win-color); }
+        .metric-value.spent { color: var(--primary-color); }
+
+        /* Progress Bar */
+        .progress-box {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .progress-header {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        .progress-bar-bg {
             width: 100%;
+            height: 10px;
+            background: #e2e8f0;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, var(--primary-color), var(--accent-gold));
+            transition: width 0.3s ease;
+        }
+
+        /* Betting Controls */
+        .control-section {
+            background: #fafafa;
+            border: 1px solid #f1f5f9;
+            border-radius: 12px;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .control-group {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .control-label {
+            font-size: 0.95rem;
+            font-weight: 600;
+        }
+
+        .stepper {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .stepper-btn {
+            width: 36px;
+            height: 36px;
             border-radius: 8px;
-            font-size: 1.1rem;
+            border: 1px solid #cbd5e1;
+            background: #ffffff;
+            font-size: 1.2rem;
             font-weight: bold;
             cursor: pointer;
-            transition: 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            user-select: none;
+            transition: all 0.15s;
         }
 
-        .btn-buy:active {
+        .stepper-btn:active {
+            background: #e2e8f0;
             transform: scale(0.95);
         }
 
-        /* 刮奖动画遮罩层 */
-        .scratch-overlay {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0, 0, 0, 0.85);
-            backdrop-filter: blur(5px);
+        .stepper-value {
+            width: 50px;
+            text-align: center;
+            font-size: 1.1rem;
+            font-weight: 700;
+            border: none;
+            background: transparent;
+        }
+
+        .cost-summary {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 8px;
+            border-top: 1px dashed #cbd5e1;
+            font-size: 0.9rem;
+        }
+
+        .cost-amount {
+            color: var(--lose-color);
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+
+        .btn-buy {
+            width: 100%;
+            padding: 14px;
+            background: var(--primary-color);
+            color: #ffffff;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
+            transition: all 0.2s;
+        }
+
+        .btn-buy:hover { background: var(--primary-hover); }
+        .btn-buy:active { transform: scale(0.98); }
+
+        /* Draw Result Area */
+        .result-card {
+            background: #f8fafc;
+            border: 2px dashed #cbd5e1;
+            border-radius: 12px;
+            padding: 16px;
+            text-align: center;
             display: flex;
             flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            z-index: 100;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.3s;
-        }
-
-        .scratch-overlay.active {
-            opacity: 1;
-            pointer-events: all;
-        }
-
-        .scratch-card-visual {
-            width: 300px;
-            height: 400px;
-            background: linear-gradient(135deg, #444, #222);
-            border-radius: 15px;
-            border: 3px solid var(--primary);
-            box-shadow: 0 0 30px var(--primary-glow);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .scratch-coating {
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" opacity="0.1"><rect width="100" height="100" fill="%23fff"/></svg>'), #888;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 2rem;
-            color: #555;
-            font-weight: bold;
-            transition: opacity 1.5s ease-out;
-        }
-
-        .scratch-coating.revealed {
-            opacity: 0;
-        }
-
-        .scratch-result {
-            font-size: 2.5rem;
-            font-weight: bold;
-            text-align: center;
-            padding: 20px;
-            transform: scale(0.5);
-            opacity: 0;
-            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
-
-        .scratch-result.show {
-            transform: scale(1);
-            opacity: 1;
-        }
-
-        .win-text { color: var(--success); text-shadow: 0 0 15px rgba(46, 213, 115, 0.6); }
-        .lose-text { color: var(--text-muted); }
-
-        /* 结局模态框 */
-        .modal {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.95);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 1000;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.5s;
-        }
-
-        .modal.active {
-            opacity: 1;
-            pointer-events: all;
-        }
-
-        .modal-content {
-            background: var(--card-bg);
-            border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 20px;
-            padding: 40px;
-            max-width: 600px;
-            width: 90%;
-            text-align: center;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.8);
-            transform: translateY(50px);
-            transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
-
-        .modal.active .modal-content {
-            transform: translateY(0);
-        }
-
-        .ending-icon {
-            font-size: 5rem;
-            margin-bottom: 20px;
-        }
-
-        .ending-title {
-            font-size: 2.5rem;
-            margin-bottom: 15px;
-        }
-
-        .title-win { color: var(--primary); text-shadow: 0 0 20px var(--primary-glow); }
-        .title-lose { color: var(--danger); text-shadow: 0 0 20px rgba(255, 71, 87, 0.5); }
-
-        .ending-desc {
-            font-size: 1.1rem;
-            color: var(--text-muted);
-            margin-bottom: 30px;
-            line-height: 1.6;
-        }
-
-        /* 核心：反赌劝退教育板块 */
-        .educational-warning {
-            background: rgba(255, 71, 87, 0.1);
-            border-left: 5px solid var(--danger);
-            padding: 20px;
-            text-align: left;
-            border-radius: 0 8px 8px 0;
-            margin-bottom: 30px;
-        }
-
-        .warning-title {
-            color: var(--danger);
-            font-weight: bold;
-            font-size: 1.2rem;
-            margin-bottom: 10px;
-            display: flex;
-            align-items: center;
             gap: 10px;
         }
 
-        .warning-text {
-            color: #ddd;
-            font-size: 0.95rem;
-            line-height: 1.7;
+        .balls-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 24px;
         }
 
-        .warning-highlight {
-            color: var(--danger);
-            font-weight: bold;
+        .ball-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .ball-tag {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        .ball {
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.4rem;
+            font-weight: 800;
+            color: white;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+
+        .ball-user { background: linear-gradient(135deg, #3b82f6, #1d4ed8); }
+        .ball-drawn { background: linear-gradient(135deg, #f59e0b, #d97706); }
+
+        .result-status {
+            font-size: 1rem;
+            font-weight: 700;
+        }
+
+        /* History Table */
+        .history-section h3 {
+            font-size: 1rem;
+            margin-bottom: 8px;
+            color: var(--text-main);
+        }
+
+        .history-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.82rem;
+        }
+
+        .history-table th, .history-table td {
+            padding: 8px 6px;
+            text-align: center;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .history-table th {
+            color: var(--text-muted);
+            font-weight: 600;
+            background: #f1f5f9;
+        }
+
+        .txt-win { color: var(--win-color); font-weight: 600; }
+        .txt-lose { color: var(--lose-color); }
+
+        /* Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(15, 23, 42, 0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 16px;
+            z-index: 1000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .modal {
+            background: #ffffff;
+            border-radius: 16px;
+            max-width: 480px;
+            width: 100%;
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2);
+            transform: translateY(20px);
+            transition: transform 0.3s ease;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-overlay.active .modal {
+            transform: translateY(0);
+        }
+
+        .modal-title {
+            font-size: 1.3rem;
+            font-weight: 800;
+            text-align: center;
+        }
+
+        .modal-stats {
+            background: #f8fafc;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .advice-box {
+            background: #fffbebf8;
+            border-left: 4px solid var(--accent-gold);
+            padding: 12px 14px;
+            border-radius: 6px;
+            font-size: 0.88rem;
+            line-height: 1.5;
+            color: #78350f;
+        }
+
+        .advice-box h4 {
+            margin-bottom: 6px;
+            font-size: 0.95rem;
+            color: #92400e;
         }
 
         .btn-restart {
-            background: transparent;
-            border: 2px solid var(--text-muted);
-            color: var(--text-main);
-            padding: 12px 40px;
-            font-size: 1.1rem;
-            border-radius: 30px;
+            width: 100%;
+            padding: 12px;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 700;
             cursor: pointer;
-            transition: 0.3s;
         }
 
-        .btn-restart:hover {
-            background: var(--text-main);
-            color: var(--bg-dark);
+        /* Responsive adjustments */
+        @media (max-width: 400px) {
+            .dashboard { grid-template-columns: 1fr; }
+            .balls-container { gap: 12px; }
+            .ball { width: 48px; height: 48px; font-size: 1.2rem; }
         }
-
     </style>
 </head>
 <body>
 
-    <header>
-        <div class="title">当前总资产</div>
-        <div class="balance-container">
-            <span class="currency">¥</span>
-            <span id="balance-display">10,000</span>
-        </div>
-        <div class="target-hint">人生目标：¥1,000,000,000 (十亿)</div>
+<div class="container">
+    <!-- Header -->
+    <header class="header">
+        <h1>🎰 模拟彩票机</h1>
+        <p>理性购彩 · 模拟体验 · 远离赌博</p>
     </header>
 
-    <main>
-        <h2 class="section-title">选择您的命运</h2>
-        <div class="tickets-grid" id="tickets-container">
-            <!-- 彩票卡片由 JS 动态生成 -->
+    <!-- Dashboard -->
+    <section class="dashboard">
+        <div class="metric-card">
+            <div class="metric-label">当前可用资金</div>
+            <div class="metric-value balance" id="balance">100 元</div>
         </div>
-    </main>
-
-    <!-- 刮奖动画层 -->
-    <div class="scratch-overlay" id="scratch-overlay">
-        <h2 style="margin-bottom: 20px; color: white;">正在刮开涂层...</h2>
-        <div class="scratch-card-visual">
-            <div class="scratch-result" id="scratch-result-text">未中奖</div>
-            <div class="scratch-coating" id="scratch-coating">刮</div>
+        <div class="metric-card">
+            <div class="metric-label">累计下注金额</div>
+            <div class="metric-value spent" id="cumulativeSpent">0 元</div>
         </div>
-    </div>
+    </section>
 
-    <!-- 结局模态框 -->
-    <div class="modal" id="game-over-modal">
-        <div class="modal-content">
-            <div class="ending-icon" id="ending-icon">💀</div>
-            <h1 class="ending-title" id="ending-title">很遗憾，您破产了</h1>
-            <p class="ending-desc" id="ending-desc">您的财富已清零，所有的美梦都在此刻破碎。这就是现实的残酷。</p>
-            
-            <!-- 反赌博核心教育版块 -->
-            <div class="educational-warning">
-                <div class="warning-title">
-                    ⚠️ 游戏开发组的劝退教导
-                </div>
-                <div class="warning-text">
-                    无论您在游戏中是偶然达成了十亿目标，还是输光了所有的本金，请务必清醒：<br><br>
-                    在现实世界中，所有的“彩票”、“盲盒”和“赌博”背后，都是由精密数学公式构建的<span class="warning-highlight">“庄家必赢”期望值陷阱</span>。您体验到的“差点就中奖”、“小赢一把”的快感，都是为了榨干您钱包而精心设计的心理学诱饵。<br><br>
-                    无数人为了虚无缥缈的一夜暴富梦，倾尽所有，最终换来的只有<span class="warning-highlight">债务缠身和家破人亡</span>。十赌十输，不赌才是真正的赢家。<br><br>
-                    <strong>请认清现实，远离一切形式的赌博。脚踏实地，珍惜当下的生活与家人，才是通往幸福的唯一捷径！</strong>
-                </div>
+    <!-- Progress -->
+    <section class="progress-box">
+        <div class="progress-header">
+            <span>目标达成进度 (目标 10,000 元)</span>
+            <span id="progressPercent">0.0%</span>
+        </div>
+        <div class="progress-bar-bg">
+            <div class="progress-bar-fill" id="progressBar"></div>
+        </div>
+    </section>
+
+    <!-- Controls -->
+    <section class="control-section">
+        <div class="control-group">
+            <span class="control-label">投注号码 (1 ~ 100)</span>
+            <div class="stepper">
+                <button class="stepper-btn" onclick="adjustNumber(-1)">-</button>
+                <input type="number" class="stepper-value" id="selectedNum" value="50" min="1" max="100" readonly>
+                <button class="stepper-btn" onclick="adjustNumber(1)">+</button>
             </div>
-
-            <button class="btn-restart" onclick="initGame()">重新审视人生</button>
         </div>
+
+        <div class="control-group">
+            <span class="control-label">下注注数 (1 ~ 10注)</span>
+            <div class="stepper">
+                <button class="stepper-btn" onclick="adjustBets(-1)">-</button>
+                <input type="number" class="stepper-value" id="selectedBets" value="1" min="1" max="10" readonly>
+                <button class="stepper-btn" onclick="adjustBets(1)">+</button>
+            </div>
+        </div>
+
+        <div class="cost-summary">
+            <span>单价: 10元/注</span>
+            <span>本次花费: <span class="cost-amount" id="totalCost">10 元</span></span>
+        </div>
+
+        <button class="btn-buy" id="buyBtn" onclick="playLottery()">购买彩票</button>
+    </section>
+
+    <!-- Draw Result -->
+    <section class="result-card">
+        <div class="balls-container">
+            <div class="ball-wrapper">
+                <span class="ball-tag">你的号码</span>
+                <div class="ball ball-user" id="dispUserNum">--</div>
+            </div>
+            <div style="font-weight: 800; color: #cbd5e1; font-size: 1.2rem;">VS</div>
+            <div class="ball-wrapper">
+                <span class="ball-tag">开奖号码</span>
+                <div class="ball ball-drawn" id="dispDrawnNum">--</div>
+            </div>
+        </div>
+        <div class="result-status" id="resultStatus" style="color: var(--text-muted);">
+            点击“购买彩票”开始开奖
+        </div>
+    </section>
+
+    <!-- History -->
+    <section class="history-section">
+        <h3>最近 10 次购买记录</h3>
+        <table class="history-table">
+            <thead>
+                <tr>
+                    <th>期数</th>
+                    <th>所选</th>
+                    <th>开奖</th>
+                    <th>差值</th>
+                    <th>结果</th>
+                    <th>收支</th>
+                </tr>
+            </thead>
+            <tbody id="historyBody">
+                <tr>
+                    <td colspan="6" style="color: var(--text-muted); padding: 12px;">暂无记录</td>
+                </tr>
+            </tbody>
+        </table>
+    </section>
+</div>
+
+<!-- Game Over / Victory Modal -->
+<div class="modal-overlay" id="gameModal">
+    <div class="modal">
+        <div class="modal-title" id="modalTitle">提示标题</div>
+        <div class="modal-stats" id="modalStats">
+            <!-- 动态填充 -->
+        </div>
+        
+        <!-- 劝解词 -->
+        <div class="advice-box">
+            <h4>💡 理性警示与建议</h4>
+            <p>彩票本质上是一种基于<strong>负期望值</strong>的概率游戏。在本次模拟中，您无论体验到的是偶然的“中奖暴富”还是“资金告罄”，都请时刻保持清醒：</p>
+            <p style="margin-top: 6px;">1. <strong>概率陷阱：</strong>开奖完全随机，不存在所谓的“规律”或“追号补偿”。</p>
+            <p style="margin-top: 4px;">2. <strong>沉沉陷陷：</strong>试图靠追加投注“翻本”往往会导致更大的财务危机。</p>
+            <p style="margin-top: 6px; font-weight: bold; color: #92400e;">请拒绝赌博心理，理性对待彩票，珍惜劳动所得，脚踏实地创造美好生活！</p>
+        </div>
+
+        <button class="btn-restart" onclick="resetGame()">重新开始游戏</button>
     </div>
+</div>
 
-    <script>
-        // 初始资金与目标
-        const INITIAL_BALANCE = 100000; // 10万初始资金
-        const TARGET_BALANCE = 1000000000; // 10亿目标
-        let currentBalance = INITIAL_BALANCE;
-        let isScratching = false;
+<script>
+    // 游戏状态变量
+    let balance = 100;
+    let cumulativeSpent = 0;
+    const TARGET_SPENT = 10000;
+    let currentNumber = 50;
+    let currentBets = 1;
+    let roundCount = 0;
+    let historyList = [];
 
-        // 格式化数字工具 (如: 1,000,000)
-        const formatMoney = (num) => {
-            return Math.floor(num).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-        };
+    // DOM 元素引用
+    const elBalance = document.getElementById('balance');
+    const elSpent = document.getElementById('cumulativeSpent');
+    const elProgressBar = document.getElementById('progressBar');
+    const elProgressPercent = document.getElementById('progressPercent');
+    const elSelectedNum = document.getElementById('selectedNum');
+    const elSelectedBets = document.getElementById('selectedBets');
+    const elTotalCost = document.getElementById('totalCost');
+    const elDispUserNum = document.getElementById('dispUserNum');
+    const elDispDrawnNum = document.getElementById('dispDrawnNum');
+    const elResultStatus = document.getElementById('resultStatus');
+    const elHistoryBody = document.getElementById('historyBody');
+    const elModal = document.getElementById('gameModal');
 
-        // 彩票配置 (注意：期望值全部为负，模拟真实赌博的残酷)
-        const tickets = [
-            {
-                id: 1,
-                name: "青铜小试",
-                desc: "适合新手的刮刮乐，小赌怡情？",
-                cost: 1000,
-                color: "#cd7f32",
-                rewards: [
-                    { prize: 10000, chance: 0.02 },  // 2% 中 1万
-                    { prize: 2000, chance: 0.15 },   // 15% 中 2千
-                    { prize: 500, chance: 0.30 },    // 30% 中 5百 (依然亏)
-                    { prize: 0, chance: 0.53 }       // 53% 全亏
-                ]
-            },
-            {
-                id: 2,
-                name: "白银诱惑",
-                desc: "赔率上升，欲望开始膨胀",
-                cost: 10000,
-                color: "#c0c0c0",
-                rewards: [
-                    { prize: 200000, chance: 0.01 }, // 1% 中 20万
-                    { prize: 30000, chance: 0.08 },  // 8% 中 3万
-                    { prize: 5000, chance: 0.20 },   // 20% 中 5千
-                    { prize: 0, chance: 0.71 }       // 71% 全亏
-                ]
-            },
-            {
-                id: 3,
-                name: "黄金狂热",
-                desc: "高风险高回报，一念天堂",
-                cost: 100000,
-                color: "#ffd700",
-                rewards: [
-                    { prize: 5000000, chance: 0.005 },// 0.5% 中 500万
-                    { prize: 200000, chance: 0.05 },  // 5% 中 20万
-                    { prize: 0, chance: 0.945 }       // 94.5% 全亏
-                ]
-            },
-            {
-                id: 4,
-                name: "巅峰至尊盲盒",
-                desc: "孤注一掷！可能瞬间实现十亿目标",
-                cost: 5000000,
-                color: "#e55039",
-                rewards: [
-                    { prize: 1000000000, chance: 0.001 }, // 0.1% 直接达成10亿目标
-                    { prize: 20000000, chance: 0.02 },    // 2% 回血 2000万
-                    { prize: 0, chance: 0.979 }           // 97.9% 瞬间倾家荡产
-                ]
-            }
-        ];
+    // 调节所选号码
+    function adjustNumber(delta) {
+        currentNumber += delta;
+        if (currentNumber < 1) currentNumber = 100;
+        if (currentNumber > 100) currentNumber = 1;
+        elSelectedNum.value = currentNumber;
+    }
 
-        // 初始化/重置游戏
-        function initGame() {
-            currentBalance = INITIAL_BALANCE;
-            updateBalanceDisplay();
-            document.getElementById('game-over-modal').classList.remove('active');
-            renderTickets();
+    // 调节所选注数
+    function adjustBets(delta) {
+        currentBets += delta;
+        if (currentBets < 1) currentBets = 1;
+        if (currentBets > 10) currentBets = 10;
+        elSelectedBets.value = currentBets;
+        updateCost();
+    }
+
+    // 更新本次开销显示
+    function updateCost() {
+        const cost = currentBets * 10;
+        elTotalCost.innerText = `${cost} 元`;
+    }
+
+    // 刷新 UI Dashboard
+    function updateUI() {
+        elBalance.innerText = `${balance} 元`;
+        elSpent.innerText = `${cumulativeSpent} 元`;
+
+        const percent = Math.min(100, (cumulativeSpent / TARGET_SPENT) * 100);
+        elProgressBar.style.width = `${percent}%`;
+        elProgressPercent.innerText = `${percent.toFixed(1)}%`;
+
+        updateCost();
+    }
+
+    // 核心开奖逻辑
+    function playLottery() {
+        const cost = currentBets * 10;
+
+        // 检查资金不足（失败条件）
+        if (balance < cost) {
+            triggerGameOver(false);
+            return;
         }
 
-        // 渲染彩票列表
-        function renderTickets() {
-            const container = document.getElementById('tickets-container');
-            container.innerHTML = '';
-            
-            tickets.forEach(ticket => {
-                const maxPrize = formatMoney(ticket.rewards[0].prize);
-                const card = document.createElement('div');
-                const canAfford = currentBalance >= ticket.cost;
-                
-                card.className = `ticket-card ${canAfford ? '' : 'disabled'}`;
-                card.style.borderTop = `4px solid ${ticket.color}`;
-                
-                card.innerHTML = `
-                    <div class="ticket-name" style="color: ${ticket.color}">${ticket.name}</div>
-                    <div class="ticket-desc">${ticket.desc}</div>
-                    <div style="font-size: 0.9rem; margin-bottom: 15px;">最高可中: <span style="color:var(--primary)">¥${maxPrize}</span></div>
-                    <div class="ticket-cost">售价: ¥${formatMoney(ticket.cost)}</div>
-                    <button class="btn-buy" style="${!canAfford ? 'background: #555;' : ''}">${canAfford ? '购买并刮开' : '资金不足'}</button>
-                `;
-                
-                if (canAfford) {
-                    card.onclick = () => buyTicket(ticket);
-                }
-                
-                container.appendChild(card);
-            });
+        // 扣除下注资金与增加累计消费
+        balance -= cost;
+        cumulativeSpent += cost;
+        roundCount++;
+
+        // 随机生成开奖号码 (1~100)
+        const drawnNumber = Math.floor(Math.random() * 100) + 1;
+        const diff = Math.abs(currentNumber - drawnNumber);
+
+        // 计算奖金
+        let prizePerBet = 0;
+        let prizeTierName = "未中奖";
+        let statusColor = "var(--lose-color)";
+
+        if (diff === 0) {
+            prizePerBet = 500;
+            prizeTierName = "🎉 一等奖（特等大奖）";
+            statusColor = "var(--win-color)";
+        } else if (diff <= 5) {
+            prizePerBet = 50;
+            prizeTierName = "✨ 二等奖";
+            statusColor = "var(--win-color)";
+        } else if (diff <= 10) {
+            prizePerBet = 10;
+            prizeTierName = "👍 三等奖（保本）";
+            statusColor = "var(--accent-gold)";
         }
 
-        // 更新余额显示并检查游戏结束状态
-        function updateBalanceDisplay() {
-            const display = document.getElementById('balance-display');
-            display.innerText = formatMoney(currentBalance);
-            
-            // 添加数字跳动动画效果
-            display.style.transform = 'scale(1.1)';
-            setTimeout(() => { display.style.transform = 'scale(1)'; }, 200);
+        const totalPrize = currentBets * prizePerBet;
+        const netProfit = totalPrize - cost;
+        balance += totalPrize;
 
-            // 检查结局
-            checkEndings();
+        // 更新开奖展示区
+        elDispUserNum.innerText = currentNumber;
+        elDispDrawnNum.innerText = drawnNumber;
+        if (totalPrize > 0) {
+            elResultStatus.innerHTML = `<span style="color:${statusColor}">${prizeTierName}！赢得 ${totalPrize} 元</span>`;
+        } else {
+            elResultStatus.innerHTML = `<span style="color:var(--lose-color)">未中奖 (差值 ${diff})</span>`;
         }
 
-        // 抽奖核心逻辑
-        function getReward(ticket) {
-            const rand = Math.random();
-            let cumulativeChance = 0;
-            
-            for (let reward of ticket.rewards) {
-                cumulativeChance += reward.chance;
-                if (rand < cumulativeChance) {
-                    return reward.prize;
-                }
-            }
-            return 0; // 兜底
+        // 记录历史
+        addHistory({
+            round: roundCount,
+            userNum: currentNumber,
+            drawnNum: drawnNumber,
+            diff: diff,
+            tier: prizeTierName,
+            net: netProfit
+        });
+
+        // 刷新 UI
+        updateUI();
+
+        // 检查胜利条件
+        if (cumulativeSpent >= TARGET_SPENT) {
+            triggerGameOver(true);
+            return;
         }
 
-        // 购买动作与动画流程
-        function buyTicket(ticket) {
-            if (isScratching || currentBalance < ticket.cost) return;
-            
-            // 扣钱
-            currentBalance -= ticket.cost;
-            isScratching = true;
-            renderTickets(); // 更新按钮状态
-            updateBalanceDisplay();
+        // 检查下次开奖是否资金不足以支撑最小注数(或当前注数)
+        if (balance < cost) {
+            triggerGameOver(false);
+        }
+    }
 
-            // 计算结果
-            const wonAmount = getReward(ticket);
-            
-            // 执行UI动画
-            showScratchAnimation(wonAmount, () => {
-                // 动画结束，结算奖金
-                if (wonAmount > 0) {
-                    currentBalance += wonAmount;
-                }
-                isScratching = false;
-                updateBalanceDisplay();
-                renderTickets();
-            });
+    // 添加历史记录（最多保留10条）
+    function addHistory(item) {
+        historyList.unshift(item);
+        if (historyList.length > 10) {
+            historyList.pop();
+        }
+        renderHistory();
+    }
+
+    function renderHistory() {
+        if (historyList.length === 0) {
+            elHistoryBody.innerHTML = `<tr><td colspan="6" style="color: var(--text-muted); padding: 12px;">暂无记录</td></tr>`;
+            return;
         }
 
-        // 刮刮乐视觉模拟
-        function showScratchAnimation(wonAmount, callback) {
-            const overlay = document.getElementById('scratch-overlay');
-            const coating = document.getElementById('scratch-coating');
-            const resultText = document.getElementById('scratch-result-text');
-            
-            // 初始化状态
-            coating.classList.remove('revealed');
-            resultText.classList.remove('show');
-            resultText.className = 'scratch-result';
-            
-            if (wonAmount > 0) {
-                resultText.innerHTML = `🎉 中奖了！<br><span style="font-size:1.5rem">¥${formatMoney(wonAmount)}</span>`;
-                resultText.classList.add('win-text');
-            } else {
-                resultText.innerHTML = `未中奖<br><span style="font-size:1rem; opacity:0.7">谢谢惠顾</span>`;
-                resultText.classList.add('lose-text');
-            }
+        elHistoryBody.innerHTML = historyList.map(h => {
+            const netText = h.net > 0 ? `+${h.net}` : `${h.net}`;
+            const netClass = h.net >= 0 ? 'txt-win' : 'txt-lose';
+            return `
+                <tr>
+                    <td>第${h.round}期</td>
+                    <td>${h.userNum}</td>
+                    <td>${h.drawnNum}</td>
+                    <td>${h.diff}</td>
+                    <td>${h.tier.replace(/^[^\s]+/, '')}</td>
+                    <td class="${netClass}">${netText}元</td>
+                </tr>
+            `;
+        }).join('');
+    }
 
-            overlay.classList.add('active');
+    // 触发结束模态框（胜利或失败）
+    function triggerGameOver(isWin) {
+        const modalTitle = document.getElementById('modalTitle');
+        const modalStats = document.getElementById('modalStats');
 
-            // 模拟刮涂层的时间延迟 (1.2秒)
-            setTimeout(() => {
-                coating.classList.add('revealed');
-                resultText.classList.add('show');
-                
-                // 展示结果后停留一小段时间再关闭
-                setTimeout(() => {
-                    overlay.classList.remove('active');
-                    callback();
-                }, 1500);
-            }, 1200);
+        if (isWin) {
+            modalTitle.innerText = "🎉 恭喜您达成目标！";
+            modalTitle.style.color = "var(--win-color)";
+            modalStats.innerHTML = `
+                <div><strong>累计花费总额：</strong>${cumulativeSpent} 元</div>
+                <div><strong>最终可用资金：</strong>${balance} 元</div>
+                <div><strong>总共购买期数：</strong>${roundCount} 期</div>
+            `;
+        } else {
+            modalTitle.innerText = "😔 资金耗尽，无法购买";
+            modalTitle.style.color = "var(--lose-color)";
+            modalStats.innerHTML = `
+                <div><strong>累计花费总额：</strong>${cumulativeSpent} 元</div>
+                <div><strong>剩余可用资金：</strong>${balance} 元</div>
+                <div><strong>本次尝试花费：</strong>${currentBets * 10} 元</div>
+            `;
         }
 
-        // 检查是否达成结局
-        function checkEndings() {
-            if (isScratching) return; // 动画期间不弹结算
+        elModal.classList.add('active');
+    }
 
-            const minCost = Math.min(...tickets.map(t => t.cost));
-            
-            // 结局1：走向人生巅峰
-            if (currentBalance >= TARGET_BALANCE) {
-                triggerEnding(
-                    "🎉",
-                    "恭喜您，总金额达到10亿！",
-                    "title-win",
-                    "您战胜了那微乎其微的概率，走向了人生的巅峰！但请记住，这仅仅是代码编写的童话。"
-                );
-            } 
-            // 结局2：破产清零 (资金小于最便宜的彩票即视为破产)
-            else if (currentBalance < minCost) {
-                triggerEnding(
-                    "💀",
-                    "很遗憾，您破产了",
-                    "title-lose",
-                    "您的财富已清零，所有的美梦都在此刻破碎。这就是现实的残酷。"
-                );
-            }
-        }
+    // 重置游戏
+    function resetGame() {
+        balance = 100;
+        cumulativeSpent = 0;
+        currentNumber = 50;
+        currentBets = 1;
+        roundCount = 0;
+        historyList = [];
 
-        function triggerEnding(icon, title, titleClass, desc) {
-            document.getElementById('ending-icon').innerText = icon;
-            const titleEl = document.getElementById('ending-title');
-            titleEl.innerText = title;
-            titleEl.className = `ending-title ${titleClass}`;
-            document.getElementById('ending-desc').innerText = desc;
-            
-            // 延迟一点点弹出，让玩家看清最后的余额
-            setTimeout(() => {
-                document.getElementById('game-over-modal').classList.add('active');
-            }, 500);
-        }
+        elSelectedNum.value = 50;
+        elSelectedBets.value = 1;
+        elDispUserNum.innerText = "--";
+        elDispDrawnNum.innerText = "--";
+        elResultStatus.innerText = "点击“购买彩票”开始开奖";
+        elResultStatus.style.color = "var(--text-muted)";
 
-        // 页面加载完毕初始化
-        window.onload = initGame;
+        renderHistory();
+        updateUI();
 
-    </script>
+        elModal.classList.remove('active');
+    }
+
+    // 初始化 UI
+    updateUI();
+</script>
+
 </body>
 </html>

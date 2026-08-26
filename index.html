@@ -5,34 +5,116 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>光荣青春 - 中国军旅生涯模拟系统</title>
     <style>
-        /* 全局样式重置与国防蓝主题配色 */
+        /* 全局样式与全屏铺满重置 */
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
             font-family: "Microsoft YaHei", "SimSun", Arial, sans-serif;
         }
-        body {
+        html, body {
+            width: 100%;
+            height: 100vh;
             background-color: #0b2545;
             color: #333333;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            overflow-x: hidden;
+            overflow: hidden;
         }
-        /* 主容器：模拟PC端控制台，支持响应式适配 */
-        #game-container {
-            width: 1200px;
-            height: 750px;
-            background-color: #f4f6f9;
-            border: 2px solid #133863;
-            box-shadow: 0 0 20px rgba(0, 0, 0, 0.6);
+
+        /* 隐藏与显示控制类 */
+        .hidden {
+            display: none !important;
+        }
+
+        /* 1. 欢迎/开始游戏界面 (高度拟真征兵网全屏海报大厅风格) */
+        #start-screen {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #0b2545 0%, #134074 100%);
             display: flex;
             flex-direction: column;
-            position: relative;
+            justify-content: center;
+            align-items: center;
+            color: #ffffff;
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 100;
         }
-        /* 顶部导航与状态栏（严谨征兵网风格） */
+        .start-logo {
+            font-size: 48px;
+            color: #ffd700;
+            margin-bottom: 10px;
+            font-weight: bold;
+            letter-spacing: 4px;
+        }
+        .start-subtitle {
+            font-size: 20px;
+            color: #cbd5e1;
+            margin-bottom: 40px;
+            letter-spacing: 2px;
+        }
+        .login-panel {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 30px;
+            border-radius: 6px;
+            width: 400px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            backdrop-filter: blur(5px);
+        }
+        .login-panel h3 {
+            font-size: 16px;
+            color: #ffd700;
+            margin-bottom: 5px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            padding-bottom: 8px;
+        }
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        .input-group label {
+            font-size: 13px;
+            color: #e2e8f0;
+        }
+        .input-group input, .input-group select {
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.9);
+            border: 1px solid #94a3b8;
+            border-radius: 3px;
+            font-size: 14px;
+            color: #0f172a;
+        }
+        .start-btn {
+            background-color: #c00000;
+            color: white;
+            border: none;
+            padding: 12px;
+            font-size: 16px;
+            font-weight: bold;
+            letter-spacing: 2px;
+            border-radius: 3px;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: background 0.2s;
+        }
+        .start-btn:hover {
+            background-color: #990000;
+        }
+
+        /* 2. 主游戏容器（全屏填满100%宽高） */
+        #game-container {
+            width: 100%;
+            height: 100%;
+            background-color: #f4f6f9;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* 顶部导航与状态栏 */
         header {
             background: linear-gradient(90deg, #0b2545, #134074);
             color: #ffffff;
@@ -42,6 +124,7 @@
             justify-content: space-between;
             padding: 0 20px;
             border-bottom: 3px solid #c00000;
+            flex-shrink: 0;
         }
         .header-title {
             font-size: 20px;
@@ -50,7 +133,7 @@
             display: flex;
             align-items: center;
         }
-        .header-title span {
+        .star-icon {
             color: #ffd700;
             margin-right: 10px;
             font-size: 22px;
@@ -59,13 +142,17 @@
             font-size: 14px;
             color: #d1d5db;
         }
-        /* 主体三栏布局 */
+
+        /* 主体三栏布局占满剩余高度 */
         .main-body {
             display: flex;
             flex: 1;
-            height: calc(100% - 60px);
+            width: 100%;
+            height: calc(100% - 60px - 30px);
+            overflow: hidden;
         }
-        /* 左侧：个人档案与服役信息 */
+
+        /* 左侧：个人档案 */
         .sidebar-left {
             width: 260px;
             background-color: #e9ecef;
@@ -74,6 +161,7 @@
             display: flex;
             flex-direction: column;
             gap: 15px;
+            flex-shrink: 0;
         }
         .profile-card {
             background: #ffffff;
@@ -101,6 +189,7 @@
             font-weight: bold;
             color: #0f172a;
         }
+
         /* 中央：核心剧情与交互区 */
         .content-center {
             flex: 1;
@@ -113,36 +202,38 @@
         }
         .scene-box {
             border: 1px solid #cbd5e1;
-            padding: 15px;
+            padding: 20px;
             background-color: #f8fafc;
             border-radius: 4px;
-            min-height: 320px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
             margin-bottom: 15px;
         }
         .scene-title {
-            font-size: 16px;
+            font-size: 18px;
             font-weight: bold;
             color: #0b2545;
-            margin-bottom: 10px;
+            margin-bottom: 15px;
             border-left: 4px solid #c00000;
             padding-left: 8px;
         }
         .scene-desc {
-            font-size: 14px;
+            font-size: 15px;
             line-height: 1.8;
             color: #334155;
-            margin-bottom: 15px;
         }
         .choices-box {
             display: flex;
             flex-direction: column;
             gap: 10px;
+            flex-shrink: 0;
         }
         .choice-btn {
             background-color: #0b2545;
             color: white;
             border: none;
-            padding: 10px 15px;
+            padding: 12px 15px;
             text-align: left;
             font-size: 14px;
             border-radius: 3px;
@@ -152,7 +243,8 @@
         .choice-btn:hover {
             background-color: #134074;
         }
-        /* 右侧：军事素质与考核面板 */
+
+        /* 右侧：军事素质指标面板 */
         .sidebar-right {
             width: 280px;
             background-color: #e9ecef;
@@ -161,6 +253,7 @@
             display: flex;
             flex-direction: column;
             gap: 15px;
+            flex-shrink: 0;
         }
         .stat-group {
             background: #ffffff;
@@ -197,24 +290,80 @@
             background-color: #2e7d32;
             width: 60%;
         }
-        /* 底部系统状态提示 */
+
+        /* 底部系统状态栏 */
         footer {
             background-color: #0b2545;
             color: #94a3b8;
             text-align: center;
             font-size: 12px;
-            padding: 6px;
+            padding: 8px;
             border-top: 1px solid #133863;
+            flex-shrink: 0;
+            height: 30px;
+        }
+
+        /* 响应式移动端适配：手机屏幕等比例自动缩放或重排布局 */
+        @media screen and (max-width: 900px) {
+            .main-body {
+                flex-direction: column;
+                overflow-y: auto;
+            }
+            .sidebar-left, .sidebar-right {
+                width: 100%;
+                flex-direction: row;
+                flex-wrap: wrap;
+                gap: 10px;
+            }
+            .profile-card, .stat-group {
+                flex: 1;
+                min-width: 200px;
+            }
+            #game-container {
+                height: 100vh;
+                overflow-y: auto;
+            }
         }
     </style>
 </head>
 <body>
 
-    <div id="game-container">
-        <!-- 顶部：严谨征兵网风格表头 -->
+    <!-- 1. 登录及开始游戏界面 -->
+    <div id="start-screen">
+        <div class="start-logo">★ 光荣青春</div>
+        <div class="start-subtitle">全国征兵暨军旅生涯沉浸式模拟系统</div>
+        <div class="login-panel">
+            <h3>新兵入伍登记卡</h3>
+            <div class="input-group">
+                <label>新兵姓名：</label>
+                <input type="text" id="input-name" value="张建国">
+            </div>
+            <div class="input-group">
+                <label>文化程度：</label>
+                <select id="input-edu">
+                    <option value="全日制本科">全日制本科</option>
+                    <option value="全日制大专">全日制大专</option>
+                    <option value="高中/中专">高中/中专</option>
+                </select>
+            </div>
+            <div class="input-group">
+                <label>应征去向：</label>
+                <select id="input-dept">
+                    <option value="某集团军步兵旅">某集团军步兵旅</option>
+                    <option value="某合成旅装甲步兵营">某合成旅装甲步兵营</option>
+                    <option value="某特种作战旅">某特种作战旅</option>
+                </select>
+            </div>
+            <button class="start-btn" onclick="startGame()">依法服兵役 逐梦军营</button>
+        </div>
+    </div>
+
+    <!-- 2. 主游戏界面（全屏填充） -->
+    <div id="game-container" class="hidden">
+        <!-- 顶部：严谨征兵网风格表头，已更换为黄色五角星 -->
         <header>
             <div class="header-title">
-                <span>🛡️</span>全国征兵暨军旅生涯模拟系统 —— 《光荣青春》
+                <span class="star-icon">★</span>全国征兵暨军旅生涯模拟系统 —— 《光荣青春》
             </div>
             <div class="header-info" id="game-date">
                 服役时间：新兵连入伍第一周 | 当前状态：适应期
@@ -229,14 +378,14 @@
                     <h3>新兵档案</h3>
                     <div class="profile-item"><span class="label">姓名：</span><span class="value" id="p-name">张建国</span></div>
                     <div class="profile-item"><span class="label">籍贯：</span><span class="value">华北某省</span></div>
-                    <div class="profile-item"><span class="label">学历：</span><span class="value">全日制本科</span></div>
-                    <div class="profile-item"><span class="label">去向：</span><span class="value">某集团军步兵旅</span></div>
+                    <div class="profile-item"><span class="label">学历：</span><span class="value" id="p-edu">全日制本科</span></div>
+                    <div class="profile-item"><span class="label">去向：</span><span class="value" id="p-dept">某集团军步兵旅</span></div>
                     <div class="profile-item"><span class="label">军衔：</span><span class="value">列兵</span></div>
                 </div>
                 <div class="profile-card">
                     <h3>党团情况</h3>
                     <div class="profile-item"><span class="label">政治面貌：</span><span class="value">共青团员</span></div>
-                    <div class="profile-item"><span class="label">入党申请：</span><span class="value" id="p-party">已递交</span></div>
+                    <div class="profile-item"><span class="label">入党申请：</span><span class="value">已递交</span></div>
                 </div>
             </div>
 
@@ -289,7 +438,28 @@
     </div>
 
     <script>
-        // 简单交互演示逻辑
+        // 开始游戏逻辑：读取输入并进入主界面
+        function startGame() {
+            const name = document.getElementById("input-name").value.trim();
+            const edu = document.getElementById("input-edu").value;
+            const dept = document.getElementById("input-dept").value;
+
+            if(!name) {
+                alert("请输入新兵姓名！");
+                return;
+            }
+
+            // 赋值到主界面档案
+            document.getElementById("p-name").innerText = name;
+            document.getElementById("p-edu").innerText = edu;
+            document.getElementById("p-dept").innerText = dept;
+
+            // 切换界面：隐藏开始屏幕，显示全屏游戏容器
+            document.getElementById("start-screen").classList.add("hidden");
+            document.getElementById("game-container").classList.remove("hidden");
+        }
+
+        // 剧情推进逻辑
         function nextStage(option) {
             const titleElem = document.getElementById("scene-title");
             const descElem = document.getElementById("scene-desc");

@@ -24,16 +24,24 @@
             -webkit-user-select: none;
         }
 
-        /* 背景图片层（使用img标签） */
-        .bg-layer {
+        /* ============ 背景图片容器（您粘贴的图片HTML代码将放在这里） ============ */
+        .bg-layer-container {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
             z-index: 0;
+            overflow: hidden;
+            pointer-events: none; /* 让点击穿透到下面的内容 */
+        }
+
+        /* 强制容器内的任何图片或SVG铺满整个屏幕 */
+        .bg-layer-container img,
+        .bg-layer-container svg {
+            width: 100%;
+            height: 100%;
             object-fit: cover;
-            object-position: center center;
             display: block;
         }
 
@@ -493,11 +501,14 @@
 <body>
 
     <!-- ============================================================
-         ★★★ 桌面端背景图 ★★★
-         将下面 img 标签的 src 属性替换为你的图片链接或 base64 代码
-         当前已使用您提供的桌面端链接
+         ★★★ 桌面端背景图容器 ★★★
+         请将您准备好的图片HTML代码（例如 <img src="..."> 或 SVG 代码）
+         完整地粘贴到下面这个容器内，替换掉示例的 <img> 标签。
+         注意：不要修改容器本身的 class 和 id。
          ============================================================ -->
-    <img src="<!DOCTYPE html>
+    <div class="bg-layer-container" id="bgDesktopContainer" aria-hidden="true">
+        <!-- 示例图片标签，请整体替换成您的图片HTML代码 -->
+        <img src="<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="utf-8" />
@@ -515,18 +526,18 @@
 </figure>
 </body>
 </html>
-" 
-         class="bg-layer" 
-         id="bgDesktop" 
-         alt="主控中心桌面背景" 
-         aria-hidden="true">
+" alt="桌面背景">
+    </div>
 
     <!-- ============================================================
-         ★★★ 手机端背景图 ★★★
-         将下面 img 标签的 src 属性替换为你的图片链接或 base64 代码
-         当前已使用您提供的手机端链接
+         ★★★ 手机端背景图容器 ★★★
+         请将您准备好的图片HTML代码完整地粘贴到下面这个容器内，
+         替换掉示例的 <img> 标签。
+         如果手机端与桌面端使用同一张图，两个容器内粘贴相同内容即可。
          ============================================================ -->
-    <img src="<!DOCTYPE html>
+    <div class="bg-layer-container" id="bgMobileContainer" aria-hidden="true" style="display: none;">
+        <!-- 示例图片标签，请整体替换成您的图片HTML代码 -->
+        <img src="<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="utf-8" />
@@ -544,12 +555,8 @@
 </figure>
 </body>
 </html>
-" 
-         class="bg-layer" 
-         id="bgMobile" 
-         alt="主控中心手机背景" 
-         aria-hidden="true"
-         style="display: none;">
+" alt="手机背景">
+    </div>
 
     <!-- 暗色遮罩 -->
     <div class="bg-overlay" aria-hidden="true"></div>
@@ -581,36 +588,30 @@
 
         <!-- 中央核心区 -->
         <div class="core-area">
-            <!-- 标题 -->
             <div class="title-block">
                 <h1 class="game-main-title">货运安全管控</h1>
                 <p class="game-sub-title">Freight Security Command</p>
             </div>
 
-            <!-- 分隔线 -->
             <div class="divider-line">
                 <span class="line"></span>
                 <span class="diamond"></span>
                 <span class="line"></span>
             </div>
 
-            <!-- 版本号 -->
             <span class="version-tag">v0.1.0 &nbsp;|&nbsp; BUILD 2024.11</span>
 
-            <!-- 按钮 -->
             <div class="button-area">
                 <button class="btn-start" id="btnStart" type="button">开始游戏</button>
                 <button class="btn-secondary" id="btnSettings" type="button">系统设置</button>
             </div>
 
-            <!-- 提示文字 -->
             <p class="hint-text">
                 &gt; 链路检测中 ... 所有货柜监控节点在线 &lt;<br>
                 &gt; 按 [ENTER] 快速进入指挥台 &lt;
             </p>
         </div>
 
-        <!-- 底部角落信息 -->
         <div class="corner-decor bottom-left" aria-hidden="true">
             节点: CQ-07 &nbsp;|&nbsp; 线路: 渝新欧<br>
             延迟: 12ms &nbsp;|&nbsp; 加密: AES-256
@@ -637,19 +638,19 @@
             updateClock();
             setInterval(updateClock, 1000);
 
-            // ============ 背景图片切换（桌面/手机） ============
-            var bgDesktop = document.getElementById('bgDesktop');
-            var bgMobile = document.getElementById('bgMobile');
+            // ============ 背景容器切换（桌面/手机） ============
+            var bgDesktopContainer = document.getElementById('bgDesktopContainer');
+            var bgMobileContainer = document.getElementById('bgMobileContainer');
 
             function switchBackground() {
                 var isMobile = window.innerWidth <= 768;
-                if (bgDesktop && bgMobile) {
+                if (bgDesktopContainer && bgMobileContainer) {
                     if (isMobile) {
-                        bgDesktop.style.display = 'none';
-                        bgMobile.style.display = 'block';
+                        bgDesktopContainer.style.display = 'none';
+                        bgMobileContainer.style.display = 'block';
                     } else {
-                        bgDesktop.style.display = 'block';
-                        bgMobile.style.display = 'none';
+                        bgDesktopContainer.style.display = 'block';
+                        bgMobileContainer.style.display = 'none';
                     }
                 }
             }

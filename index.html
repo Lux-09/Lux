@@ -12,7 +12,7 @@
             box-sizing: border-box;
         }
 
-        html，
+        html,
         body {
             width: 100%;
             height: 100%;
@@ -40,7 +40,7 @@
             transition: background-image 0.4s ease;
         }
 
-        /* 手机端背景图切换（使用新链接） */
+        /* 手机端背景图切换（新链接） */
         @media (max-width: 768px) {
             .bg-layer {
                 background-image: url('https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEaXZFqmCyWXGUO-7hbwsVc3eTM48K1FwAC8zMAAm9BwFTDFpVwPEdWMD0E.png');
@@ -175,7 +175,7 @@
             text-align: center;
             max-width: 680px;
             width: 100%;
-            transform: translateY(-2vh);
+            /* 已移除 transform: translateY(-2vh)，确保完美居中 */
         }
 
         .title-block {
@@ -238,7 +238,7 @@
             margin-top: 2px;
         }
 
-        /* ============ 按钮区域（已删除系统设置按钮） ============ */
+        /* ============ 按钮区域（仅保留开始游戏） ============ */
         .button-area {
             display: flex;
             flex-direction: column;
@@ -301,7 +301,7 @@
                 inset 0 0 20px rgba(100, 190, 230, 0.1);
         }
 
-        /* 已删除光标闪烁伪元素 */
+        /* 注意：已删除 .btn-start::after 闪烁光标 */
 
         .hint-text {
             font-size: 9.5px;
@@ -329,11 +329,11 @@
             left: 20px;
             text-align: left;
             line-height: 1.7;
-            /* 节点/线路/延迟/加密信息默认隐藏，等创建后显示 */
+            /* 节点信息默认隐藏，等创建后由JS控制显示 */
             display: none;
         }
         .corner-decor.bottom-right {
-            bottom: 16px;
+            bottom: 16px;  /* 适当调整位置，保持贴底 */
             right: 20px;
             text-align: right;
             line-height: 1.7;
@@ -394,7 +394,7 @@
             }
             .core-area {
                 gap: 16px;
-                transform: translateY(-1vh);
+                /* 已移除 transform: translateY(-1vh)，保持居中 */
             }
             .game-main-title {
                 letter-spacing: 3px;
@@ -440,7 +440,7 @@
             }
             .core-area {
                 gap: 10px;
-                transform: translateY(0);
+                /* 移除横屏时的偏移 */
             }
             .game-main-title {
                 font-size: clamp(20px, 4.5vw, 30px);
@@ -459,7 +459,7 @@
 </head>
 <body>
 
-    <!-- 背景图片层（CSS背景图实现） -->
+    <!-- 背景图片层 -->
     <div class="bg-layer" id="bgLayer" aria-hidden="true"></div>
 
     <!-- 暗色遮罩 -->
@@ -505,10 +505,10 @@
                 <span class="line"></span>
             </div>
 
-            <!-- 版本号（2026年） -->
+            <!-- 版本号（更新为2026） -->
             <span class="version-tag">v0.1.0 &nbsp;|&nbsp; BUILD 2026.09</span>
 
-            <!-- 按钮（仅保留开始游戏） -->
+            <!-- 按钮（仅“开始游戏”） -->
             <div class="button-area">
                 <button class="btn-start" id="btnStart" type="button">开始游戏</button>
             </div>
@@ -520,8 +520,8 @@
             </p>
         </div>
 
-        <!-- 底部角落信息：左侧节点信息默认隐藏，右侧版权信息保留并更新年份 -->
-        <div class="corner-decor bottom-left" aria-hidden="true">
+        <!-- 底部角落信息：左侧节点信息默认隐藏，右侧版权信息保留 -->
+        <div class="corner-decor bottom-left" id="nodeInfo" aria-hidden="true">
             节点: 未创建 &nbsp;|&nbsp; 线路: 未创建<br>
             延迟: -- &nbsp;|&nbsp; 加密: --
         </div>
@@ -607,6 +607,16 @@
                     e.preventDefault();
                 }
             }, { passive: false });
+
+            // 将来若需要显示节点信息，可调用以下函数：
+            window.showNodeInfo = function(node, line, delay, enc) {
+                var el = document.getElementById('nodeInfo');
+                if (el) {
+                    el.innerHTML = '节点: ' + node + ' &nbsp;|&nbsp; 线路: ' + line + '<br>' +
+                                   '延迟: ' + delay + ' &nbsp;|&nbsp; 加密: ' + enc;
+                    el.style.display = 'block';
+                }
+            };
 
         })();
     </script>

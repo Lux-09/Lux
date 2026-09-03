@@ -350,6 +350,7 @@
             max-width: 800px;
             text-align: center;
             margin-bottom: 20px;
+            position: relative;
         }
         .quiz-title {
             font-size: clamp(20px, 4vw, 30px);
@@ -428,10 +429,15 @@
             display: flex;
             justify-content: center;
             margin-top: 20px;
+            gap: 12px;
         }
         .btn-submit {
             padding: 12px 40px;
             font-size: 15px;
+        }
+        .btn-quiz-back {
+            padding: 12px 30px;
+            font-size: 14px;
         }
 
         /* 底部角落信息 */
@@ -505,6 +511,7 @@
             .corner-decor { font-size: 8px; }
             .corner-decor.bottom-right { bottom: 10px; right: 10px; }
             .quiz-page { padding: 15px 10px 30px; }
+            .quiz-submit { flex-direction: column; align-items: center; }
         }
     </style>
 </head>
@@ -643,6 +650,7 @@
         </div>
         <div class="quiz-container" id="quizContainer"></div>
         <div class="quiz-submit">
+            <button class="btn btn-quiz-back" id="btnQuizBack">返回注册</button>
             <button class="btn btn-submit" id="btnSubmitQuiz">提交答卷</button>
         </div>
     </div>
@@ -677,6 +685,7 @@
             var quizPage = document.getElementById('quizPage');
             var btnStartGame = document.getElementById('btnStartGame');
             var btnBackHome = document.getElementById('btnBackHome');
+            var btnQuizBack = document.getElementById('btnQuizBack');
 
             function showPage(page) {
                 homePage.classList.remove('active');
@@ -692,6 +701,7 @@
             }
             if (btnStartGame) btnStartGame.addEventListener('click', () => showPage('register'));
             if (btnBackHome) btnBackHome.addEventListener('click', () => showPage('home'));
+            if (btnQuizBack) btnQuizBack.addEventListener('click', () => showPage('register'));
 
             document.addEventListener('keydown', function(e) {
                 if (e.key === 'Enter' && homePage.classList.contains('active')) {
@@ -775,7 +785,7 @@
 
             function showGameModal(title, message, callback) {
                 modalTitle.textContent = title;
-                modalMessage.innerHTML = message.replace(/\n/g, '<br>'); // 支持换行
+                modalMessage.innerHTML = message.replace(/\n/g, '<br>');
                 modalOverlay.classList.add('show');
                 if (typeof callback === 'function') {
                     modalBtn.onclick = function() {
@@ -967,7 +977,6 @@
                     html += '</div></div>';
                 });
                 container.innerHTML = html;
-                // 保存当前题库类型
                 container.setAttribute('data-quiz-type', type);
             }
 
@@ -1013,24 +1022,44 @@
                         msg += '恭喜通过考核！';
                     } else {
                         msg += '未达到及格线（9分）。<br>';
-                        if (wrongList.length > 0) {
-                            msg += '<br><b>错题解析：</b><br>';
-                            wrongList.forEach(function(item) {
-                                msg += '<br><b>第' + (item.index + 1) + '题：' + item.question + '</b><br>';
-                                msg += '你的答案：' + item.userAnswer + ' &nbsp;|&nbsp; 正确答案：' + item.correctAnswer + '<br>';
-                                msg += '解析：' + item.explanation + '<br>';
+                    }
+
+                    // 无论是否通过，有错题则展示错题解析
+                    if (wrongList.length > 0) {
+                        msg += '<br><b>错题解析：</b><br>';
+                        wrongList.forEach(function(item) {
+                            msg += '<br><b>第' + (item.index + 1) + '题：' + item.question + '</b><br>';
+                            msg += '你的答案：' + item.userAnswer + ' &nbsp;|&nbsp; 正确答案：' + item.correctAnswer + '<br>';
+                            msg += '解析：' + item.explanation + '<br>';
+                        });
+                    }
+
+                    // 处理无驾驶证流程
+                    var needDriverTest = type === 'driver';
+                    if (needDriverTest) {
+                        if (passed) {
+                            // 司机题通过，继续考安全员题
+                            showGameModal('司机题通过', msg + '<br><br>请继续完成安全员题考试。', function() {
+                                generateQuiz('safety');
+                            });
+                        } else {
+                            // 司机题未通过，重新生成司机题
+                            showGameModal('司机题未通过', msg + '<br>请重新答题。', function() {
+                                generateQuiz('driver');
+                            });
+                        }
+                    } else {
+                        // 安全员题（有驾驶证者只考这个）
+                        if (passed) {
+                            showGameModal('考核通过', msg, function() {
+                                showPage('home');
+                            });
+                        } else {
+                            showGameModal('考核未通过', msg + '<br>请重新答题。', function() {
+                                generateQuiz('safety');
                             });
                         }
                     }
-
-                    showGameModal(passed ? '考核通过' : '考核未通过', msg, function() {
-                        if (passed) {
-                            showPage('home');
-                        } else {
-                            // 重新生成同一套题
-                            generateQuiz(type);
-                        }
-                    });
                 });
             }
 

@@ -174,7 +174,7 @@
             font-weight: 600;
             letter-spacing: 3px;
             text-transform: uppercase;
-            border-radius: 8px; /* 圆角设计 */
+            border-radius: 8px;
             cursor: pointer;
             transition: all 0.25s ease;
             outline: none;
@@ -229,7 +229,7 @@
             background: rgba(5, 12, 20, 0.6);
             padding: 24px 20px;
             border: 1px solid rgba(100, 160, 190, 0.25);
-            border-radius: 12px; /* 圆角 */
+            border-radius: 12px;
             box-shadow: 0 0 20px rgba(0,0,0,0.4);
         }
         .form-row { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
@@ -245,12 +245,12 @@
             font-size: 14px;
             letter-spacing: 1px;
             outline: none;
-            border-radius: 8px; /* 圆角 */
+            border-radius: 8px;
             transition: border 0.2s;
         }
         .text-input:focus { border-color: rgba(150, 220, 250, 0.8); box-shadow: 0 0 10px rgba(100, 190, 230, 0.2); }
 
-        /* ============ 自定义下拉（修复+动画） ============ */
+        /* ============ 自定义下拉（事件委托+动画） ============ */
         .custom-select { position: relative; width: 100%; }
         .select-display {
             background: rgba(10, 20, 30, 0.7);
@@ -263,7 +263,7 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border-radius: 8px; /* 圆角 */
+            border-radius: 8px;
             transition: border 0.2s;
         }
         .select-display:hover { border-color: rgba(150, 220, 250, 0.6); }
@@ -279,7 +279,7 @@
             max-height: 200px;
             overflow-y: auto;
             z-index: 50;
-            border-radius: 8px; /* 圆角 */
+            border-radius: 8px;
             box-shadow: 0 6px 16px rgba(0,0,0,0.5);
             opacity: 0;
             visibility: hidden;
@@ -336,7 +336,7 @@
             width: 90%;
             text-align: center;
             position: relative;
-            border-radius: 12px; /* 圆角 */
+            border-radius: 12px;
             animation: modal-in 0.25s ease;
         }
         @keyframes modal-in { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
@@ -363,7 +363,7 @@
             color: #d8ecf4;
             background: rgba(10, 20, 30, 0.7);
             border: 1px solid rgba(120, 190, 220, 0.6);
-            border-radius: 8px; /* 圆角 */
+            border-radius: 8px;
             cursor: pointer;
             transition: all 0.2s;
             text-transform: uppercase;
@@ -422,10 +422,7 @@
                 <div class="button-area">
                     <button class="btn btn-start" id="btnStartGame" type="button">开始游戏</button>
                 </div>
-                <p class="hint-text">
-                    &gt; 链路检测中 ... 所有货柜监控节点在线 &lt;<br>
-                    &gt; 按 [ENTER] 快速进入注册 &lt;
-                </p>
+                <!-- 提示文字已删除 -->
             </div>
         </div>
 
@@ -442,11 +439,16 @@
                             <input type="text" id="regName" class="text-input" placeholder="请输入姓名" autocomplete="off">
                         </div>
                     </div>
-                    <!-- 年龄 -->
+                    <!-- 年龄（下拉选择18-40） -->
                     <div class="form-row">
-                        <label class="form-label" for="regAge">年龄</label>
+                        <label class="form-label">年龄</label>
                         <div class="form-control">
-                            <input type="number" id="regAge" class="text-input" placeholder="请输入年龄" min="18" max="60" autocomplete="off">
+                            <div class="custom-select" data-select="age">
+                                <div class="select-display"><span class="selected-text">请选择年龄</span><span class="arrow">▼</span></div>
+                                <div class="select-options" id="ageOptions">
+                                    <!-- JS动态生成18-40 -->
+                                </div>
+                            </div>
                         </div>
                     </div>
                     <!-- 性别 -->
@@ -556,7 +558,6 @@
                     registerPage.classList.add('active');
                 }
             }
-
             if (btnStartGame) btnStartGame.addEventListener('click', () => showPage('register'));
             if (btnBackHome) btnBackHome.addEventListener('click', () => showPage('home'));
 
@@ -567,40 +568,15 @@
                 }
             });
 
-            // 自定义下拉组件（通用）
-            function initCustomSelect(selectEl) {
-                var display = selectEl.querySelector('.select-display');
-                var options = selectEl.querySelector('.select-options');
-                var selectedText = selectEl.querySelector('.selected-text');
-                var optionItems = selectEl.querySelectorAll('.select-option');
-
-                if (!display || !options) return;
-
-                display.addEventListener('click', function(e) {
-                    e.stopPropagation();
-                    // 关闭其他下拉
-                    document.querySelectorAll('.custom-select.open').forEach(function(other) {
-                        if (other !== selectEl) {
-                            other.classList.remove('open');
-                            other.querySelector('.select-options').classList.remove('show');
-                        }
-                    });
-                    selectEl.classList.toggle('open');
-                    options.classList.toggle('show');
-                });
-
-                optionItems.forEach(function(opt) {
-                    opt.addEventListener('click', function() {
-                        selectedText.textContent = opt.textContent;
-                        selectEl.setAttribute('data-value', opt.getAttribute('data-value'));
-                        selectEl.classList.remove('open');
-                        options.classList.remove('show');
-                    });
-                });
+            // 生成年龄选项 (18-40)
+            var ageOptionsContainer = document.getElementById('ageOptions');
+            if (ageOptionsContainer) {
+                var ageHtml = '';
+                for (var i = 18; i <= 40; i++) {
+                    ageHtml += '<div class="select-option" data-value="' + i + '">' + i + '岁</div>';
+                }
+                ageOptionsContainer.innerHTML = ageHtml;
             }
-
-            // 初始化所有已有下拉
-            document.querySelectorAll('.custom-select').forEach(initCustomSelect);
 
             // 生成单位选项（全国34个省级行政区）
             var provinces = [
@@ -612,18 +588,49 @@
             ];
             var unitOptionsContainer = document.getElementById('unitOptions');
             if (unitOptionsContainer) {
-                var html = '';
+                var unitHtml = '';
                 provinces.forEach(function(prov) {
-                    html += '<div class="select-option" data-value="' + prov + '货运安全部">' + prov + '货运安全部</div>';
+                    unitHtml += '<div class="select-option" data-value="' + prov + '货运安全部">' + prov + '货运安全部</div>';
                 });
-                unitOptionsContainer.innerHTML = html;
-                // 重新初始化单位下拉
-                var unitSelect = unitOptionsContainer.closest('.custom-select');
-                if (unitSelect) initCustomSelect(unitSelect);
+                unitOptionsContainer.innerHTML = unitHtml;
             }
 
-            // 点击页面其他区域关闭下拉
+            // 使用事件委托处理所有下拉列表交互
             document.addEventListener('click', function(e) {
+                // 点击 select-display 切换下拉
+                var display = e.target.closest('.select-display');
+                if (display) {
+                    var select = display.closest('.custom-select');
+                    if (!select) return;
+                    e.stopPropagation();
+                    // 关闭其他下拉
+                    document.querySelectorAll('.custom-select.open').forEach(function(other) {
+                        if (other !== select) {
+                            other.classList.remove('open');
+                            other.querySelector('.select-options').classList.remove('show');
+                        }
+                    });
+                    select.classList.toggle('open');
+                    var options = select.querySelector('.select-options');
+                    if (options) options.classList.toggle('show');
+                    return;
+                }
+
+                // 点击选项
+                var option = e.target.closest('.select-option');
+                if (option) {
+                    var select = option.closest('.custom-select');
+                    if (!select) return;
+                    var selectedText = select.querySelector('.selected-text');
+                    if (selectedText) selectedText.textContent = option.textContent;
+                    select.setAttribute('data-value', option.getAttribute('data-value'));
+                    select.classList.remove('open');
+                    var options = select.querySelector('.select-options');
+                    if (options) options.classList.remove('show');
+                    return;
+                }
+
+                // 点击其他区域关闭所有下拉
                 if (!e.target.closest('.custom-select')) {
                     document.querySelectorAll('.custom-select.open').forEach(function(sel) {
                         sel.classList.remove('open');
@@ -651,7 +658,7 @@
             if (btnConfirmRegister) {
                 btnConfirmRegister.addEventListener('click', function() {
                     var name = document.getElementById('regName').value.trim();
-                    var age = document.getElementById('regAge').value.trim();
+                    var ageSelect = document.querySelector('[data-select="age"]');
                     var genderSelect = document.querySelector('[data-select="gender"]');
                     var companySelect = document.querySelector('[data-select="company"]');
                     var unitSelect = document.querySelector('[data-select="unit"]');
@@ -661,7 +668,8 @@
                         if (licenseRadios[i].checked) { licenseValue = licenseRadios[i].value; break; }
                     }
 
-                    if (!name || !age) { showGameModal('提示', '请填写完整的姓名和年龄。'); return; }
+                    if (!name) { showGameModal('提示', '请填写姓名。'); return; }
+                    if (!ageSelect.getAttribute('data-value')) { showGameModal('提示', '请选择年龄。'); return; }
                     if (!genderSelect.getAttribute('data-value')) { showGameModal('提示', '请选择性别。'); return; }
                     if (!companySelect.getAttribute('data-value')) { showGameModal('提示', '请选择应聘公司。'); return; }
                     if (!unitSelect.getAttribute('data-value')) { showGameModal('提示', '请选择货运安全部单位。'); return; }

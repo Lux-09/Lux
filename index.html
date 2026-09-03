@@ -24,7 +24,7 @@
             -webkit-user-select: none;
         }
 
-        /* ============ 背景层（两页共用） ============ */
+        /* ============ 背景层 ============ */
         .bg-layer {
             position: fixed;
             top: 0;
@@ -56,9 +56,7 @@
             pointer-events: none;
         }
         @media (max-width: 768px) {
-            .bg-overlay {
-                background: rgba(4, 8, 15, 0.52);
-            }
+            .bg-overlay { background: rgba(4, 8, 15, 0.52); }
         }
 
         .scanlines {
@@ -69,11 +67,7 @@
             height: 100%;
             z-index: 2;
             pointer-events: none;
-            background: repeating-linear-gradient(0deg,
-                    transparent,
-                    transparent 2px,
-                    rgba(0, 0, 0, 0.03) 2px,
-                    rgba(0, 0, 0, 0.03) 4px);
+            background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0, 0, 0, 0.03) 2px, rgba(0, 0, 0, 0.03) 4px);
         }
 
         .noise {
@@ -170,10 +164,45 @@
         .divider-line .diamond { width: 8px; height: 8px; background: #7dd3e8; transform: rotate(45deg); box-shadow: 0 0 10px #7dd3e8; flex-shrink: 0; }
         .version-tag { font-size: 10px; letter-spacing: 3px; color: #6a8fa0; opacity: 0.6; margin-top: 2px; }
         .button-area { display: flex; flex-direction: column; align-items: center; gap: 16px; margin-top: 18px; width: 100%; }
-        .btn-start { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 16px 52px; font-family: inherit; font-size: clamp(16px, 2.5vw, 20px); font-weight: 600; letter-spacing: 4px; color: #d8ecf4; background: rgba(10, 20, 30, 0.55); border: 1.5px solid rgba(120, 190, 220, 0.6); border-radius: 2px; cursor: pointer; text-transform: uppercase; transition: all 0.25s ease; text-shadow: 0 0 8px rgba(150, 210, 240, 0.6); box-shadow: 0 0 20px rgba(80, 160, 200, 0.2), inset 0 0 18px rgba(80, 160, 200, 0.08); outline: none; -webkit-appearance: none; appearance: none; background-clip: padding-box; }
-        .btn-start:hover { background: rgba(15, 30, 42, 0.7); border-color: rgba(150, 220, 250, 0.85); box-shadow: 0 0 32px rgba(100, 190, 230, 0.4), inset 0 0 24px rgba(100, 190, 230, 0.12); color: #f0f8fc; transform: translateY(-1px); }
-        .btn-start:active { transform: translateY(1px); box-shadow: 0 0 14px rgba(80, 160, 200, 0.3), inset 0 0 20px rgba(80, 160, 200, 0.15); background: rgba(8, 16, 24, 0.8); }
-        .hint-text { font-size: 9.5px; letter-spacing: 2px; color: #56788a; opacity: 0.55; margin-top: 6px; text-align: center; line-height: 1.6; pointer-events: none; }
+
+        /* ============ 统一按钮风格 ============ */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-family: inherit;
+            font-weight: 600;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            border-radius: 8px; /* 圆角设计 */
+            cursor: pointer;
+            transition: all 0.25s ease;
+            outline: none;
+            -webkit-appearance: none;
+            appearance: none;
+            background-clip: padding-box;
+            text-shadow: 0 0 8px rgba(150, 210, 240, 0.6);
+            box-shadow: 0 0 20px rgba(80, 160, 200, 0.2), inset 0 0 18px rgba(80, 160, 200, 0.08);
+            color: #d8ecf4;
+            background: rgba(10, 20, 30, 0.55);
+            border: 1.5px solid rgba(120, 190, 220, 0.6);
+        }
+        .btn:hover {
+            background: rgba(15, 30, 42, 0.7);
+            border-color: rgba(150, 220, 250, 0.85);
+            box-shadow: 0 0 32px rgba(100, 190, 230, 0.4), inset 0 0 24px rgba(100, 190, 230, 0.12);
+            color: #f0f8fc;
+            transform: translateY(-1px);
+        }
+        .btn:active {
+            transform: translateY(1px);
+            box-shadow: 0 0 14px rgba(80, 160, 200, 0.3), inset 0 0 20px rgba(80, 160, 200, 0.15);
+            background: rgba(8, 16, 24, 0.8);
+        }
+        .btn-start { padding: 16px 52px; font-size: clamp(16px, 2.5vw, 20px); }
+        .btn-register { padding: 12px 40px; font-size: 15px; }
+        .btn-back { padding: 8px 20px; font-size: 12px; background: rgba(10, 20, 30, 0.35); border-color: rgba(110, 150, 170, 0.5); box-shadow: 0 0 10px rgba(80, 160, 200, 0.1); }
+        .btn-back:hover { background: rgba(20, 40, 55, 0.6); border-color: rgba(150, 220, 250, 0.8); }
 
         /* ============ 注册页面核心区 ============ */
         .register-core {
@@ -192,38 +221,102 @@
         }
         .register-title { font-size: clamp(22px, 4vw, 34px); font-weight: 700; letter-spacing: 4px; color: #e8f4fa; text-shadow: 0 0 16px rgba(120, 200, 240, 0.7); text-transform: uppercase; }
         .register-subtitle { font-size: 11px; letter-spacing: 4px; color: #9cc8dc; opacity: 0.7; text-transform: uppercase; margin-bottom: 6px; }
-        .register-form { display: flex; flex-direction: column; gap: 14px; width: 100%; background: rgba(5, 12, 20, 0.6); padding: 24px 20px; border: 1px solid rgba(100, 160, 190, 0.25); border-radius: 4px; box-shadow: 0 0 20px rgba(0,0,0,0.4); }
+        .register-form {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            width: 100%;
+            background: rgba(5, 12, 20, 0.6);
+            padding: 24px 20px;
+            border: 1px solid rgba(100, 160, 190, 0.25);
+            border-radius: 12px; /* 圆角 */
+            box-shadow: 0 0 20px rgba(0,0,0,0.4);
+        }
         .form-row { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
         .form-label { width: 100px; text-align: right; color: #9cc8dc; font-size: 13px; letter-spacing: 1px; }
         .form-control { flex: 1; min-width: 180px; }
-        .text-input { width: 100%; background: rgba(10, 20, 30, 0.7); border: 1px solid rgba(110, 160, 190, 0.4); color: #d8ecf4; padding: 10px 12px; font-family: inherit; font-size: 14px; letter-spacing: 1px; outline: none; border-radius: 2px; transition: border 0.2s; }
+        .text-input {
+            width: 100%;
+            background: rgba(10, 20, 30, 0.7);
+            border: 1px solid rgba(110, 160, 190, 0.4);
+            color: #d8ecf4;
+            padding: 10px 14px;
+            font-family: inherit;
+            font-size: 14px;
+            letter-spacing: 1px;
+            outline: none;
+            border-radius: 8px; /* 圆角 */
+            transition: border 0.2s;
+        }
         .text-input:focus { border-color: rgba(150, 220, 250, 0.8); box-shadow: 0 0 10px rgba(100, 190, 230, 0.2); }
-        /* 自定义下拉选择 */
+
+        /* ============ 自定义下拉（修复+动画） ============ */
         .custom-select { position: relative; width: 100%; }
-        .select-display { background: rgba(10, 20, 30, 0.7); border: 1px solid rgba(110, 160, 190, 0.4); padding: 10px 12px; color: #d8ecf4; font-size: 14px; letter-spacing: 1px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; border-radius: 2px; }
-        .select-display .arrow { font-size: 12px; color: #7dd3e8; }
-        .select-options { position: absolute; top: calc(100% + 4px); left: 0; right: 0; background: #0c151f; border: 1px solid rgba(110, 160, 190, 0.5); max-height: 180px; overflow-y: auto; z-index: 50; display: none; border-radius: 2px; box-shadow: 0 6px 16px rgba(0,0,0,0.5); }
-        .select-options.show { display: block; }
-        .select-option { padding: 8px 12px; color: #b8d8e8; font-size: 13px; letter-spacing: 1px; cursor: pointer; transition: background 0.15s; text-align: left; }
-        .select-option:hover { background: rgba(70, 140, 180, 0.25); color: #fff; }
+        .select-display {
+            background: rgba(10, 20, 30, 0.7);
+            border: 1px solid rgba(110, 160, 190, 0.4);
+            padding: 10px 14px;
+            color: #d8ecf4;
+            font-size: 14px;
+            letter-spacing: 1px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-radius: 8px; /* 圆角 */
+            transition: border 0.2s;
+        }
+        .select-display:hover { border-color: rgba(150, 220, 250, 0.6); }
+        .select-display .arrow { font-size: 12px; color: #7dd3e8; transition: transform 0.3s; }
+        .custom-select.open .select-display .arrow { transform: rotate(180deg); }
+        .select-options {
+            position: absolute;
+            top: calc(100% + 6px);
+            left: 0;
+            right: 0;
+            background: #0c151f;
+            border: 1px solid rgba(110, 160, 190, 0.5);
+            max-height: 200px;
+            overflow-y: auto;
+            z-index: 50;
+            border-radius: 8px; /* 圆角 */
+            box-shadow: 0 6px 16px rgba(0,0,0,0.5);
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-8px);
+            transition: opacity 0.2s ease, transform 0.2s ease, visibility 0.2s;
+        }
+        .select-options.show {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+        .select-option {
+            padding: 9px 14px;
+            color: #b8d8e8;
+            font-size: 13px;
+            letter-spacing: 1px;
+            cursor: pointer;
+            transition: background 0.15s, color 0.15s;
+            text-align: left;
+            border-bottom: 1px solid rgba(80, 120, 140, 0.15);
+        }
+        .select-option:last-child { border-bottom: none; }
+        .select-option:hover { background: rgba(70, 140, 180, 0.3); color: #ffffff; }
+
         /* 单选按钮组 */
         .radio-group { display: flex; gap: 20px; }
-        .radio-option { display: flex; align-items: center; gap: 6px; color: #b8d8e8; font-size: 14px; cursor: pointer; letter-spacing: 1px; }
-        .radio-option input[type="radio"] { appearance: none; -webkit-appearance: none; width: 14px; height: 14px; border: 1px solid #6a9aa8; border-radius: 50%; background: #0a0e14; cursor: pointer; position: relative; }
-        .radio-option input[type="radio"]:checked::after { content: ''; position: absolute; top: 3px; left: 3px; width: 6px; height: 6px; border-radius: 50%; background: #7dd3e8; box-shadow: 0 0 6px #7dd3e8; }
-        .radio-option input[type="radio"]:focus-visible { outline: none; border-color: #7dd3e8; box-shadow: 0 0 8px rgba(100, 190, 230, 0.4); }
-        /* 按钮 */
-        .btn-register { display: inline-flex; align-items: center; justify-content: center; padding: 12px 40px; font-family: inherit; font-size: 15px; font-weight: 600; letter-spacing: 3px; color: #d8ecf4; background: rgba(10, 20, 30, 0.55); border: 1.5px solid rgba(120, 190, 220, 0.6); border-radius: 2px; cursor: pointer; text-transform: uppercase; transition: all 0.25s ease; margin: 8px auto 0; }
-        .btn-register:hover { background: rgba(15, 30, 42, 0.7); border-color: rgba(150, 220, 250, 0.85); box-shadow: 0 0 32px rgba(100, 190, 230, 0.4); }
-        .btn-back { background: transparent; border: 1px solid rgba(110, 150, 170, 0.35); padding: 6px 16px; font-size: 11px; letter-spacing: 2px; color: #7a9dad; cursor: pointer; transition: all 0.2s; }
-        .btn-back:hover { border-color: rgba(140, 190, 215, 0.7); color: #b8dce8; background: rgba(10, 20, 30, 0.35); }
+        .radio-option { display: flex; align-items: center; gap: 8px; color: #b8d8e8; font-size: 14px; cursor: pointer; letter-spacing: 1px; }
+        .radio-option input[type="radio"] { appearance: none; -webkit-appearance: none; width: 18px; height: 18px; border: 2px solid #6a9aa8; border-radius: 50%; background: #0a0e14; cursor: pointer; position: relative; transition: border 0.2s; }
+        .radio-option input[type="radio"]:checked { border-color: #7dd3e8; }
+        .radio-option input[type="radio"]:checked::after { content: ''; position: absolute; top: 3px; left: 3px; width: 8px; height: 8px; border-radius: 50%; background: #7dd3e8; box-shadow: 0 0 6px #7dd3e8; }
 
         /* 底部角落信息 */
         .corner-decor { position: absolute; z-index: 15; pointer-events: none; opacity: 0.45; font-size: 10px; letter-spacing: 2px; color: #6a9aa8; }
         .corner-decor.bottom-left { bottom: 16px; left: 20px; text-align: left; line-height: 1.7; display: none; }
         .corner-decor.bottom-right { bottom: 16px; right: 20px; text-align: right; line-height: 1.7; }
 
-        /* ============ 游戏弹窗 ============ */
+        /* ============ 游戏弹窗（圆角） ============ */
         .game-modal-overlay {
             position: fixed;
             top: 0; left: 0; right: 0; bottom: 0;
@@ -232,7 +325,6 @@
             display: none;
             align-items: center;
             justify-content: center;
-            pointer-events: auto;
         }
         .game-modal-overlay.show { display: flex; }
         .game-modal {
@@ -244,6 +336,7 @@
             width: 90%;
             text-align: center;
             position: relative;
+            border-radius: 12px; /* 圆角 */
             animation: modal-in 0.25s ease;
         }
         @keyframes modal-in { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
@@ -270,7 +363,7 @@
             color: #d8ecf4;
             background: rgba(10, 20, 30, 0.7);
             border: 1px solid rgba(120, 190, 220, 0.6);
-            border-radius: 2px;
+            border-radius: 8px; /* 圆角 */
             cursor: pointer;
             transition: all 0.2s;
             text-transform: uppercase;
@@ -300,7 +393,7 @@
     <div class="corner-frame bl" aria-hidden="true"></div>
     <div class="corner-frame br" aria-hidden="true"></div>
 
-    <!-- 顶部状态栏（全局） -->
+    <!-- 顶部状态栏 -->
     <div class="top-status">
         <div class="indicator-dots">
             <span class="dot" aria-hidden="true"></span>
@@ -313,7 +406,7 @@
     <!-- 主内容容器 -->
     <div class="main-container">
 
-        <!-- ========== 首页 ========== -->
+        <!-- 首页 -->
         <div class="page active" id="homePage">
             <div class="home-core">
                 <div class="title-block">
@@ -327,7 +420,7 @@
                 </div>
                 <span class="version-tag">v0.1.0 &nbsp;|&nbsp; BUILD 2026.09</span>
                 <div class="button-area">
-                    <button class="btn-start" id="btnStartGame" type="button">开始游戏</button>
+                    <button class="btn btn-start" id="btnStartGame" type="button">开始游戏</button>
                 </div>
                 <p class="hint-text">
                     &gt; 链路检测中 ... 所有货柜监控节点在线 &lt;<br>
@@ -336,7 +429,7 @@
             </div>
         </div>
 
-        <!-- ========== 注册页 ========== -->
+        <!-- 注册页 -->
         <div class="page" id="registerPage">
             <div class="register-core">
                 <div class="register-title">人员注册</div>
@@ -396,7 +489,7 @@
                             <div class="custom-select" data-select="unit">
                                 <div class="select-display"><span class="selected-text">请选择货运安全部</span><span class="arrow">▼</span></div>
                                 <div class="select-options" id="unitOptions">
-                                    <!-- 由JS动态生成，确保完整 -->
+                                    <!-- JS动态生成 -->
                                 </div>
                             </div>
                         </div>
@@ -413,8 +506,8 @@
                     </div>
                 </div>
                 <div style="display: flex; gap: 12px; justify-content: center; margin-top: 6px;">
-                    <button class="btn-register" id="btnConfirmRegister">确认注册</button>
-                    <button class="btn-back" id="btnBackHome">返回</button>
+                    <button class="btn btn-register" id="btnConfirmRegister">确认注册</button>
+                    <button class="btn btn-back" id="btnBackHome">返回</button>
                 </div>
             </div>
         </div>
@@ -435,7 +528,7 @@
 
     <script>
         (function() {
-            // ============ 实时时钟 ============
+            // 实时时钟
             function updateClock() {
                 var el = document.getElementById('sysTime');
                 if (!el) return;
@@ -448,19 +541,7 @@
             updateClock();
             setInterval(updateClock, 1000);
 
-            // ============ 背景图片加载兜底 ============
-            var bgLayer = document.getElementById('bgLayer');
-            if (bgLayer) {
-                var testImg = new Image();
-                testImg.onerror = function() {
-                    bgLayer.style.backgroundImage = 'none';
-                    bgLayer.style.backgroundColor = '#0c1218';
-                };
-                var bgUrl = window.getComputedStyle(bgLayer).backgroundImage.slice(4, -1).replace(/"/g, "");
-                if (bgUrl) testImg.src = bgUrl;
-            }
-
-            // ============ 页面切换 ============
+            // 页面切换
             var homePage = document.getElementById('homePage');
             var registerPage = document.getElementById('registerPage');
             var btnStartGame = document.getElementById('btnStartGame');
@@ -476,63 +557,52 @@
                 }
             }
 
-            if (btnStartGame) {
-                btnStartGame.addEventListener('click', function() {
-                    showPage('register');
-                });
-            }
-            if (btnBackHome) {
-                btnBackHome.addEventListener('click', function() {
-                    showPage('home');
-                });
-            }
+            if (btnStartGame) btnStartGame.addEventListener('click', () => showPage('register'));
+            if (btnBackHome) btnBackHome.addEventListener('click', () => showPage('home'));
 
-            // 键盘快捷键：Enter在首页进入注册
             document.addEventListener('keydown', function(e) {
-                if (e.key === 'Enter' || e.keyCode === 13) {
-                    if (homePage.classList.contains('active')) {
-                        if (btnStartGame) btnStartGame.click();
-                        e.preventDefault();
-                    }
+                if (e.key === 'Enter' && homePage.classList.contains('active')) {
+                    if (btnStartGame) btnStartGame.click();
+                    e.preventDefault();
                 }
             });
 
-            // ============ 自定义下拉选择 ============
-            var customSelects = document.querySelectorAll('.custom-select');
-            customSelects.forEach(function(select) {
-                var display = select.querySelector('.select-display');
-                var options = select.querySelector('.select-options');
-                var selectedText = select.querySelector('.selected-text');
-                var optionItems = select.querySelectorAll('.select-option');
+            // 自定义下拉组件（通用）
+            function initCustomSelect(selectEl) {
+                var display = selectEl.querySelector('.select-display');
+                var options = selectEl.querySelector('.select-options');
+                var selectedText = selectEl.querySelector('.selected-text');
+                var optionItems = selectEl.querySelectorAll('.select-option');
+
+                if (!display || !options) return;
 
                 display.addEventListener('click', function(e) {
                     e.stopPropagation();
                     // 关闭其他下拉
-                    document.querySelectorAll('.select-options.show').forEach(function(opt) {
-                        if (opt !== options) opt.classList.remove('show');
+                    document.querySelectorAll('.custom-select.open').forEach(function(other) {
+                        if (other !== selectEl) {
+                            other.classList.remove('open');
+                            other.querySelector('.select-options').classList.remove('show');
+                        }
                     });
+                    selectEl.classList.toggle('open');
                     options.classList.toggle('show');
                 });
 
                 optionItems.forEach(function(opt) {
                     opt.addEventListener('click', function() {
                         selectedText.textContent = opt.textContent;
-                        select.setAttribute('data-value', opt.getAttribute('data-value'));
+                        selectEl.setAttribute('data-value', opt.getAttribute('data-value'));
+                        selectEl.classList.remove('open');
                         options.classList.remove('show');
                     });
                 });
-            });
+            }
 
-            // 点击页面其他区域关闭下拉
-            document.addEventListener('click', function(e) {
-                if (!e.target.closest('.custom-select')) {
-                    document.querySelectorAll('.select-options.show').forEach(function(opt) {
-                        opt.classList.remove('show');
-                    });
-                }
-            });
+            // 初始化所有已有下拉
+            document.querySelectorAll('.custom-select').forEach(initCustomSelect);
 
-            // ============ 生成单位选项（全国34个省级行政区） ============
+            // 生成单位选项（全国34个省级行政区）
             var provinces = [
                 '北京市','天津市','上海市','重庆市','河北省','山西省','辽宁省','吉林省',
                 '黑龙江省','江苏省','浙江省','安徽省','福建省','江西省','山东省','河南省',
@@ -547,31 +617,22 @@
                     html += '<div class="select-option" data-value="' + prov + '货运安全部">' + prov + '货运安全部</div>';
                 });
                 unitOptionsContainer.innerHTML = html;
-                // 重新绑定选项事件
+                // 重新初始化单位下拉
                 var unitSelect = unitOptionsContainer.closest('.custom-select');
-                if (unitSelect) {
-                    var unitDisplay = unitSelect.querySelector('.select-display');
-                    var unitSelectedText = unitSelect.querySelector('.selected-text');
-                    var unitOptions = unitSelect.querySelectorAll('.select-option');
-                    unitOptions.forEach(function(opt) {
-                        opt.addEventListener('click', function() {
-                            unitSelectedText.textContent = opt.textContent;
-                            unitSelect.setAttribute('data-value', opt.getAttribute('data-value'));
-                            unitOptionsContainer.classList.remove('show');
-                        });
-                    });
-                    // 重新绑定显示点击
-                    unitDisplay.addEventListener('click', function(e) {
-                        e.stopPropagation();
-                        document.querySelectorAll('.select-options.show').forEach(function(opt) {
-                            if (opt !== unitOptionsContainer) opt.classList.remove('show');
-                        });
-                        unitOptionsContainer.classList.toggle('show');
-                    });
-                }
+                if (unitSelect) initCustomSelect(unitSelect);
             }
 
-            // ============ 游戏弹窗 ============
+            // 点击页面其他区域关闭下拉
+            document.addEventListener('click', function(e) {
+                if (!e.target.closest('.custom-select')) {
+                    document.querySelectorAll('.custom-select.open').forEach(function(sel) {
+                        sel.classList.remove('open');
+                        sel.querySelector('.select-options').classList.remove('show');
+                    });
+                }
+            });
+
+            // 游戏弹窗
             var modalOverlay = document.getElementById('gameModalOverlay');
             var modalTitle = document.getElementById('modalTitle');
             var modalMessage = document.getElementById('modalMessage');
@@ -582,15 +643,10 @@
                 modalMessage.textContent = message;
                 modalOverlay.classList.add('show');
             }
+            modalBtn.addEventListener('click', function() { modalOverlay.classList.remove('show'); });
+            modalOverlay.addEventListener('click', function(e) { if (e.target === modalOverlay) modalOverlay.classList.remove('show'); });
 
-            modalBtn.addEventListener('click', function() {
-                modalOverlay.classList.remove('show');
-            });
-            modalOverlay.addEventListener('click', function(e) {
-                if (e.target === modalOverlay) modalOverlay.classList.remove('show');
-            });
-
-            // ============ 注册确认逻辑 ============
+            // 注册确认逻辑
             var btnConfirmRegister = document.getElementById('btnConfirmRegister');
             if (btnConfirmRegister) {
                 btnConfirmRegister.addEventListener('click', function() {
@@ -602,36 +658,18 @@
                     var licenseRadios = document.getElementsByName('license');
                     var licenseValue = '';
                     for (var i = 0; i < licenseRadios.length; i++) {
-                        if (licenseRadios[i].checked) {
-                            licenseValue = licenseRadios[i].value;
-                            break;
-                        }
+                        if (licenseRadios[i].checked) { licenseValue = licenseRadios[i].value; break; }
                     }
 
-                    // 基础必填检查
-                    if (!name || !age) {
-                        showGameModal('提示', '请填写完整的姓名和年龄。');
-                        return;
-                    }
-                    if (genderSelect.getAttribute('data-value') === '' || !genderSelect.getAttribute('data-value')) {
-                        showGameModal('提示', '请选择性别。');
-                        return;
-                    }
-                    if (companySelect.getAttribute('data-value') === '' || !companySelect.getAttribute('data-value')) {
-                        showGameModal('提示', '请选择应聘公司。');
-                        return;
-                    }
-                    if (unitSelect.getAttribute('data-value') === '' || !unitSelect.getAttribute('data-value')) {
-                        showGameModal('提示', '请选择货运安全部单位。');
-                        return;
-                    }
+                    if (!name || !age) { showGameModal('提示', '请填写完整的姓名和年龄。'); return; }
+                    if (!genderSelect.getAttribute('data-value')) { showGameModal('提示', '请选择性别。'); return; }
+                    if (!companySelect.getAttribute('data-value')) { showGameModal('提示', '请选择应聘公司。'); return; }
+                    if (!unitSelect.getAttribute('data-value')) { showGameModal('提示', '请选择货运安全部单位。'); return; }
 
-                    // 驾驶证检查
                     if (licenseValue === '没有') {
                         showGameModal('不符合岗位要求', '由于您没有驾驶安全常识，不符合该岗位要求，感谢您的注册。');
                     } else {
                         showGameModal('注册成功', '欢迎加入货运安全管控系统，您的信息已提交审核。');
-                        // 可在此处添加后续处理，如返回主页或清空表单
                     }
                 });
             }
@@ -641,7 +679,7 @@
                 if (window.innerWidth <= 768) e.preventDefault();
             }, { passive: false });
 
-            // 预留节点信息显示函数
+            // 预留节点信息显示
             window.showNodeInfo = function(node, line, delay, enc) {
                 var el = document.getElementById('nodeInfo');
                 if (el) {
@@ -649,7 +687,6 @@
                     el.style.display = 'block';
                 }
             };
-
         })();
     </script>
 </body>

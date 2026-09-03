@@ -491,6 +491,10 @@
             text-shadow: 0 0 16px rgba(120, 200, 240, 0.7);
             margin-bottom: 16px;
         }
+        .announce-title .star {
+            color: #f0c040;
+            margin: 0 4px;
+        }
         .announce-text {
             font-size: 14px;
             letter-spacing: 1.5px;
@@ -759,7 +763,9 @@
     <!-- 语音播报界面 -->
     <div class="announce-page" id="announcePage">
         <div class="announce-box">
-            <div class="announce-title">🎉 恭喜通过考核</div>
+            <div class="announce-title">
+                <span class="star">★</span> 恭喜通过考核 <span class="star">★</span>
+            </div>
             <div class="announce-text">
                 祝贺您正式就任货运安全管理员！
 
@@ -820,7 +826,6 @@
                 announcePage.classList.remove('show');
                 gameMainPage.classList.remove('show');
 
-                // 移除所有背景相关类
                 bgLayer.classList.remove('home-bg', 'blur-bg');
 
                 if (page === 'home') {
@@ -833,12 +838,10 @@
                 } else if (page === 'announce') {
                     announcePage.classList.add('show');
                 } else if (page === 'gameMain') {
-                    // 游戏主界面：使用新图并模糊
                     bgLayer.classList.add('home-bg', 'blur-bg');
                     gameMainPage.classList.add('show');
                 }
 
-                // 停止音频（如果切换离开播报页）
                 if (page !== 'announce' && announceAudio) {
                     announceAudio.pause();
                     announceAudio.currentTime = 0;
@@ -863,7 +866,7 @@
                 }
             });
 
-            // 生成年龄选项 (18-40)
+            // 生成年龄选项
             var ageOptionsContainer = document.getElementById('ageOptions');
             if (ageOptionsContainer) {
                 var ageHtml = '';
@@ -873,7 +876,7 @@
                 ageOptionsContainer.innerHTML = ageHtml;
             }
 
-            // 生成单位选项（全国34个省级行政区）
+            // 生成单位选项
             var provinces = [
                 '北京市','天津市','上海市','重庆市','河北省','山西省','辽宁省','吉林省',
                 '黑龙江省','江苏省','浙江省','安徽省','福建省','江西省','山东省','河南省',
@@ -890,7 +893,7 @@
                 unitOptionsContainer.innerHTML = unitHtml;
             }
 
-            // 事件委托处理所有下拉列表交互
+            // 事件委托处理下拉
             document.addEventListener('click', function(e) {
                 var display = e.target.closest('.select-display');
                 if (display) {
@@ -980,7 +983,7 @@
                 });
             }
 
-            // ============ 两套题库 ============
+            // 题库
             var safetyQuestions = [
                 { question: "安全员在货物装车前应重点检查什么？", options: ["货物数量", "车辆技术状况及货物捆绑", "司机驾驶证", "天气情况"], correct: 1, explanation: "安全员需确认车辆状态良好及货物固定牢靠，防止运输途中发生意外。" },
                 { question: "发现安全隐患时，安全员首先应？", options: ["自行处理", "立即上报并停止相关作业", "忽视继续工作", "通知司机处理"], correct: 1, explanation: "安全员应立即上报隐患，确保人员安全，不得擅自冒险作业。" },

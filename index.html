@@ -294,11 +294,29 @@
             visibility: hidden;
             transform: translateY(-8px);
             transition: opacity 0.2s ease, transform 0.2s ease, visibility 0.2s;
+
+            /* 自定义滚动条（隐藏默认箭头） */
+            scrollbar-width: thin;
+            scrollbar-color: #6a9aa8 #0c151f;
         }
         .select-options.show {
             opacity: 1;
             visibility: visible;
             transform: translateY(0);
+        }
+        .select-options::-webkit-scrollbar {
+            width: 8px;
+        }
+        .select-options::-webkit-scrollbar-track {
+            background: #0c151f;
+            border-radius: 8px;
+        }
+        .select-options::-webkit-scrollbar-thumb {
+            background: #6a9aa8;
+            border-radius: 8px;
+        }
+        .select-options::-webkit-scrollbar-button {
+            display: none;  /* 隐藏上下箭头按钮 */
         }
         .select-option {
             padding: 9px 14px;
@@ -879,10 +897,8 @@
                     var msg = '您的得分：' + score + ' / 20。' + (passed ? '恭喜通过考核！' : '未达到及格线（18分），请重新考核。');
                     showGameModal(passed ? '考核通过' : '考核未通过', msg, function() {
                         if (!passed) {
-                            // 重新生成题目
                             generateQuiz();
                         } else {
-                            // 通过后返回首页或其他
                             showPage('home');
                         }
                     });

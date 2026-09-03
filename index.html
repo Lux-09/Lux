@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>货运安全管控系统 - 注册与主控台</title>
+    <title>货运安全管控系统 - 注册考核</title>
     <style>
         /* ============ 全局重置 ============ */
         * {
@@ -247,8 +247,17 @@
             outline: none;
             border-radius: 8px;
             transition: border 0.2s;
+            -webkit-box-shadow: 0 0 0 1000px rgba(10, 20, 30, 0.7) inset;
+            box-shadow: 0 0 0 1000px rgba(10, 20, 30, 0.7) inset;
         }
-        .text-input:focus { border-color: rgba(150, 220, 250, 0.8); box-shadow: 0 0 10px rgba(100, 190, 230, 0.2); }
+        .text-input:focus { border-color: rgba(150, 220, 250, 0.8); box-shadow: 0 0 10px rgba(100, 190, 230, 0.2), 0 0 0 1000px rgba(10, 20, 30, 0.7) inset; }
+        .text-input:-webkit-autofill,
+        .text-input:-webkit-autofill:hover,
+        .text-input:-webkit-autofill:focus {
+            -webkit-text-fill-color: #d8ecf4;
+            -webkit-box-shadow: 0 0 0 1000px rgba(10, 20, 30, 0.7) inset;
+            transition: background-color 5000s ease-in-out 0s;
+        }
 
         /* ============ 自定义下拉（事件委托+动画） ============ */
         .custom-select { position: relative; width: 100%; }
@@ -311,6 +320,114 @@
         .radio-option input[type="radio"]:checked { border-color: #7dd3e8; }
         .radio-option input[type="radio"]:checked::after { content: ''; position: absolute; top: 3px; left: 3px; width: 8px; height: 8px; border-radius: 50%; background: #7dd3e8; box-shadow: 0 0 6px #7dd3e8; }
 
+        /* ============ 答题页面（全屏覆盖） ============ */
+        .quiz-page {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(5, 12, 20, 0.95);
+            z-index: 200;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            overflow-y: auto;
+            padding: 20px 15px 40px;
+        }
+        .quiz-page.show {
+            display: flex;
+        }
+        .quiz-header {
+            width: 100%;
+            max-width: 800px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .quiz-title {
+            font-size: clamp(20px, 4vw, 30px);
+            font-weight: 700;
+            letter-spacing: 4px;
+            color: #e8f4fa;
+            text-shadow: 0 0 16px rgba(120, 200, 240, 0.7);
+        }
+        .quiz-subtitle {
+            font-size: 12px;
+            letter-spacing: 3px;
+            color: #9cc8dc;
+            opacity: 0.7;
+            margin-top: 6px;
+        }
+        .quiz-container {
+            width: 100%;
+            max-width: 800px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        .question-block {
+            background: rgba(5, 12, 20, 0.7);
+            border: 1px solid rgba(100, 160, 190, 0.3);
+            border-radius: 10px;
+            padding: 16px 18px;
+        }
+        .question-text {
+            font-size: 14px;
+            letter-spacing: 1px;
+            color: #d8ecf4;
+            margin-bottom: 12px;
+        }
+        .options-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .option-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #b8d8e8;
+            font-size: 13px;
+            letter-spacing: 1px;
+            cursor: pointer;
+        }
+        .option-item input[type="radio"] {
+            appearance: none;
+            -webkit-appearance: none;
+            width: 16px;
+            height: 16px;
+            border: 2px solid #6a9aa8;
+            border-radius: 50%;
+            background: #0a0e14;
+            cursor: pointer;
+            position: relative;
+            flex-shrink: 0;
+        }
+        .option-item input[type="radio"]:checked {
+            border-color: #7dd3e8;
+        }
+        .option-item input[type="radio"]:checked::after {
+            content: '';
+            position: absolute;
+            top: 3px;
+            left: 3px;
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: #7dd3e8;
+            box-shadow: 0 0 6px #7dd3e8;
+        }
+        .quiz-submit {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+        }
+        .btn-submit {
+            padding: 12px 40px;
+            font-size: 15px;
+        }
+
         /* 底部角落信息 */
         .corner-decor { position: absolute; z-index: 15; pointer-events: none; opacity: 0.45; font-size: 10px; letter-spacing: 2px; color: #6a9aa8; }
         .corner-decor.bottom-left { bottom: 16px; left: 20px; text-align: left; line-height: 1.7; display: none; }
@@ -321,7 +438,7 @@
             position: fixed;
             top: 0; left: 0; right: 0; bottom: 0;
             background: rgba(0, 0, 0, 0.7);
-            z-index: 100;
+            z-index: 300;
             display: none;
             align-items: center;
             justify-content: center;
@@ -378,6 +495,7 @@
             .register-form { padding: 18px 14px; }
             .corner-decor { font-size: 8px; }
             .corner-decor.bottom-right { bottom: 10px; right: 10px; }
+            .quiz-page { padding: 15px 10px 30px; }
         }
     </style>
 </head>
@@ -422,7 +540,6 @@
                 <div class="button-area">
                     <button class="btn btn-start" id="btnStartGame" type="button">开始游戏</button>
                 </div>
-                <!-- 提示文字已删除 -->
             </div>
         </div>
 
@@ -432,26 +549,21 @@
                 <div class="register-title">人员注册</div>
                 <div class="register-subtitle">FREIGHT SECURITY PERSONNEL REGISTRATION</div>
                 <div class="register-form">
-                    <!-- 姓名 -->
                     <div class="form-row">
                         <label class="form-label" for="regName">姓名</label>
                         <div class="form-control">
                             <input type="text" id="regName" class="text-input" placeholder="请输入姓名" autocomplete="off">
                         </div>
                     </div>
-                    <!-- 年龄（下拉选择18-40） -->
                     <div class="form-row">
                         <label class="form-label">年龄</label>
                         <div class="form-control">
                             <div class="custom-select" data-select="age">
                                 <div class="select-display"><span class="selected-text">请选择年龄</span><span class="arrow">▼</span></div>
-                                <div class="select-options" id="ageOptions">
-                                    <!-- JS动态生成18-40 -->
-                                </div>
+                                <div class="select-options" id="ageOptions"></div>
                             </div>
                         </div>
                     </div>
-                    <!-- 性别 -->
                     <div class="form-row">
                         <label class="form-label">性别</label>
                         <div class="form-control">
@@ -464,7 +576,6 @@
                             </div>
                         </div>
                     </div>
-                    <!-- 应聘公司 -->
                     <div class="form-row">
                         <label class="form-label">应聘公司</label>
                         <div class="form-control">
@@ -484,19 +595,15 @@
                             </div>
                         </div>
                     </div>
-                    <!-- 单位选择（全国各省市） -->
                     <div class="form-row">
                         <label class="form-label">单位选择</label>
                         <div class="form-control">
                             <div class="custom-select" data-select="unit">
                                 <div class="select-display"><span class="selected-text">请选择货运安全部</span><span class="arrow">▼</span></div>
-                                <div class="select-options" id="unitOptions">
-                                    <!-- JS动态生成 -->
-                                </div>
+                                <div class="select-options" id="unitOptions"></div>
                             </div>
                         </div>
                     </div>
-                    <!-- 是否拥有驾驶证 -->
                     <div class="form-row">
                         <label class="form-label">驾驶证</label>
                         <div class="form-control">
@@ -517,6 +624,18 @@
         <!-- 底部角落信息 -->
         <div class="corner-decor bottom-left" id="nodeInfo" aria-hidden="true">节点: 未创建 &nbsp;|&nbsp; 线路: 未创建<br>延迟: -- &nbsp;|&nbsp; 加密: --</div>
         <div class="corner-decor bottom-right" aria-hidden="true">FSCS 安全管控系统<br>© 2026 货运安保部</div>
+    </div>
+
+    <!-- 答题页面（全屏覆盖） -->
+    <div class="quiz-page" id="quizPage">
+        <div class="quiz-header">
+            <div class="quiz-title">安全知识考核</div>
+            <div class="quiz-subtitle">FREIGHT SAFETY & EMERGENCY HANDLING</div>
+        </div>
+        <div class="quiz-container" id="quizContainer"></div>
+        <div class="quiz-submit">
+            <button class="btn btn-submit" id="btnSubmitQuiz">提交答卷</button>
+        </div>
     </div>
 
     <!-- 游戏弹窗 -->
@@ -546,16 +665,20 @@
             // 页面切换
             var homePage = document.getElementById('homePage');
             var registerPage = document.getElementById('registerPage');
+            var quizPage = document.getElementById('quizPage');
             var btnStartGame = document.getElementById('btnStartGame');
             var btnBackHome = document.getElementById('btnBackHome');
 
             function showPage(page) {
+                homePage.classList.remove('active');
+                registerPage.classList.remove('active');
+                quizPage.classList.remove('show');
                 if (page === 'home') {
                     homePage.classList.add('active');
-                    registerPage.classList.remove('active');
-                } else {
-                    homePage.classList.remove('active');
+                } else if (page === 'register') {
                     registerPage.classList.add('active');
+                } else if (page === 'quiz') {
+                    quizPage.classList.add('show');
                 }
             }
             if (btnStartGame) btnStartGame.addEventListener('click', () => showPage('register'));
@@ -595,15 +718,13 @@
                 unitOptionsContainer.innerHTML = unitHtml;
             }
 
-            // 使用事件委托处理所有下拉列表交互
+            // 事件委托处理所有下拉列表交互
             document.addEventListener('click', function(e) {
-                // 点击 select-display 切换下拉
                 var display = e.target.closest('.select-display');
                 if (display) {
                     var select = display.closest('.custom-select');
                     if (!select) return;
                     e.stopPropagation();
-                    // 关闭其他下拉
                     document.querySelectorAll('.custom-select.open').forEach(function(other) {
                         if (other !== select) {
                             other.classList.remove('open');
@@ -616,7 +737,6 @@
                     return;
                 }
 
-                // 点击选项
                 var option = e.target.closest('.select-option');
                 if (option) {
                     var select = option.closest('.custom-select');
@@ -630,7 +750,6 @@
                     return;
                 }
 
-                // 点击其他区域关闭所有下拉
                 if (!e.target.closest('.custom-select')) {
                     document.querySelectorAll('.custom-select.open').forEach(function(sel) {
                         sel.classList.remove('open');
@@ -645,12 +764,21 @@
             var modalMessage = document.getElementById('modalMessage');
             var modalBtn = document.getElementById('modalBtn');
 
-            function showGameModal(title, message) {
+            function showGameModal(title, message, callback) {
                 modalTitle.textContent = title;
                 modalMessage.textContent = message;
                 modalOverlay.classList.add('show');
+                if (typeof callback === 'function') {
+                    modalBtn.onclick = function() {
+                        modalOverlay.classList.remove('show');
+                        callback();
+                    };
+                } else {
+                    modalBtn.onclick = function() {
+                        modalOverlay.classList.remove('show');
+                    };
+                }
             }
-            modalBtn.addEventListener('click', function() { modalOverlay.classList.remove('show'); });
             modalOverlay.addEventListener('click', function(e) { if (e.target === modalOverlay) modalOverlay.classList.remove('show'); });
 
             // 注册确认逻辑
@@ -677,8 +805,87 @@
                     if (licenseValue === '没有') {
                         showGameModal('不符合岗位要求', '由于您没有驾驶安全常识，不符合该岗位要求，感谢您的注册。');
                     } else {
-                        showGameModal('注册成功', '欢迎加入货运安全管控系统，您的信息已提交审核。');
+                        showGameModal('注册成功', '欢迎加入货运安全管控系统，请完成安全知识考核。', function() {
+                            showPage('quiz');
+                            generateQuiz();
+                        });
                     }
+                });
+            }
+
+            // ============ 答题系统 ============
+            var quizQuestions = [
+                { question: "运输易燃液体时，车辆必须配备的消防器材是？", options: ["泡沫灭火器", "干粉灭火器", "水", "沙土"], correct: 1 },
+                { question: "货车装载货物时，货物重心应尽量位于车辆的什么位置？", options: ["前部", "后部", "中部", "任意位置"], correct: 2 },
+                { question: "发现货物有散落风险，应首先采取的措施是？", options: ["继续行驶", "停车加固", "加速通过", "鸣笛警示"], correct: 1 },
+                { question: "危险品运输车辆必须悬挂的标志是？", options: ["红色旗帜", "危险品标志牌", "公司标志", "速度警示"], correct: 1 },
+                { question: "长途运输前，驾驶员必须检查的关键项目不包括？", options: ["轮胎气压", "刹车系统", "货物捆绑", "车内音响"], correct: 3 },
+                { question: "车辆在高速公路上突发故障，应首先开启什么灯？", options: ["远光灯", "双闪警示灯", "雾灯", "倒车灯"], correct: 1 },
+                { question: "运输中发现货物冒烟，且无法立即扑灭，应？", options: ["继续行驶找水源", "停车远离并报警", "打开车厢通风", "用棉被覆盖"], correct: 1 },
+                { question: "驾驶货车通过长下坡路段时，正确的做法是？", options: ["空挡滑行", "持续踩刹车", "低挡控速", "关闭发动机"], correct: 2 },
+                { question: "货车超载的主要危害不包括？", options: ["制动距离延长", "轮胎负荷过大", "油耗降低", "转向失控风险"], correct: 2 },
+                { question: "遇到恶劣天气（如大雾）能见度低，应？", options: ["开启远光灯加速", "降低车速并开启雾灯", "靠边停车睡觉", "跟随前车近距离行驶"], correct: 1 },
+                { question: "危险品运输途中发生泄漏，驾驶员第一时间应？", options: ["自行处理", "远离现场并报警", "继续行驶到目的地", "用泥土掩埋"], correct: 1 },
+                { question: "装载易碎货物时，正确的固定方式是？", options: ["随意堆放", "使用缓冲材料并紧固", "尽量减少固定", "只靠重力"], correct: 1 },
+                { question: "车辆行驶中轮胎突然爆裂，应？", options: ["紧急刹车", "紧握方向盘缓刹减速", "急打方向", "加速冲过"], correct: 1 },
+                { question: "货运车辆必须随车携带的证件不包括？", options: ["行驶证", "驾驶证", "道路运输证", "车辆保险单（电子）", "工作证"], correct: 4 },
+                { question: "夜间行车会车时，应如何使用灯光？", options: ["远光灯", "近光灯", "交替变换", "关闭灯光"], correct: 1 },
+                { question: "货物捆绑带断裂风险增大，应？", options: ["继续使用", "立即更换或加固", "减小货物重量", "提高车速减少震动"], correct: 1 },
+                { question: "运输中发现水温过高，应？", options: ["立即熄火", "怠速运转并检查", "继续行驶", "打开水箱盖"], correct: 1 },
+                { question: "货车转弯时容易发生侧翻，主要原因不包括？", options: ["速度过快", "重心偏高", "货物固定不良", "路面太宽"], correct: 3 },
+                { question: "运输剧毒化学品，必须配备的防护用品是？", options: ["防毒面具", "安全帽", "手套", "护目镜"], correct: 0 },
+                { question: "疲劳驾驶的危害不包括？", options: ["反应迟钝", "判断力下降", "油耗增加", "操作失误"], correct: 2 }
+            ];
+
+            function generateQuiz() {
+                var container = document.getElementById('quizContainer');
+                if (!container) return;
+                var html = '';
+                quizQuestions.forEach(function(q, index) {
+                    html += '<div class="question-block">';
+                    html += '<div class="question-text">' + (index + 1) + '. ' + q.question + '</div>';
+                    html += '<div class="options-group">';
+                    q.options.forEach(function(opt, optIndex) {
+                        html += '<label class="option-item">';
+                        html += '<input type="radio" name="q' + index + '" value="' + optIndex + '">';
+                        html += '<span>' + opt + '</span>';
+                        html += '</label>';
+                    });
+                    html += '</div></div>';
+                });
+                container.innerHTML = html;
+            }
+
+            var btnSubmitQuiz = document.getElementById('btnSubmitQuiz');
+            if (btnSubmitQuiz) {
+                btnSubmitQuiz.addEventListener('click', function() {
+                    var score = 0;
+                    var allAnswered = true;
+                    quizQuestions.forEach(function(q, index) {
+                        var selected = document.querySelector('input[name="q' + index + '"]:checked');
+                        if (!selected) {
+                            allAnswered = false;
+                        } else {
+                            if (parseInt(selected.value) === q.correct) {
+                                score++;
+                            }
+                        }
+                    });
+                    if (!allAnswered) {
+                        showGameModal('提示', '请完成所有题目后再提交。');
+                        return;
+                    }
+                    var passed = score >= 18;
+                    var msg = '您的得分：' + score + ' / 20。' + (passed ? '恭喜通过考核！' : '未达到及格线（18分），请重新考核。');
+                    showGameModal(passed ? '考核通过' : '考核未通过', msg, function() {
+                        if (!passed) {
+                            // 重新生成题目
+                            generateQuiz();
+                        } else {
+                            // 通过后返回首页或其他
+                            showPage('home');
+                        }
+                    });
                 });
             }
 

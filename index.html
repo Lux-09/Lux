@@ -35,13 +35,13 @@
             background-size: cover;
             background-position: center center;
             background-repeat: no-repeat;
-            background-image: url('https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEaXBRqmB-Du5k_LwKaKBZ_pP8Xe8F-RAACPDIAAm9BwFTn4jHKMQj3BT0E.png');
+            background-image: url('https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEaa1NqmW5X2WitN5yFwAyu_a_aDvITegACdyAAAm9B0FQqncKhQmdWmz0E.png');
             transition: background-image 0.4s ease;
         }
 
         @media (max-width: 768px) {
             .bg-layer {
-                background-image: url('https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEaXZFqmCyWXGUO-7hbwsVc3eTM48K1FwAC8zMAAm9BwFTDFpVwPEdWMD0E.png');
+                background-image: url('https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEaa1FqmW3qYwqgvS0Ui_vmm98-canbagACdSAAAm9B0FTlU4gfLXu6_j0E.png');
             }
         }
 
@@ -440,6 +440,70 @@
             font-size: 14px;
         }
 
+        /* ============ 语音播报界面 ============ */
+        .announce-page {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(5, 12, 20, 0.98);
+            z-index: 250;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 30px;
+            overflow-y: auto;
+        }
+        .announce-page.show {
+            display: flex;
+        }
+        .announce-box {
+            max-width: 700px;
+            width: 100%;
+            background: rgba(5, 12, 20, 0.8);
+            border: 1px solid rgba(100, 160, 190, 0.4);
+            border-radius: 16px;
+            padding: 30px 25px;
+            text-align: center;
+            box-shadow: 0 0 40px rgba(80, 160, 200, 0.3);
+        }
+        .announce-title {
+            font-size: clamp(20px, 4vw, 28px);
+            font-weight: 700;
+            letter-spacing: 4px;
+            color: #e8f4fa;
+            text-shadow: 0 0 16px rgba(120, 200, 240, 0.7);
+            margin-bottom: 16px;
+        }
+        .announce-text {
+            font-size: 14px;
+            letter-spacing: 1.5px;
+            color: #b8d8e8;
+            line-height: 1.8;
+            text-align: left;
+            margin-bottom: 20px;
+            white-space: pre-line;
+        }
+        .audio-control {
+            margin: 15px 0;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+        }
+        .audio-control audio {
+            width: 100%;
+            max-width: 400px;
+            outline: none;
+            background: rgba(10, 20, 30, 0.7);
+            border-radius: 8px;
+        }
+        .btn-enter-main {
+            padding: 14px 40px;
+            font-size: 16px;
+        }
+
         /* 底部角落信息 */
         .corner-decor { position: absolute; z-index: 15; pointer-events: none; opacity: 0.45; font-size: 10px; letter-spacing: 2px; color: #6a9aa8; }
         .corner-decor.bottom-left { bottom: 16px; left: 20px; text-align: left; line-height: 1.7; display: none; }
@@ -512,6 +576,8 @@
             .corner-decor.bottom-right { bottom: 10px; right: 10px; }
             .quiz-page { padding: 15px 10px 30px; }
             .quiz-submit { flex-direction: column; align-items: center; }
+            .announce-page { padding: 20px 15px; }
+            .announce-box { padding: 20px 15px; }
         }
     </style>
 </head>
@@ -655,6 +721,28 @@
         </div>
     </div>
 
+    <!-- 语音播报界面 -->
+    <div class="announce-page" id="announcePage">
+        <div class="announce-box">
+            <div class="announce-title">🎉 恭喜通过考核</div>
+            <div class="announce-text">
+                祝贺您正式就任货运安全管理员！
+
+                上岗须知：
+                祝贺获得系统操作权限，请认真监控货运运行状态
+                及时响应各类安全预警，细致核查运输相关信息
+                沉着处置突发情况，规范完成各项管控操作
+                期待您履职尽责，保障货运运输安全
+
+                祝您工作顺利！
+            </div>
+            <div class="audio-control">
+                <audio controls src="https://videotourl.com/audio/1788440810540-78a6ea5a-abcb-4060-b132-54b3361ed2ed.mp3" preload="auto"></audio>
+            </div>
+            <button class="btn btn-enter-main" id="btnEnterMain">进入主控台</button>
+        </div>
+    </div>
+
     <!-- 游戏弹窗 -->
     <div class="game-modal-overlay" id="gameModalOverlay">
         <div class="game-modal">
@@ -683,25 +771,31 @@
             var homePage = document.getElementById('homePage');
             var registerPage = document.getElementById('registerPage');
             var quizPage = document.getElementById('quizPage');
+            var announcePage = document.getElementById('announcePage');
             var btnStartGame = document.getElementById('btnStartGame');
             var btnBackHome = document.getElementById('btnBackHome');
             var btnQuizBack = document.getElementById('btnQuizBack');
+            var btnEnterMain = document.getElementById('btnEnterMain');
 
             function showPage(page) {
                 homePage.classList.remove('active');
                 registerPage.classList.remove('active');
                 quizPage.classList.remove('show');
+                announcePage.classList.remove('show');
                 if (page === 'home') {
                     homePage.classList.add('active');
                 } else if (page === 'register') {
                     registerPage.classList.add('active');
                 } else if (page === 'quiz') {
                     quizPage.classList.add('show');
+                } else if (page === 'announce') {
+                    announcePage.classList.add('show');
                 }
             }
             if (btnStartGame) btnStartGame.addEventListener('click', () => showPage('register'));
             if (btnBackHome) btnBackHome.addEventListener('click', () => showPage('home'));
             if (btnQuizBack) btnQuizBack.addEventListener('click', () => showPage('register'));
+            if (btnEnterMain) btnEnterMain.addEventListener('click', () => showPage('home'));
 
             document.addEventListener('keydown', function(e) {
                 if (e.key === 'Enter' && homePage.classList.contains('active')) {
@@ -1024,7 +1118,6 @@
                         msg += '未达到及格线（9分）。<br>';
                     }
 
-                    // 无论是否通过，有错题则展示错题解析
                     if (wrongList.length > 0) {
                         msg += '<br><b>错题解析：</b><br>';
                         wrongList.forEach(function(item) {
@@ -1034,25 +1127,20 @@
                         });
                     }
 
-                    // 处理无驾驶证流程
-                    var needDriverTest = type === 'driver';
-                    if (needDriverTest) {
+                    if (type === 'driver') {
                         if (passed) {
-                            // 司机题通过，继续考安全员题
                             showGameModal('司机题通过', msg + '<br><br>请继续完成安全员题考试。', function() {
                                 generateQuiz('safety');
                             });
                         } else {
-                            // 司机题未通过，重新生成司机题
                             showGameModal('司机题未通过', msg + '<br>请重新答题。', function() {
                                 generateQuiz('driver');
                             });
                         }
                     } else {
-                        // 安全员题（有驾驶证者只考这个）
                         if (passed) {
                             showGameModal('考核通过', msg, function() {
-                                showPage('home');
+                                showPage('announce');
                             });
                         } else {
                             showGameModal('考核未通过', msg + '<br>请重新答题。', function() {

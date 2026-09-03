@@ -37,12 +37,18 @@
             background-repeat: no-repeat;
             /* 默认使用内部页面背景（旧图） */
             background-image: url('https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEaXBRqmB-Du5k_LwKaKBZ_pP8Xe8F-RAACPDIAAm9BwFTn4jHKMQj3BT0E.png');
-            transition: background-image 0.4s ease;
+            transition: background-image 0.4s ease, filter 0.4s ease;
         }
 
         /* 首页背景（新图） */
         .bg-layer.home-bg {
             background-image: url('https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEaa1NqmW5X2WitN5yFwAyu_a_aDvITegACdyAAAm9B0FQqncKhQmdWmz0E.png');
+        }
+
+        /* 游戏主界面背景模糊 */
+        .bg-layer.blur-bg {
+            filter: blur(8px);
+            /* 可以适当加深模糊，使前景内容更清晰 */
         }
 
         @media (max-width: 768px) {
@@ -500,6 +506,31 @@
             font-size: 16px;
         }
 
+        /* ============ 游戏主界面（占位） ============ */
+        .game-main-page {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 15;
+        }
+        .game-main-page.show {
+            display: flex;
+        }
+        .game-main-placeholder {
+            font-size: 24px;
+            letter-spacing: 4px;
+            color: #d8ecf4;
+            text-shadow: 0 0 12px rgba(120, 200, 240, 0.8);
+            text-align: center;
+            line-height: 1.6;
+        }
+
         /* 底部角落信息 */
         .corner-decor { position: absolute; z-index: 15; pointer-events: none; opacity: 0.45; font-size: 10px; letter-spacing: 2px; color: #6a9aa8; }
         .corner-decor.bottom-left { bottom: 16px; left: 20px; text-align: left; line-height: 1.7; display: none; }
@@ -574,6 +605,7 @@
             .quiz-submit { flex-direction: column; align-items: center; }
             .announce-page { padding: 20px 15px; }
             .announce-box { padding: 20px 15px; }
+            .game-main-placeholder { font-size: 18px; }
         }
     </style>
 </head>
@@ -699,6 +731,14 @@
             </div>
         </div>
 
+        <!-- 游戏主界面占位 -->
+        <div class="game-main-page" id="gameMainPage">
+            <div class="game-main-placeholder">
+                游戏主界面<br>
+                <span style="font-size: 16px; opacity:0.7;">（内容开发中）</span>
+            </div>
+        </div>
+
         <!-- 底部角落信息 -->
         <div class="corner-decor bottom-left" id="nodeInfo" aria-hidden="true">节点: 未创建 &nbsp;|&nbsp; 线路: 未创建<br>延迟: -- &nbsp;|&nbsp; 加密: --</div>
         <div class="corner-decor bottom-right" aria-hidden="true">FSCS 安全管控系统<br>© 2026 货运安保部</div>
@@ -732,7 +772,6 @@
 
                 祝您工作顺利！
             </div>
-            <!-- 隐藏的音频元素，自动播放，无控件 -->
             <audio id="announceAudio" src="https://videotourl.com/audio/1788440810540-78a6ea5a-abcb-4060-b132-54b3361ed2ed.mp3" preload="auto"></audio>
             <button class="btn btn-enter-main" id="btnEnterMain">进入主控台</button>
         </div>
@@ -768,6 +807,7 @@
             var registerPage = document.getElementById('registerPage');
             var quizPage = document.getElementById('quizPage');
             var announcePage = document.getElementById('announcePage');
+            var gameMainPage = document.getElementById('gameMainPage');
             var btnStartGame = document.getElementById('btnStartGame');
             var btnBackHome = document.getElementById('btnBackHome');
             var btnQuizBack = document.getElementById('btnQuizBack');
@@ -779,16 +819,24 @@
                 registerPage.classList.remove('active');
                 quizPage.classList.remove('show');
                 announcePage.classList.remove('show');
+                gameMainPage.classList.remove('show');
 
-                // 根据页面切换背景图
+                // 移除所有背景类
+                bgLayer.classList.remove('home-bg', 'blur-bg');
+
                 if (page === 'home') {
                     bgLayer.classList.add('home-bg');
                     homePage.classList.add('active');
-                } else {
-                    bgLayer.classList.remove('home-bg');
-                    if (page === 'register') registerPage.classList.add('active');
-                    else if (page === 'quiz') quizPage.classList.add('show');
-                    else if (page === 'announce') announcePage.classList.add('show');
+                } else if (page === 'register') {
+                    registerPage.classList.add('active');
+                } else if (page === 'quiz') {
+                    quizPage.classList.add('show');
+                } else if (page === 'announce') {
+                    announcePage.classList.add('show');
+                } else if (page === 'gameMain') {
+                    // 游戏主界面：使用内部背景并模糊
+                    bgLayer.classList.add('blur-bg');
+                    gameMainPage.classList.add('show');
                 }
 
                 // 停止音频（如果切换离开播报页）
@@ -807,7 +855,7 @@
                     announceAudio.pause();
                     announceAudio.currentTime = 0;
                 }
-                showPage('home');
+                showPage('gameMain');
             });
 
             document.addEventListener('keydown', function(e) {
@@ -1052,7 +1100,6 @@
                         if (passed) {
                             showGameModal('考核通过', msg, function() {
                                 showPage('announce');
-                                // 自动播放音频
                                 if (announceAudio) {
                                     announceAudio.play().catch(function(err) {
                                         console.log('自动播放被阻止，需要用户交互');

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>货运安全管控系统 - 主控台</title>
+    <title>货运安全管控系统 - 注册与主控台</title>
     <style>
         /* ============ 全局重置 ============ */
         * {
@@ -24,7 +24,7 @@
             -webkit-user-select: none;
         }
 
-        /* ============ 背景层 ============ */
+        /* ============ 背景层（两页共用） ============ */
         .bg-layer {
             position: fixed;
             top: 0;
@@ -35,19 +35,16 @@
             background-size: cover;
             background-position: center center;
             background-repeat: no-repeat;
-            /* 桌面端背景图链接 */
             background-image: url('https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEaXBRqmB-Du5k_LwKaKBZ_pP8Xe8F-RAACPDIAAm9BwFTn4jHKMQj3BT0E.png');
             transition: background-image 0.4s ease;
         }
 
-        /* 手机端背景图切换（新链接） */
         @media (max-width: 768px) {
             .bg-layer {
                 background-image: url('https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEaXZFqmCyWXGUO-7hbwsVc3eTM48K1FwAC8zMAAm9BwFTDFpVwPEdWMD0E.png');
             }
         }
 
-        /* 叠加暗色蒙版 */
         .bg-overlay {
             position: fixed;
             top: 0;
@@ -64,7 +61,6 @@
             }
         }
 
-        /* 扫描线效果 */
         .scanlines {
             position: fixed;
             top: 0;
@@ -80,7 +76,6 @@
                     rgba(0, 0, 0, 0.03) 4px);
         }
 
-        /* 噪点纹理 */
         .noise {
             position: fixed;
             top: 0;
@@ -95,7 +90,18 @@
             background-size: 256px 256px;
         }
 
-        /* ============ 主界面容器 ============ */
+        .corner-frame {
+            position: fixed;
+            z-index: 5;
+            pointer-events: none;
+            opacity: 0.5;
+        }
+        .corner-frame.tl { top: 10px; left: 10px; width: 30px; height: 30px; border-top: 2px solid rgba(130, 190, 220, 0.7); border-left: 2px solid rgba(130, 190, 220, 0.7); }
+        .corner-frame.tr { top: 10px; right: 10px; width: 30px; height: 30px; border-top: 2px solid rgba(130, 190, 220, 0.7); border-right: 2px solid rgba(130, 190, 220, 0.7); }
+        .corner-frame.bl { bottom: 10px; left: 10px; width: 30px; height: 30px; border-bottom: 2px solid rgba(130, 190, 220, 0.7); border-left: 2px solid rgba(130, 190, 220, 0.7); }
+        .corner-frame.br { bottom: 10px; right: 10px; width: 30px; height: 30px; border-bottom: 2px solid rgba(130, 190, 220, 0.7); border-right: 2px solid rgba(130, 190, 220, 0.7); }
+
+        /* ============ 主容器 ============ */
         .main-container {
             position: relative;
             z-index: 10;
@@ -125,48 +131,26 @@
             z-index: 20;
             pointer-events: none;
         }
+        .top-status .sys-name { font-weight: bold; color: #7dd3e8; font-size: 13px; letter-spacing: 2px; opacity: 0.9; }
+        .top-status .sys-time { font-variant-numeric: tabular-nums; font-size: 13px; opacity: 0.75; letter-spacing: 1px; }
+        .indicator-dots { display: flex; gap: 8px; align-items: center; pointer-events: none; }
+        .indicator-dots .dot { width: 8px; height: 8px; border-radius: 50%; background: #44dd88; box-shadow: 0 0 6px #44dd88; animation: pulse-dot 2.2s ease-in-out infinite; }
+        .indicator-dots .dot.amber { background: #ffaa33; box-shadow: 0 0 6px #ffaa33; animation-delay: 1.1s; }
+        @keyframes pulse-dot { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.4; transform: scale(0.75); } }
 
-        .top-status .sys-name {
-            font-weight: bold;
-            color: #7dd3e8;
-            font-size: 13px;
-            letter-spacing: 2px;
-            opacity: 0.9;
+        /* ============ 页面切换 ============ */
+        .page {
+            display: none;
+            width: 100%;
+            height: 100%;
+            position: relative;
         }
-
-        .top-status .sys-time {
-            font-variant-numeric: tabular-nums;
-            font-size: 13px;
-            opacity: 0.75;
-            letter-spacing: 1px;
-        }
-
-        .indicator-dots {
-            display: flex;
-            gap: 8px;
-            align-items: center;
-            pointer-events: none;
-        }
-        .indicator-dots .dot {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            background: #44dd88;
-            box-shadow: 0 0 6px #44dd88;
-            animation: pulse-dot 2.2s ease-in-out infinite;
-        }
-        .indicator-dots .dot.amber {
-            background: #ffaa33;
-            box-shadow: 0 0 6px #ffaa33;
-            animation-delay: 1.1s;
-        }
-        @keyframes pulse-dot {
-            0%, 100% { opacity: 1; transform: scale(1); }
-            50% { opacity: 0.4; transform: scale(0.75); }
+        .page.active {
+            display: block;
         }
 
-        /* ============ 中央核心区 ============ */
-        .core-area {
+        /* ============ 首页核心区 ============ */
+        .home-core {
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -175,361 +159,278 @@
             text-align: center;
             max-width: 680px;
             width: 100%;
-            /* 已移除 transform: translateY(-2vh)，确保完美居中 */
+            height: 100%;
+            margin: 0 auto;
         }
+        .title-block { display: flex; flex-direction: column; align-items: center; gap: 10px; }
+        .game-main-title { font-size: clamp(28px, 6vw, 54px); font-weight: 700; letter-spacing: 6px; color: #e8f4fa; text-shadow: 0 0 16px rgba(120, 200, 240, 0.7), 0 0 40px rgba(80, 160, 200, 0.4), 0 2px 4px rgba(0,0,0,0.6); line-height: 1.15; text-transform: uppercase; }
+        .game-sub-title { font-size: clamp(11px, 2vw, 15px); letter-spacing: 8px; color: #9cc8dc; text-shadow: 0 0 10px rgba(100, 180, 220, 0.5); text-transform: uppercase; opacity: 0.8; margin-top: 4px; }
+        .divider-line { display: flex; align-items: center; gap: 12px; width: 80%; max-width: 420px; margin: 4px 0 6px; }
+        .divider-line .line { flex: 1; height: 1px; background: linear-gradient(90deg, transparent, rgba(140, 200, 230, 0.5), transparent); }
+        .divider-line .diamond { width: 8px; height: 8px; background: #7dd3e8; transform: rotate(45deg); box-shadow: 0 0 10px #7dd3e8; flex-shrink: 0; }
+        .version-tag { font-size: 10px; letter-spacing: 3px; color: #6a8fa0; opacity: 0.6; margin-top: 2px; }
+        .button-area { display: flex; flex-direction: column; align-items: center; gap: 16px; margin-top: 18px; width: 100%; }
+        .btn-start { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 16px 52px; font-family: inherit; font-size: clamp(16px, 2.5vw, 20px); font-weight: 600; letter-spacing: 4px; color: #d8ecf4; background: rgba(10, 20, 30, 0.55); border: 1.5px solid rgba(120, 190, 220, 0.6); border-radius: 2px; cursor: pointer; text-transform: uppercase; transition: all 0.25s ease; text-shadow: 0 0 8px rgba(150, 210, 240, 0.6); box-shadow: 0 0 20px rgba(80, 160, 200, 0.2), inset 0 0 18px rgba(80, 160, 200, 0.08); outline: none; -webkit-appearance: none; appearance: none; background-clip: padding-box; }
+        .btn-start:hover { background: rgba(15, 30, 42, 0.7); border-color: rgba(150, 220, 250, 0.85); box-shadow: 0 0 32px rgba(100, 190, 230, 0.4), inset 0 0 24px rgba(100, 190, 230, 0.12); color: #f0f8fc; transform: translateY(-1px); }
+        .btn-start:active { transform: translateY(1px); box-shadow: 0 0 14px rgba(80, 160, 200, 0.3), inset 0 0 20px rgba(80, 160, 200, 0.15); background: rgba(8, 16, 24, 0.8); }
+        .hint-text { font-size: 9.5px; letter-spacing: 2px; color: #56788a; opacity: 0.55; margin-top: 6px; text-align: center; line-height: 1.6; pointer-events: none; }
 
-        .title-block {
+        /* ============ 注册页面核心区 ============ */
+        .register-core {
             display: flex;
             flex-direction: column;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .game-main-title {
-            font-size: clamp(28px, 6vw, 54px);
-            font-weight: 700;
-            letter-spacing: 6px;
-            color: #e8f4fa;
-            text-shadow:
-                0 0 16px rgba(120, 200, 240, 0.7),
-                0 0 40px rgba(80, 160, 200, 0.4),
-                0 2px 4px rgba(0, 0, 0, 0.6);
-            line-height: 1.15;
-            text-transform: uppercase;
-        }
-
-        .game-sub-title {
-            font-size: clamp(11px, 2vw, 15px);
-            letter-spacing: 8px;
-            color: #9cc8dc;
-            text-shadow: 0 0 10px rgba(100, 180, 220, 0.5);
-            text-transform: uppercase;
-            opacity: 0.8;
-            margin-top: 4px;
-        }
-
-        .divider-line {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            width: 80%;
-            max-width: 420px;
-            margin: 4px 0 6px;
-        }
-        .divider-line .line {
-            flex: 1;
-            height: 1px;
-            background: linear-gradient(90deg, transparent, rgba(140, 200, 230, 0.5), transparent);
-        }
-        .divider-line .diamond {
-            width: 8px;
-            height: 8px;
-            background: #7dd3e8;
-            transform: rotate(45deg);
-            box-shadow: 0 0 10px #7dd3e8;
-            flex-shrink: 0;
-        }
-
-        .version-tag {
-            font-size: 10px;
-            letter-spacing: 3px;
-            color: #6a8fa0;
-            opacity: 0.6;
-            margin-top: 2px;
-        }
-
-        /* ============ 按钮区域（仅保留开始游戏） ============ */
-        .button-area {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 16px;
-            margin-top: 18px;
-            width: 100%;
-        }
-
-        .btn-start {
-            position: relative;
-            display: inline-flex;
             align-items: center;
             justify-content: center;
-            gap: 8px;
-            padding: 16px 52px;
+            gap: 18px;
+            text-align: center;
+            max-width: 620px;
+            width: 100%;
+            height: 100%;
+            margin: 0 auto;
+            overflow-y: auto;
+            padding: 60px 15px 30px;
+        }
+        .register-title { font-size: clamp(22px, 4vw, 34px); font-weight: 700; letter-spacing: 4px; color: #e8f4fa; text-shadow: 0 0 16px rgba(120, 200, 240, 0.7); text-transform: uppercase; }
+        .register-subtitle { font-size: 11px; letter-spacing: 4px; color: #9cc8dc; opacity: 0.7; text-transform: uppercase; margin-bottom: 6px; }
+        .register-form { display: flex; flex-direction: column; gap: 14px; width: 100%; background: rgba(5, 12, 20, 0.6); padding: 24px 20px; border: 1px solid rgba(100, 160, 190, 0.25); border-radius: 4px; box-shadow: 0 0 20px rgba(0,0,0,0.4); }
+        .form-row { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+        .form-label { width: 100px; text-align: right; color: #9cc8dc; font-size: 13px; letter-spacing: 1px; }
+        .form-control { flex: 1; min-width: 180px; }
+        .text-input { width: 100%; background: rgba(10, 20, 30, 0.7); border: 1px solid rgba(110, 160, 190, 0.4); color: #d8ecf4; padding: 10px 12px; font-family: inherit; font-size: 14px; letter-spacing: 1px; outline: none; border-radius: 2px; transition: border 0.2s; }
+        .text-input:focus { border-color: rgba(150, 220, 250, 0.8); box-shadow: 0 0 10px rgba(100, 190, 230, 0.2); }
+        /* 自定义下拉选择 */
+        .custom-select { position: relative; width: 100%; }
+        .select-display { background: rgba(10, 20, 30, 0.7); border: 1px solid rgba(110, 160, 190, 0.4); padding: 10px 12px; color: #d8ecf4; font-size: 14px; letter-spacing: 1px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; border-radius: 2px; }
+        .select-display .arrow { font-size: 12px; color: #7dd3e8; }
+        .select-options { position: absolute; top: calc(100% + 4px); left: 0; right: 0; background: #0c151f; border: 1px solid rgba(110, 160, 190, 0.5); max-height: 180px; overflow-y: auto; z-index: 50; display: none; border-radius: 2px; box-shadow: 0 6px 16px rgba(0,0,0,0.5); }
+        .select-options.show { display: block; }
+        .select-option { padding: 8px 12px; color: #b8d8e8; font-size: 13px; letter-spacing: 1px; cursor: pointer; transition: background 0.15s; text-align: left; }
+        .select-option:hover { background: rgba(70, 140, 180, 0.25); color: #fff; }
+        /* 单选按钮组 */
+        .radio-group { display: flex; gap: 20px; }
+        .radio-option { display: flex; align-items: center; gap: 6px; color: #b8d8e8; font-size: 14px; cursor: pointer; letter-spacing: 1px; }
+        .radio-option input[type="radio"] { appearance: none; -webkit-appearance: none; width: 14px; height: 14px; border: 1px solid #6a9aa8; border-radius: 50%; background: #0a0e14; cursor: pointer; position: relative; }
+        .radio-option input[type="radio"]:checked::after { content: ''; position: absolute; top: 3px; left: 3px; width: 6px; height: 6px; border-radius: 50%; background: #7dd3e8; box-shadow: 0 0 6px #7dd3e8; }
+        .radio-option input[type="radio"]:focus-visible { outline: none; border-color: #7dd3e8; box-shadow: 0 0 8px rgba(100, 190, 230, 0.4); }
+        /* 按钮 */
+        .btn-register { display: inline-flex; align-items: center; justify-content: center; padding: 12px 40px; font-family: inherit; font-size: 15px; font-weight: 600; letter-spacing: 3px; color: #d8ecf4; background: rgba(10, 20, 30, 0.55); border: 1.5px solid rgba(120, 190, 220, 0.6); border-radius: 2px; cursor: pointer; text-transform: uppercase; transition: all 0.25s ease; margin: 8px auto 0; }
+        .btn-register:hover { background: rgba(15, 30, 42, 0.7); border-color: rgba(150, 220, 250, 0.85); box-shadow: 0 0 32px rgba(100, 190, 230, 0.4); }
+        .btn-back { background: transparent; border: 1px solid rgba(110, 150, 170, 0.35); padding: 6px 16px; font-size: 11px; letter-spacing: 2px; color: #7a9dad; cursor: pointer; transition: all 0.2s; }
+        .btn-back:hover { border-color: rgba(140, 190, 215, 0.7); color: #b8dce8; background: rgba(10, 20, 30, 0.35); }
+
+        /* 底部角落信息 */
+        .corner-decor { position: absolute; z-index: 15; pointer-events: none; opacity: 0.45; font-size: 10px; letter-spacing: 2px; color: #6a9aa8; }
+        .corner-decor.bottom-left { bottom: 16px; left: 20px; text-align: left; line-height: 1.7; display: none; }
+        .corner-decor.bottom-right { bottom: 16px; right: 20px; text-align: right; line-height: 1.7; }
+
+        /* ============ 游戏弹窗 ============ */
+        .game-modal-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 100;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            pointer-events: auto;
+        }
+        .game-modal-overlay.show { display: flex; }
+        .game-modal {
+            background: #0b1219;
+            border: 1.5px solid rgba(120, 190, 220, 0.7);
+            box-shadow: 0 0 30px rgba(80, 160, 200, 0.5), inset 0 0 30px rgba(80, 160, 200, 0.05);
+            padding: 24px 28px;
+            max-width: 380px;
+            width: 90%;
+            text-align: center;
+            position: relative;
+            animation: modal-in 0.25s ease;
+        }
+        @keyframes modal-in { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        .game-modal .modal-title {
+            font-size: 15px;
+            letter-spacing: 2px;
+            color: #e8f4fa;
+            margin-bottom: 12px;
+            text-shadow: 0 0 8px rgba(100, 180, 220, 0.6);
+        }
+        .game-modal .modal-message {
+            font-size: 13px;
+            letter-spacing: 1px;
+            color: #b8d8e8;
+            line-height: 1.6;
+            margin-bottom: 18px;
+            word-break: break-word;
+        }
+        .game-modal .modal-btn {
+            padding: 8px 28px;
             font-family: inherit;
-            font-size: clamp(16px, 2.5vw, 20px);
-            font-weight: 600;
-            letter-spacing: 4px;
+            font-size: 13px;
+            letter-spacing: 2px;
             color: #d8ecf4;
-            background: rgba(10, 20, 30, 0.55);
-            border: 1.5px solid rgba(120, 190, 220, 0.6);
+            background: rgba(10, 20, 30, 0.7);
+            border: 1px solid rgba(120, 190, 220, 0.6);
             border-radius: 2px;
             cursor: pointer;
+            transition: all 0.2s;
             text-transform: uppercase;
-            transition: all 0.25s ease;
-            text-shadow: 0 0 8px rgba(150, 210, 240, 0.6);
-            box-shadow:
-                0 0 20px rgba(80, 160, 200, 0.2),
-                inset 0 0 18px rgba(80, 160, 200, 0.08);
-            outline: none;
-            -webkit-appearance: none;
-            appearance: none;
-            background-clip: padding-box;
         }
+        .game-modal .modal-btn:hover { background: rgba(20, 40, 55, 0.8); border-color: rgba(150, 220, 250, 0.9); }
 
-        .btn-start:hover {
-            background: rgba(15, 30, 42, 0.7);
-            border-color: rgba(150, 220, 250, 0.85);
-            box-shadow:
-                0 0 32px rgba(100, 190, 230, 0.4),
-                inset 0 0 24px rgba(100, 190, 230, 0.12);
-            color: #f0f8fc;
-            transform: translateY(-1px);
-        }
-
-        .btn-start:active {
-            transform: translateY(1px);
-            box-shadow:
-                0 0 14px rgba(80, 160, 200, 0.3),
-                inset 0 0 20px rgba(80, 160, 200, 0.15);
-            background: rgba(8, 16, 24, 0.8);
-        }
-
-        .btn-start:focus-visible {
-            border-color: rgba(160, 225, 255, 0.9);
-            box-shadow:
-                0 0 24px rgba(100, 190, 230, 0.5),
-                inset 0 0 20px rgba(100, 190, 230, 0.1);
-        }
-
-        /* 注意：已删除 .btn-start::after 闪烁光标 */
-
-        .hint-text {
-            font-size: 9.5px;
-            letter-spacing: 2px;
-            color: #56788a;
-            opacity: 0.55;
-            margin-top: 6px;
-            text-align: center;
-            line-height: 1.6;
-            pointer-events: none;
-        }
-
-        /* ============ 底部角落装饰 ============ */
-        .corner-decor {
-            position: absolute;
-            z-index: 15;
-            pointer-events: none;
-            opacity: 0.45;
-            font-size: 10px;
-            letter-spacing: 2px;
-            color: #6a9aa8;
-        }
-        .corner-decor.bottom-left {
-            bottom: 16px;
-            left: 20px;
-            text-align: left;
-            line-height: 1.7;
-            /* 节点信息默认隐藏，等创建后由JS控制显示 */
-            display: none;
-        }
-        .corner-decor.bottom-right {
-            bottom: 16px;  /* 适当调整位置，保持贴底 */
-            right: 20px;
-            text-align: right;
-            line-height: 1.7;
-        }
-
-        .corner-frame {
-            position: fixed;
-            z-index: 5;
-            pointer-events: none;
-            opacity: 0.5;
-        }
-        .corner-frame.tl {
-            top: 10px;
-            left: 10px;
-            width: 30px;
-            height: 30px;
-            border-top: 2px solid rgba(130, 190, 220, 0.7);
-            border-left: 2px solid rgba(130, 190, 220, 0.7);
-        }
-        .corner-frame.tr {
-            top: 10px;
-            right: 10px;
-            width: 30px;
-            height: 30px;
-            border-top: 2px solid rgba(130, 190, 220, 0.7);
-            border-right: 2px solid rgba(130, 190, 220, 0.7);
-        }
-        .corner-frame.bl {
-            bottom: 10px;
-            left: 10px;
-            width: 30px;
-            height: 30px;
-            border-bottom: 2px solid rgba(130, 190, 220, 0.7);
-            border-left: 2px solid rgba(130, 190, 220, 0.7);
-        }
-        .corner-frame.br {
-            bottom: 10px;
-            right: 10px;
-            width: 30px;
-            height: 30px;
-            border-bottom: 2px solid rgba(130, 190, 220, 0.7);
-            border-right: 2px solid rgba(130, 190, 220, 0.7);
-        }
-
-        /* ============ 响应式微调 ============ */
+        /* 响应式 */
         @media (max-width: 768px) {
-            .top-status {
-                padding: 10px 14px;
-                font-size: 10px;
-                letter-spacing: 1px;
-            }
-            .top-status .sys-name {
-                font-size: 11px;
-                letter-spacing: 1.5px;
-            }
-            .top-status .sys-time {
-                font-size: 11px;
-            }
-            .core-area {
-                gap: 16px;
-                /* 已移除 transform: translateY(-1vh)，保持居中 */
-            }
-            .game-main-title {
-                letter-spacing: 3px;
-            }
-            .game-sub-title {
-                letter-spacing: 4px;
-            }
-            .btn-start {
-                padding: 14px 38px;
-                font-size: 15px;
-                letter-spacing: 3px;
-            }
-            .divider-line {
-                width: 88%;
-                max-width: 320px;
-            }
-            .corner-decor {
-                font-size: 8px;
-                letter-spacing: 1px;
-            }
-            .corner-decor.bottom-left {
-                bottom: 10px;
-                left: 12px;
-            }
-            .corner-decor.bottom-right {
-                bottom: 10px;
-                right: 12px;
-            }
-            .corner-frame.tl, .corner-frame.tr,
-            .corner-frame.bl, .corner-frame.br {
-                width: 20px;
-                height: 20px;
-            }
-            .corner-frame.tl { top: 6px; left: 6px; }
-            .corner-frame.tr { top: 6px; right: 6px; }
-            .corner-frame.bl { bottom: 6px; left: 6px; }
-            .corner-frame.br { bottom: 6px; right: 6px; }
-        }
-
-        @media (max-width: 768px) and (orientation: landscape) {
-            .main-container {
-                padding: 10px;
-            }
-            .core-area {
-                gap: 10px;
-                /* 移除横屏时的偏移 */
-            }
-            .game-main-title {
-                font-size: clamp(20px, 4.5vw, 30px);
-                letter-spacing: 3px;
-            }
-            .btn-start {
-                padding: 10px 28px;
-                font-size: 13px;
-            }
-            .game-sub-title {
-                font-size: 10px;
-                letter-spacing: 3px;
-            }
+            .form-row { flex-direction: column; align-items: stretch; }
+            .form-label { width: 100%; text-align: left; margin-bottom: 4px; }
+            .register-core { padding: 50px 12px 20px; }
+            .register-form { padding: 18px 14px; }
+            .corner-decor { font-size: 8px; }
+            .corner-decor.bottom-right { bottom: 10px; right: 10px; }
         }
     </style>
 </head>
 <body>
 
-    <!-- 背景图片层 -->
+    <!-- 背景层 -->
     <div class="bg-layer" id="bgLayer" aria-hidden="true"></div>
-
-    <!-- 暗色遮罩 -->
     <div class="bg-overlay" aria-hidden="true"></div>
-
-    <!-- 扫描线效果 -->
     <div class="scanlines" aria-hidden="true"></div>
-
-    <!-- 噪点纹理 -->
     <div class="noise" aria-hidden="true"></div>
-
-    <!-- 四个角落取景框装饰 -->
     <div class="corner-frame tl" aria-hidden="true"></div>
     <div class="corner-frame tr" aria-hidden="true"></div>
     <div class="corner-frame bl" aria-hidden="true"></div>
     <div class="corner-frame br" aria-hidden="true"></div>
 
+    <!-- 顶部状态栏（全局） -->
+    <div class="top-status">
+        <div class="indicator-dots">
+            <span class="dot" aria-hidden="true"></span>
+            <span class="dot amber" aria-hidden="true"></span>
+            <span class="sys-name">FSCS · 主控中心</span>
+        </div>
+        <span class="sys-time" id="sysTime">--:--:--</span>
+    </div>
+
     <!-- 主内容容器 -->
     <div class="main-container">
 
-        <!-- 顶部状态栏 -->
-        <div class="top-status">
-            <div class="indicator-dots">
-                <span class="dot" aria-hidden="true"></span>
-                <span class="dot amber" aria-hidden="true"></span>
-                <span class="sys-name">FSCS · 主控中心</span>
+        <!-- ========== 首页 ========== -->
+        <div class="page active" id="homePage">
+            <div class="home-core">
+                <div class="title-block">
+                    <h1 class="game-main-title">货运安全管控系统</h1>
+                    <p class="game-sub-title">Freight Security Control System</p>
+                </div>
+                <div class="divider-line">
+                    <span class="line"></span>
+                    <span class="diamond"></span>
+                    <span class="line"></span>
+                </div>
+                <span class="version-tag">v0.1.0 &nbsp;|&nbsp; BUILD 2026.09</span>
+                <div class="button-area">
+                    <button class="btn-start" id="btnStartGame" type="button">开始游戏</button>
+                </div>
+                <p class="hint-text">
+                    &gt; 链路检测中 ... 所有货柜监控节点在线 &lt;<br>
+                    &gt; 按 [ENTER] 快速进入注册 &lt;
+                </p>
             </div>
-            <span class="sys-time" id="sysTime">--:--:--</span>
         </div>
 
-        <!-- 中央核心区 -->
-        <div class="core-area">
-            <!-- 标题 -->
-            <div class="title-block">
-                <h1 class="game-main-title">货运安全管控系统</h1>
-                <p class="game-sub-title">Freight Security Control System</p>
+        <!-- ========== 注册页 ========== -->
+        <div class="page" id="registerPage">
+            <div class="register-core">
+                <div class="register-title">人员注册</div>
+                <div class="register-subtitle">FREIGHT SECURITY PERSONNEL REGISTRATION</div>
+                <div class="register-form">
+                    <!-- 姓名 -->
+                    <div class="form-row">
+                        <label class="form-label" for="regName">姓名</label>
+                        <div class="form-control">
+                            <input type="text" id="regName" class="text-input" placeholder="请输入姓名" autocomplete="off">
+                        </div>
+                    </div>
+                    <!-- 年龄 -->
+                    <div class="form-row">
+                        <label class="form-label" for="regAge">年龄</label>
+                        <div class="form-control">
+                            <input type="number" id="regAge" class="text-input" placeholder="请输入年龄" min="18" max="60" autocomplete="off">
+                        </div>
+                    </div>
+                    <!-- 性别 -->
+                    <div class="form-row">
+                        <label class="form-label">性别</label>
+                        <div class="form-control">
+                            <div class="custom-select" data-select="gender">
+                                <div class="select-display"><span class="selected-text">请选择性别</span><span class="arrow">▼</span></div>
+                                <div class="select-options">
+                                    <div class="select-option" data-value="男">男</div>
+                                    <div class="select-option" data-value="女">女</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- 应聘公司 -->
+                    <div class="form-row">
+                        <label class="form-label">应聘公司</label>
+                        <div class="form-control">
+                            <div class="custom-select" data-select="company">
+                                <div class="select-display"><span class="selected-text">请选择应聘公司</span><span class="arrow">▼</span></div>
+                                <div class="select-options">
+                                    <div class="select-option" data-value="顺驰速运">顺驰速运</div>
+                                    <div class="select-option" data-value="京驰物流">京驰物流</div>
+                                    <div class="select-option" data-value="国邮快递">国邮快递</div>
+                                    <div class="select-option" data-value="德远货运">德远货运</div>
+                                    <div class="select-option" data-value="中驰快运">中驰快运</div>
+                                    <div class="select-option" data-value="圆驰物流">圆驰物流</div>
+                                    <div class="select-option" data-value="申达快运">申达快运</div>
+                                    <div class="select-option" data-value="运达速运">运达速运</div>
+                                    <div class="select-option" data-value="吉兔速递">吉兔速递</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- 单位选择（全国各省市） -->
+                    <div class="form-row">
+                        <label class="form-label">单位选择</label>
+                        <div class="form-control">
+                            <div class="custom-select" data-select="unit">
+                                <div class="select-display"><span class="selected-text">请选择货运安全部</span><span class="arrow">▼</span></div>
+                                <div class="select-options" id="unitOptions">
+                                    <!-- 由JS动态生成，确保完整 -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- 是否拥有驾驶证 -->
+                    <div class="form-row">
+                        <label class="form-label">驾驶证</label>
+                        <div class="form-control">
+                            <div class="radio-group" id="licenseRadioGroup">
+                                <label class="radio-option"><input type="radio" name="license" value="有" checked> 有</label>
+                                <label class="radio-option"><input type="radio" name="license" value="没有"> 没有</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div style="display: flex; gap: 12px; justify-content: center; margin-top: 6px;">
+                    <button class="btn-register" id="btnConfirmRegister">确认注册</button>
+                    <button class="btn-back" id="btnBackHome">返回</button>
+                </div>
             </div>
-
-            <!-- 分隔线 -->
-            <div class="divider-line">
-                <span class="line"></span>
-                <span class="diamond"></span>
-                <span class="line"></span>
-            </div>
-
-            <!-- 版本号（更新为2026） -->
-            <span class="version-tag">v0.1.0 &nbsp;|&nbsp; BUILD 2026.09</span>
-
-            <!-- 按钮（仅“开始游戏”） -->
-            <div class="button-area">
-                <button class="btn-start" id="btnStart" type="button">开始游戏</button>
-            </div>
-
-            <!-- 提示文字 -->
-            <p class="hint-text">
-                &gt; 链路检测中 ... 所有货柜监控节点在线 &lt;<br>
-                &gt; 按 [ENTER] 快速进入指挥台 &lt;
-            </p>
         </div>
 
-        <!-- 底部角落信息：左侧节点信息默认隐藏，右侧版权信息保留 -->
-        <div class="corner-decor bottom-left" id="nodeInfo" aria-hidden="true">
-            节点: 未创建 &nbsp;|&nbsp; 线路: 未创建<br>
-            延迟: -- &nbsp;|&nbsp; 加密: --
-        </div>
-        <div class="corner-decor bottom-right" aria-hidden="true">
-            FSCS 安全管控系统<br>
-            © 2026 货运安保部
-        </div>
+        <!-- 底部角落信息 -->
+        <div class="corner-decor bottom-left" id="nodeInfo" aria-hidden="true">节点: 未创建 &nbsp;|&nbsp; 线路: 未创建<br>延迟: -- &nbsp;|&nbsp; 加密: --</div>
+        <div class="corner-decor bottom-right" aria-hidden="true">FSCS 安全管控系统<br>© 2026 货运安保部</div>
+    </div>
 
+    <!-- 游戏弹窗 -->
+    <div class="game-modal-overlay" id="gameModalOverlay">
+        <div class="game-modal">
+            <div class="modal-title" id="modalTitle">提示</div>
+            <div class="modal-message" id="modalMessage"></div>
+            <button class="modal-btn" id="modalBtn">确定</button>
+        </div>
     </div>
 
     <script>
@@ -556,64 +457,195 @@
                     bgLayer.style.backgroundColor = '#0c1218';
                 };
                 var bgUrl = window.getComputedStyle(bgLayer).backgroundImage.slice(4, -1).replace(/"/g, "");
-                if (bgUrl) {
-                    testImg.src = bgUrl;
+                if (bgUrl) testImg.src = bgUrl;
+            }
+
+            // ============ 页面切换 ============
+            var homePage = document.getElementById('homePage');
+            var registerPage = document.getElementById('registerPage');
+            var btnStartGame = document.getElementById('btnStartGame');
+            var btnBackHome = document.getElementById('btnBackHome');
+
+            function showPage(page) {
+                if (page === 'home') {
+                    homePage.classList.add('active');
+                    registerPage.classList.remove('active');
+                } else {
+                    homePage.classList.remove('active');
+                    registerPage.classList.add('active');
                 }
             }
 
-            // ============ 按钮交互 ============
-            var btnStart = document.getElementById('btnStart');
-
-            if (btnStart) {
-                btnStart.addEventListener('click', function(e) {
-                    btnStart.style.transform = 'translateY(1px)';
-                    setTimeout(function() {
-                        btnStart.style.transform = '';
-                    }, 120);
-                    showBootMessage('正在连接主控网络 ... 请稍候');
+            if (btnStartGame) {
+                btnStartGame.addEventListener('click', function() {
+                    showPage('register');
+                });
+            }
+            if (btnBackHome) {
+                btnBackHome.addEventListener('click', function() {
+                    showPage('home');
                 });
             }
 
-            // ============ 键盘快捷键 ============
+            // 键盘快捷键：Enter在首页进入注册
             document.addEventListener('keydown', function(e) {
                 if (e.key === 'Enter' || e.keyCode === 13) {
-                    if (btnStart) {
-                        btnStart.click();
+                    if (homePage.classList.contains('active')) {
+                        if (btnStartGame) btnStartGame.click();
+                        e.preventDefault();
                     }
-                    e.preventDefault();
                 }
             });
 
-            // ============ 简单消息提示 ============
-            function showBootMessage(msg) {
-                var hintEl = document.querySelector('.hint-text');
-                if (!hintEl) return;
-                var originalText = hintEl.innerHTML;
-                hintEl.textContent = '> ' + msg + ' <';
-                hintEl.style.opacity = '0.9';
-                hintEl.style.color = '#a8ccd8';
+            // ============ 自定义下拉选择 ============
+            var customSelects = document.querySelectorAll('.custom-select');
+            customSelects.forEach(function(select) {
+                var display = select.querySelector('.select-display');
+                var options = select.querySelector('.select-options');
+                var selectedText = select.querySelector('.selected-text');
+                var optionItems = select.querySelectorAll('.select-option');
 
-                clearTimeout(hintEl._msgTimer);
-                hintEl._msgTimer = setTimeout(function() {
-                    hintEl.innerHTML = originalText;
-                    hintEl.style.opacity = '';
-                    hintEl.style.color = '';
-                }, 3500);
+                display.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    // 关闭其他下拉
+                    document.querySelectorAll('.select-options.show').forEach(function(opt) {
+                        if (opt !== options) opt.classList.remove('show');
+                    });
+                    options.classList.toggle('show');
+                });
+
+                optionItems.forEach(function(opt) {
+                    opt.addEventListener('click', function() {
+                        selectedText.textContent = opt.textContent;
+                        select.setAttribute('data-value', opt.getAttribute('data-value'));
+                        options.classList.remove('show');
+                    });
+                });
+            });
+
+            // 点击页面其他区域关闭下拉
+            document.addEventListener('click', function(e) {
+                if (!e.target.closest('.custom-select')) {
+                    document.querySelectorAll('.select-options.show').forEach(function(opt) {
+                        opt.classList.remove('show');
+                    });
+                }
+            });
+
+            // ============ 生成单位选项（全国34个省级行政区） ============
+            var provinces = [
+                '北京市','天津市','上海市','重庆市','河北省','山西省','辽宁省','吉林省',
+                '黑龙江省','江苏省','浙江省','安徽省','福建省','江西省','山东省','河南省',
+                '湖北省','湖南省','广东省','海南省','四川省','贵州省','云南省','陕西省',
+                '甘肃省','青海省','台湾省','内蒙古自治区','广西壮族自治区','西藏自治区',
+                '宁夏回族自治区','新疆维吾尔自治区','香港特别行政区','澳门特别行政区'
+            ];
+            var unitOptionsContainer = document.getElementById('unitOptions');
+            if (unitOptionsContainer) {
+                var html = '';
+                provinces.forEach(function(prov) {
+                    html += '<div class="select-option" data-value="' + prov + '货运安全部">' + prov + '货运安全部</div>';
+                });
+                unitOptionsContainer.innerHTML = html;
+                // 重新绑定选项事件
+                var unitSelect = unitOptionsContainer.closest('.custom-select');
+                if (unitSelect) {
+                    var unitDisplay = unitSelect.querySelector('.select-display');
+                    var unitSelectedText = unitSelect.querySelector('.selected-text');
+                    var unitOptions = unitSelect.querySelectorAll('.select-option');
+                    unitOptions.forEach(function(opt) {
+                        opt.addEventListener('click', function() {
+                            unitSelectedText.textContent = opt.textContent;
+                            unitSelect.setAttribute('data-value', opt.getAttribute('data-value'));
+                            unitOptionsContainer.classList.remove('show');
+                        });
+                    });
+                    // 重新绑定显示点击
+                    unitDisplay.addEventListener('click', function(e) {
+                        e.stopPropagation();
+                        document.querySelectorAll('.select-options.show').forEach(function(opt) {
+                            if (opt !== unitOptionsContainer) opt.classList.remove('show');
+                        });
+                        unitOptionsContainer.classList.toggle('show');
+                    });
+                }
             }
 
-            // ============ 防止移动端双击缩放干扰 ============
+            // ============ 游戏弹窗 ============
+            var modalOverlay = document.getElementById('gameModalOverlay');
+            var modalTitle = document.getElementById('modalTitle');
+            var modalMessage = document.getElementById('modalMessage');
+            var modalBtn = document.getElementById('modalBtn');
+
+            function showGameModal(title, message) {
+                modalTitle.textContent = title;
+                modalMessage.textContent = message;
+                modalOverlay.classList.add('show');
+            }
+
+            modalBtn.addEventListener('click', function() {
+                modalOverlay.classList.remove('show');
+            });
+            modalOverlay.addEventListener('click', function(e) {
+                if (e.target === modalOverlay) modalOverlay.classList.remove('show');
+            });
+
+            // ============ 注册确认逻辑 ============
+            var btnConfirmRegister = document.getElementById('btnConfirmRegister');
+            if (btnConfirmRegister) {
+                btnConfirmRegister.addEventListener('click', function() {
+                    var name = document.getElementById('regName').value.trim();
+                    var age = document.getElementById('regAge').value.trim();
+                    var genderSelect = document.querySelector('[data-select="gender"]');
+                    var companySelect = document.querySelector('[data-select="company"]');
+                    var unitSelect = document.querySelector('[data-select="unit"]');
+                    var licenseRadios = document.getElementsByName('license');
+                    var licenseValue = '';
+                    for (var i = 0; i < licenseRadios.length; i++) {
+                        if (licenseRadios[i].checked) {
+                            licenseValue = licenseRadios[i].value;
+                            break;
+                        }
+                    }
+
+                    // 基础必填检查
+                    if (!name || !age) {
+                        showGameModal('提示', '请填写完整的姓名和年龄。');
+                        return;
+                    }
+                    if (genderSelect.getAttribute('data-value') === '' || !genderSelect.getAttribute('data-value')) {
+                        showGameModal('提示', '请选择性别。');
+                        return;
+                    }
+                    if (companySelect.getAttribute('data-value') === '' || !companySelect.getAttribute('data-value')) {
+                        showGameModal('提示', '请选择应聘公司。');
+                        return;
+                    }
+                    if (unitSelect.getAttribute('data-value') === '' || !unitSelect.getAttribute('data-value')) {
+                        showGameModal('提示', '请选择货运安全部单位。');
+                        return;
+                    }
+
+                    // 驾驶证检查
+                    if (licenseValue === '没有') {
+                        showGameModal('不符合岗位要求', '由于您没有驾驶安全常识，不符合该岗位要求，感谢您的注册。');
+                    } else {
+                        showGameModal('注册成功', '欢迎加入货运安全管控系统，您的信息已提交审核。');
+                        // 可在此处添加后续处理，如返回主页或清空表单
+                    }
+                });
+            }
+
+            // 防止移动端双击缩放
             document.addEventListener('dblclick', function(e) {
-                if (window.innerWidth <= 768) {
-                    e.preventDefault();
-                }
+                if (window.innerWidth <= 768) e.preventDefault();
             }, { passive: false });
 
-            // 将来若需要显示节点信息，可调用以下函数：
+            // 预留节点信息显示函数
             window.showNodeInfo = function(node, line, delay, enc) {
                 var el = document.getElementById('nodeInfo');
                 if (el) {
-                    el.innerHTML = '节点: ' + node + ' &nbsp;|&nbsp; 线路: ' + line + '<br>' +
-                                   '延迟: ' + delay + ' &nbsp;|&nbsp; 加密: ' + enc;
+                    el.innerHTML = '节点: ' + node + ' &nbsp;|&nbsp; 线路: ' + line + '<br>延迟: ' + delay + ' &nbsp;|&nbsp; 加密: ' + enc;
                     el.style.display = 'block';
                 }
             };

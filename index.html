@@ -294,8 +294,6 @@
             visibility: hidden;
             transform: translateY(-8px);
             transition: opacity 0.2s ease, transform 0.2s ease, visibility 0.2s;
-
-            /* 自定义滚动条（隐藏默认箭头） */
             scrollbar-width: thin;
             scrollbar-color: #6a9aa8 #0c151f;
         }
@@ -304,20 +302,10 @@
             visibility: visible;
             transform: translateY(0);
         }
-        .select-options::-webkit-scrollbar {
-            width: 8px;
-        }
-        .select-options::-webkit-scrollbar-track {
-            background: #0c151f;
-            border-radius: 8px;
-        }
-        .select-options::-webkit-scrollbar-thumb {
-            background: #6a9aa8;
-            border-radius: 8px;
-        }
-        .select-options::-webkit-scrollbar-button {
-            display: none;  /* 隐藏上下箭头按钮 */
-        }
+        .select-options::-webkit-scrollbar { width: 8px; }
+        .select-options::-webkit-scrollbar-track { background: #0c151f; border-radius: 8px; }
+        .select-options::-webkit-scrollbar-thumb { background: #6a9aa8; border-radius: 8px; }
+        .select-options::-webkit-scrollbar-button { display: none; }
         .select-option {
             padding: 9px 14px;
             color: #b8d8e8;
@@ -467,12 +455,14 @@
             border: 1.5px solid rgba(120, 190, 220, 0.7);
             box-shadow: 0 0 30px rgba(80, 160, 200, 0.5), inset 0 0 30px rgba(80, 160, 200, 0.05);
             padding: 24px 28px;
-            max-width: 380px;
+            max-width: 500px;
             width: 90%;
             text-align: center;
             position: relative;
             border-radius: 12px;
             animation: modal-in 0.25s ease;
+            max-height: 80vh;
+            overflow-y: auto;
         }
         @keyframes modal-in { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
         .game-modal .modal-title {
@@ -489,6 +479,7 @@
             line-height: 1.6;
             margin-bottom: 18px;
             word-break: break-word;
+            text-align: left;
         }
         .game-modal .modal-btn {
             padding: 8px 28px;
@@ -648,7 +639,7 @@
     <div class="quiz-page" id="quizPage">
         <div class="quiz-header">
             <div class="quiz-title">安全知识考核</div>
-            <div class="quiz-subtitle">FREIGHT SAFETY & EMERGENCY HANDLING</div>
+            <div class="quiz-subtitle" id="quizSubtitle">FREIGHT SAFETY & EMERGENCY HANDLING</div>
         </div>
         <div class="quiz-container" id="quizContainer"></div>
         <div class="quiz-submit">
@@ -784,7 +775,7 @@
 
             function showGameModal(title, message, callback) {
                 modalTitle.textContent = title;
-                modalMessage.textContent = message;
+                modalMessage.innerHTML = message.replace(/\n/g, '<br>'); // 支持换行
                 modalOverlay.classList.add('show');
                 if (typeof callback === 'function') {
                     modalBtn.onclick = function() {
@@ -820,46 +811,150 @@
                     if (!companySelect.getAttribute('data-value')) { showGameModal('提示', '请选择应聘公司。'); return; }
                     if (!unitSelect.getAttribute('data-value')) { showGameModal('提示', '请选择货运安全部单位。'); return; }
 
-                    if (licenseValue === '没有') {
-                        showGameModal('不符合岗位要求', '由于您没有驾驶安全常识，不符合该岗位要求，感谢您的注册。');
-                    } else {
-                        showGameModal('注册成功', '欢迎加入货运安全管控系统，请完成安全知识考核。', function() {
-                            showPage('quiz');
-                            generateQuiz();
-                        });
-                    }
+                    // 根据驾驶证选择对应题库
+                    var quizType = (licenseValue === '没有') ? 'driver' : 'safety';
+                    showPage('quiz');
+                    generateQuiz(quizType);
                 });
             }
 
-            // ============ 答题系统 ============
-            var quizQuestions = [
-                { question: "运输易燃液体时，车辆必须配备的消防器材是？", options: ["泡沫灭火器", "干粉灭火器", "水", "沙土"], correct: 1 },
-                { question: "货车装载货物时，货物重心应尽量位于车辆的什么位置？", options: ["前部", "后部", "中部", "任意位置"], correct: 2 },
-                { question: "发现货物有散落风险，应首先采取的措施是？", options: ["继续行驶", "停车加固", "加速通过", "鸣笛警示"], correct: 1 },
-                { question: "危险品运输车辆必须悬挂的标志是？", options: ["红色旗帜", "危险品标志牌", "公司标志", "速度警示"], correct: 1 },
-                { question: "长途运输前，驾驶员必须检查的关键项目不包括？", options: ["轮胎气压", "刹车系统", "货物捆绑", "车内音响"], correct: 3 },
-                { question: "车辆在高速公路上突发故障，应首先开启什么灯？", options: ["远光灯", "双闪警示灯", "雾灯", "倒车灯"], correct: 1 },
-                { question: "运输中发现货物冒烟，且无法立即扑灭，应？", options: ["继续行驶找水源", "停车远离并报警", "打开车厢通风", "用棉被覆盖"], correct: 1 },
-                { question: "驾驶货车通过长下坡路段时，正确的做法是？", options: ["空挡滑行", "持续踩刹车", "低挡控速", "关闭发动机"], correct: 2 },
-                { question: "货车超载的主要危害不包括？", options: ["制动距离延长", "轮胎负荷过大", "油耗降低", "转向失控风险"], correct: 2 },
-                { question: "遇到恶劣天气（如大雾）能见度低，应？", options: ["开启远光灯加速", "降低车速并开启雾灯", "靠边停车睡觉", "跟随前车近距离行驶"], correct: 1 },
-                { question: "危险品运输途中发生泄漏，驾驶员第一时间应？", options: ["自行处理", "远离现场并报警", "继续行驶到目的地", "用泥土掩埋"], correct: 1 },
-                { question: "装载易碎货物时，正确的固定方式是？", options: ["随意堆放", "使用缓冲材料并紧固", "尽量减少固定", "只靠重力"], correct: 1 },
-                { question: "车辆行驶中轮胎突然爆裂，应？", options: ["紧急刹车", "紧握方向盘缓刹减速", "急打方向", "加速冲过"], correct: 1 },
-                { question: "货运车辆必须随车携带的证件不包括？", options: ["行驶证", "驾驶证", "道路运输证", "车辆保险单（电子）", "工作证"], correct: 4 },
-                { question: "夜间行车会车时，应如何使用灯光？", options: ["远光灯", "近光灯", "交替变换", "关闭灯光"], correct: 1 },
-                { question: "货物捆绑带断裂风险增大，应？", options: ["继续使用", "立即更换或加固", "减小货物重量", "提高车速减少震动"], correct: 1 },
-                { question: "运输中发现水温过高，应？", options: ["立即熄火", "怠速运转并检查", "继续行驶", "打开水箱盖"], correct: 1 },
-                { question: "货车转弯时容易发生侧翻，主要原因不包括？", options: ["速度过快", "重心偏高", "货物固定不良", "路面太宽"], correct: 3 },
-                { question: "运输剧毒化学品，必须配备的防护用品是？", options: ["防毒面具", "安全帽", "手套", "护目镜"], correct: 0 },
-                { question: "疲劳驾驶的危害不包括？", options: ["反应迟钝", "判断力下降", "油耗增加", "操作失误"], correct: 2 }
+            // ============ 两套题库 ============
+            var safetyQuestions = [
+                {
+                    question: "安全员在货物装车前应重点检查什么？",
+                    options: ["货物数量", "车辆技术状况及货物捆绑", "司机驾驶证", "天气情况"],
+                    correct: 1,
+                    explanation: "安全员需确认车辆状态良好及货物固定牢靠，防止运输途中发生意外。"
+                },
+                {
+                    question: "发现安全隐患时，安全员首先应？",
+                    options: ["自行处理", "立即上报并停止相关作业", "忽视继续工作", "通知司机处理"],
+                    correct: 1,
+                    explanation: "安全员应立即上报隐患，确保人员安全，不得擅自冒险作业。"
+                },
+                {
+                    question: "危险品运输车辆出车前，安全员必须核查什么证件？",
+                    options: ["行驶证", "危险品运输许可证", "营运证", "保险单"],
+                    correct: 1,
+                    explanation: "危险品运输需持有专门许可证，安全员必须核实。"
+                },
+                {
+                    question: "货物堆码不符合规定时，安全员应如何处理？",
+                    options: ["要求重新堆码", "直接放行", "记录后放行", "增加捆绑带"],
+                    correct: 0,
+                    explanation: "堆码不稳易导致货物倒塌，必须重新堆码至符合安全标准。"
+                },
+                {
+                    question: "应急预案演练中，安全员的主要职责是？",
+                    options: ["参与救援", "组织协调和监督执行", "驾驶车辆", "记录数据"],
+                    correct: 1,
+                    explanation: "安全员负责组织协调演练，确保流程正确执行。"
+                },
+                {
+                    question: "运输途中发生货物泄漏，安全员应首先？",
+                    options: ["组织人员疏散并报警", "自行清理", "继续行驶", "掩盖泄漏物"],
+                    correct: 0,
+                    explanation: "安全员应优先疏散人员并报警，避免扩大危害。"
+                },
+                {
+                    question: "安全员在车辆出场前需对哪些项目签字确认？",
+                    options: ["车辆技术状况", "货物装载情况", "司机精神状态", "以上都是"],
+                    correct: 3,
+                    explanation: "安全员需综合确认车辆、货物、人员状态，全部合格方可放行。"
+                },
+                {
+                    question: "发现驾驶员疲劳驾驶，安全员应？",
+                    options: ["强制其休息", "提醒注意", "继续行程", "换另一名司机"],
+                    correct: 0,
+                    explanation: "疲劳驾驶是严重安全隐患，必须强制停车休息。"
+                },
+                {
+                    question: "安全员对运输路线的风险评估应包括哪些？",
+                    options: ["路况", "天气", "限行规定", "以上都是"],
+                    correct: 3,
+                    explanation: "安全员需全面评估路线风险，制定应对措施。"
+                },
+                {
+                    question: "事故发生后，安全员应首先保护现场并？",
+                    options: ["抢救伤员", "报警", "拍照记录", "移动车辆"],
+                    correct: 0,
+                    explanation: "保护现场同时应立即抢救伤员，减少伤亡。"
+                }
             ];
 
-            function generateQuiz() {
+            var driverQuestions = [
+                {
+                    question: "运输易燃液体时，车辆必须配备的消防器材是？",
+                    options: ["泡沫灭火器", "干粉灭火器", "水", "沙土"],
+                    correct: 1,
+                    explanation: "干粉灭火器适用于扑灭易燃液体火灾。"
+                },
+                {
+                    question: "货车装载货物时，货物重心应尽量位于车辆的什么位置？",
+                    options: ["前部", "后部", "中部", "任意位置"],
+                    correct: 2,
+                    explanation: "重心居中有利于车辆稳定，防止侧翻。"
+                },
+                {
+                    question: "发现货物有散落风险，应首先采取的措施是？",
+                    options: ["继续行驶", "停车加固", "加速通过", "鸣笛警示"],
+                    correct: 1,
+                    explanation: "立即停车加固货物，避免散落造成事故。"
+                },
+                {
+                    question: "危险品运输车辆必须悬挂的标志是？",
+                    options: ["红色旗帜", "危险品标志牌", "公司标志", "速度警示"],
+                    correct: 1,
+                    explanation: "危险品车辆必须悬挂醒目的危险品标志牌。"
+                },
+                {
+                    question: "长途运输前，驾驶员必须检查的关键项目不包括？",
+                    options: ["轮胎气压", "刹车系统", "货物捆绑", "车内音响"],
+                    correct: 3,
+                    explanation: "车内音响不属于安全关键项目，可忽略。"
+                },
+                {
+                    question: "车辆在高速公路上突发故障，应首先开启什么灯？",
+                    options: ["远光灯", "双闪警示灯", "雾灯", "倒车灯"],
+                    correct: 1,
+                    explanation: "双闪警示灯可提醒后方车辆，避免追尾。"
+                },
+                {
+                    question: "运输中发现货物冒烟，且无法立即扑灭，应？",
+                    options: ["继续行驶找水源", "停车远离并报警", "打开车厢通风", "用棉被覆盖"],
+                    correct: 1,
+                    explanation: "远离并报警是最安全做法，避免人员伤亡。"
+                },
+                {
+                    question: "驾驶货车通过长下坡路段时，正确的做法是？",
+                    options: ["空挡滑行", "持续踩刹车", "低挡控速", "关闭发动机"],
+                    correct: 2,
+                    explanation: "低挡位利用发动机制动，避免刹车过热。"
+                },
+                {
+                    question: "货车超载的主要危害不包括？",
+                    options: ["制动距离延长", "轮胎负荷过大", "油耗降低", "转向失控风险"],
+                    correct: 2,
+                    explanation: "超载会增加油耗，而非降低。"
+                },
+                {
+                    question: "遇到恶劣天气（如大雾）能见度低，应？",
+                    options: ["开启远光灯加速", "降低车速并开启雾灯", "靠边停车睡觉", "跟随前车近距离行驶"],
+                    correct: 1,
+                    explanation: "降低车速、开启雾灯可提高安全性。"
+                }
+            ];
+
+            function generateQuiz(type) {
                 var container = document.getElementById('quizContainer');
+                var subtitle = document.getElementById('quizSubtitle');
                 if (!container) return;
+                var questions = (type === 'safety') ? safetyQuestions : driverQuestions;
+                if (subtitle) {
+                    subtitle.textContent = (type === 'safety') ? '安全员专业知识考核' : '驾驶员安全知识考核';
+                }
                 var html = '';
-                quizQuestions.forEach(function(q, index) {
+                questions.forEach(function(q, index) {
                     html += '<div class="question-block">';
                     html += '<div class="question-text">' + (index + 1) + '. ' + q.question + '</div>';
                     html += '<div class="options-group">';
@@ -872,34 +967,68 @@
                     html += '</div></div>';
                 });
                 container.innerHTML = html;
+                // 保存当前题库类型
+                container.setAttribute('data-quiz-type', type);
             }
 
+            // 提交答卷
             var btnSubmitQuiz = document.getElementById('btnSubmitQuiz');
             if (btnSubmitQuiz) {
                 btnSubmitQuiz.addEventListener('click', function() {
+                    var container = document.getElementById('quizContainer');
+                    var type = container.getAttribute('data-quiz-type');
+                    var questions = (type === 'safety') ? safetyQuestions : driverQuestions;
                     var score = 0;
                     var allAnswered = true;
-                    quizQuestions.forEach(function(q, index) {
+                    var wrongList = [];
+
+                    questions.forEach(function(q, index) {
                         var selected = document.querySelector('input[name="q' + index + '"]:checked');
                         if (!selected) {
                             allAnswered = false;
                         } else {
-                            if (parseInt(selected.value) === q.correct) {
+                            var selectedValue = parseInt(selected.value);
+                            if (selectedValue === q.correct) {
                                 score++;
+                            } else {
+                                wrongList.push({
+                                    index: index,
+                                    question: q.question,
+                                    userAnswer: q.options[selectedValue],
+                                    correctAnswer: q.options[q.correct],
+                                    explanation: q.explanation
+                                });
                             }
                         }
                     });
+
                     if (!allAnswered) {
                         showGameModal('提示', '请完成所有题目后再提交。');
                         return;
                     }
-                    var passed = score >= 18;
-                    var msg = '您的得分：' + score + ' / 20。' + (passed ? '恭喜通过考核！' : '未达到及格线（18分），请重新考核。');
+
+                    var passed = score >= 9;
+                    var msg = '您的得分：' + score + ' / 10。<br>';
+                    if (passed) {
+                        msg += '恭喜通过考核！';
+                    } else {
+                        msg += '未达到及格线（9分）。<br>';
+                        if (wrongList.length > 0) {
+                            msg += '<br><b>错题解析：</b><br>';
+                            wrongList.forEach(function(item) {
+                                msg += '<br><b>第' + (item.index + 1) + '题：' + item.question + '</b><br>';
+                                msg += '你的答案：' + item.userAnswer + ' &nbsp;|&nbsp; 正确答案：' + item.correctAnswer + '<br>';
+                                msg += '解析：' + item.explanation + '<br>';
+                            });
+                        }
+                    }
+
                     showGameModal(passed ? '考核通过' : '考核未通过', msg, function() {
-                        if (!passed) {
-                            generateQuiz();
-                        } else {
+                        if (passed) {
                             showPage('home');
+                        } else {
+                            // 重新生成同一套题
+                            generateQuiz(type);
                         }
                     });
                 });

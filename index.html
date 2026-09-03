@@ -40,15 +40,14 @@
             transition: background-image 0.4s ease, filter 0.4s ease;
         }
 
-        /* 首页背景（新图） */
+        /* 首页和游戏主界面使用的新图 */
         .bg-layer.home-bg {
             background-image: url('https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEaa1NqmW5X2WitN5yFwAyu_a_aDvITegACdyAAAm9B0FQqncKhQmdWmz0E.png');
         }
 
-        /* 游戏主界面背景模糊 */
+        /* 模糊效果（游戏主界面专用） */
         .bg-layer.blur-bg {
             filter: blur(8px);
-            /* 可以适当加深模糊，使前景内容更清晰 */
         }
 
         @media (max-width: 768px) {
@@ -821,7 +820,7 @@
                 announcePage.classList.remove('show');
                 gameMainPage.classList.remove('show');
 
-                // 移除所有背景类
+                // 移除所有背景相关类
                 bgLayer.classList.remove('home-bg', 'blur-bg');
 
                 if (page === 'home') {
@@ -834,8 +833,8 @@
                 } else if (page === 'announce') {
                     announcePage.classList.add('show');
                 } else if (page === 'gameMain') {
-                    // 游戏主界面：使用内部背景并模糊
-                    bgLayer.classList.add('blur-bg');
+                    // 游戏主界面：使用新图并模糊
+                    bgLayer.classList.add('home-bg', 'blur-bg');
                     gameMainPage.classList.add('show');
                 }
 
@@ -850,7 +849,6 @@
             if (btnBackHome) btnBackHome.addEventListener('click', () => showPage('home'));
             if (btnQuizBack) btnQuizBack.addEventListener('click', () => showPage('register'));
             if (btnEnterMain) btnEnterMain.addEventListener('click', () => {
-                // 停止音频
                 if (announceAudio) {
                     announceAudio.pause();
                     announceAudio.currentTime = 0;

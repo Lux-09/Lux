@@ -35,12 +35,21 @@
             background-size: cover;
             background-position: center center;
             background-repeat: no-repeat;
-            background-image: url('https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEaa1NqmW5X2WitN5yFwAyu_a_aDvITegACdyAAAm9B0FQqncKhQmdWmz0E.png');
+            /* 默认使用内部页面背景（旧图） */
+            background-image: url('https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEaXBRqmB-Du5k_LwKaKBZ_pP8Xe8F-RAACPDIAAm9BwFTn4jHKMQj3BT0E.png');
             transition: background-image 0.4s ease;
+        }
+
+        /* 首页背景（新图） */
+        .bg-layer.home-bg {
+            background-image: url('https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEaa1NqmW5X2WitN5yFwAyu_a_aDvITegACdyAAAm9B0FQqncKhQmdWmz0E.png');
         }
 
         @media (max-width: 768px) {
             .bg-layer {
+                background-image: url('https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEaXZFqmCyWXGUO-7hbwsVc3eTM48K1FwAC8zMAAm9BwFTDFpVwPEdWMD0E.png');
+            }
+            .bg-layer.home-bg {
                 background-image: url('https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEaa1FqmW3qYwqgvS0Ui_vmm98-canbagACdSAAAm9B0FTlU4gfLXu6_j0E.png');
             }
         }
@@ -486,19 +495,6 @@
             margin-bottom: 20px;
             white-space: pre-line;
         }
-        .audio-control {
-            margin: 15px 0;
-            width: 100%;
-            display: flex;
-            justify-content: center;
-        }
-        .audio-control audio {
-            width: 100%;
-            max-width: 400px;
-            outline: none;
-            background: rgba(10, 20, 30, 0.7);
-            border-radius: 8px;
-        }
         .btn-enter-main {
             padding: 14px 40px;
             font-size: 16px;
@@ -618,7 +614,7 @@
                     <span class="diamond"></span>
                     <span class="line"></span>
                 </div>
-                <span class="version-tag">v0.1.0 &nbsp;|&nbsp; BUILD 2026.09</span>
+                <span class="version-tag">v0.0.8 &nbsp;|&nbsp; BUILD 2026.09</span>
                 <div class="button-area">
                     <button class="btn btn-start" id="btnStartGame" type="button">开始游戏</button>
                 </div>
@@ -736,9 +732,8 @@
 
                 祝您工作顺利！
             </div>
-            <div class="audio-control">
-                <audio controls src="https://videotourl.com/audio/1788440810540-78a6ea5a-abcb-4060-b132-54b3361ed2ed.mp3" preload="auto"></audio>
-            </div>
+            <!-- 隐藏的音频元素，自动播放，无控件 -->
+            <audio id="announceAudio" src="https://videotourl.com/audio/1788440810540-78a6ea5a-abcb-4060-b132-54b3361ed2ed.mp3" preload="auto"></audio>
             <button class="btn btn-enter-main" id="btnEnterMain">进入主控台</button>
         </div>
     </div>
@@ -767,7 +762,8 @@
             updateClock();
             setInterval(updateClock, 1000);
 
-            // 页面切换
+            // 页面切换与背景图切换
+            var bgLayer = document.getElementById('bgLayer');
             var homePage = document.getElementById('homePage');
             var registerPage = document.getElementById('registerPage');
             var quizPage = document.getElementById('quizPage');
@@ -776,26 +772,43 @@
             var btnBackHome = document.getElementById('btnBackHome');
             var btnQuizBack = document.getElementById('btnQuizBack');
             var btnEnterMain = document.getElementById('btnEnterMain');
+            var announceAudio = document.getElementById('announceAudio');
 
             function showPage(page) {
                 homePage.classList.remove('active');
                 registerPage.classList.remove('active');
                 quizPage.classList.remove('show');
                 announcePage.classList.remove('show');
+
+                // 根据页面切换背景图
                 if (page === 'home') {
+                    bgLayer.classList.add('home-bg');
                     homePage.classList.add('active');
-                } else if (page === 'register') {
-                    registerPage.classList.add('active');
-                } else if (page === 'quiz') {
-                    quizPage.classList.add('show');
-                } else if (page === 'announce') {
-                    announcePage.classList.add('show');
+                } else {
+                    bgLayer.classList.remove('home-bg');
+                    if (page === 'register') registerPage.classList.add('active');
+                    else if (page === 'quiz') quizPage.classList.add('show');
+                    else if (page === 'announce') announcePage.classList.add('show');
+                }
+
+                // 停止音频（如果切换离开播报页）
+                if (page !== 'announce' && announceAudio) {
+                    announceAudio.pause();
+                    announceAudio.currentTime = 0;
                 }
             }
+
             if (btnStartGame) btnStartGame.addEventListener('click', () => showPage('register'));
             if (btnBackHome) btnBackHome.addEventListener('click', () => showPage('home'));
             if (btnQuizBack) btnQuizBack.addEventListener('click', () => showPage('register'));
-            if (btnEnterMain) btnEnterMain.addEventListener('click', () => showPage('home'));
+            if (btnEnterMain) btnEnterMain.addEventListener('click', () => {
+                // 停止音频
+                if (announceAudio) {
+                    announceAudio.pause();
+                    announceAudio.currentTime = 0;
+                }
+                showPage('home');
+            });
 
             document.addEventListener('keydown', function(e) {
                 if (e.key === 'Enter' && homePage.classList.contains('active')) {
@@ -915,7 +928,6 @@
                     if (!companySelect.getAttribute('data-value')) { showGameModal('提示', '请选择应聘公司。'); return; }
                     if (!unitSelect.getAttribute('data-value')) { showGameModal('提示', '请选择货运安全部单位。'); return; }
 
-                    // 根据驾驶证选择对应题库
                     var quizType = (licenseValue === '没有') ? 'driver' : 'safety';
                     showPage('quiz');
                     generateQuiz(quizType);
@@ -924,129 +936,29 @@
 
             // ============ 两套题库 ============
             var safetyQuestions = [
-                {
-                    question: "安全员在货物装车前应重点检查什么？",
-                    options: ["货物数量", "车辆技术状况及货物捆绑", "司机驾驶证", "天气情况"],
-                    correct: 1,
-                    explanation: "安全员需确认车辆状态良好及货物固定牢靠，防止运输途中发生意外。"
-                },
-                {
-                    question: "发现安全隐患时，安全员首先应？",
-                    options: ["自行处理", "立即上报并停止相关作业", "忽视继续工作", "通知司机处理"],
-                    correct: 1,
-                    explanation: "安全员应立即上报隐患，确保人员安全，不得擅自冒险作业。"
-                },
-                {
-                    question: "危险品运输车辆出车前，安全员必须核查什么证件？",
-                    options: ["行驶证", "危险品运输许可证", "营运证", "保险单"],
-                    correct: 1,
-                    explanation: "危险品运输需持有专门许可证，安全员必须核实。"
-                },
-                {
-                    question: "货物堆码不符合规定时，安全员应如何处理？",
-                    options: ["要求重新堆码", "直接放行", "记录后放行", "增加捆绑带"],
-                    correct: 0,
-                    explanation: "堆码不稳易导致货物倒塌，必须重新堆码至符合安全标准。"
-                },
-                {
-                    question: "应急预案演练中，安全员的主要职责是？",
-                    options: ["参与救援", "组织协调和监督执行", "驾驶车辆", "记录数据"],
-                    correct: 1,
-                    explanation: "安全员负责组织协调演练，确保流程正确执行。"
-                },
-                {
-                    question: "运输途中发生货物泄漏，安全员应首先？",
-                    options: ["组织人员疏散并报警", "自行清理", "继续行驶", "掩盖泄漏物"],
-                    correct: 0,
-                    explanation: "安全员应优先疏散人员并报警，避免扩大危害。"
-                },
-                {
-                    question: "安全员在车辆出场前需对哪些项目签字确认？",
-                    options: ["车辆技术状况", "货物装载情况", "司机精神状态", "以上都是"],
-                    correct: 3,
-                    explanation: "安全员需综合确认车辆、货物、人员状态，全部合格方可放行。"
-                },
-                {
-                    question: "发现驾驶员疲劳驾驶，安全员应？",
-                    options: ["强制其休息", "提醒注意", "继续行程", "换另一名司机"],
-                    correct: 0,
-                    explanation: "疲劳驾驶是严重安全隐患，必须强制停车休息。"
-                },
-                {
-                    question: "安全员对运输路线的风险评估应包括哪些？",
-                    options: ["路况", "天气", "限行规定", "以上都是"],
-                    correct: 3,
-                    explanation: "安全员需全面评估路线风险，制定应对措施。"
-                },
-                {
-                    question: "事故发生后，安全员应首先保护现场并？",
-                    options: ["抢救伤员", "报警", "拍照记录", "移动车辆"],
-                    correct: 0,
-                    explanation: "保护现场同时应立即抢救伤员，减少伤亡。"
-                }
+                { question: "安全员在货物装车前应重点检查什么？", options: ["货物数量", "车辆技术状况及货物捆绑", "司机驾驶证", "天气情况"], correct: 1, explanation: "安全员需确认车辆状态良好及货物固定牢靠，防止运输途中发生意外。" },
+                { question: "发现安全隐患时，安全员首先应？", options: ["自行处理", "立即上报并停止相关作业", "忽视继续工作", "通知司机处理"], correct: 1, explanation: "安全员应立即上报隐患，确保人员安全，不得擅自冒险作业。" },
+                { question: "危险品运输车辆出车前，安全员必须核查什么证件？", options: ["行驶证", "危险品运输许可证", "营运证", "保险单"], correct: 1, explanation: "危险品运输需持有专门许可证，安全员必须核实。" },
+                { question: "货物堆码不符合规定时，安全员应如何处理？", options: ["要求重新堆码", "直接放行", "记录后放行", "增加捆绑带"], correct: 0, explanation: "堆码不稳易导致货物倒塌，必须重新堆码至符合安全标准。" },
+                { question: "应急预案演练中，安全员的主要职责是？", options: ["参与救援", "组织协调和监督执行", "驾驶车辆", "记录数据"], correct: 1, explanation: "安全员负责组织协调演练，确保流程正确执行。" },
+                { question: "运输途中发生货物泄漏，安全员应首先？", options: ["组织人员疏散并报警", "自行清理", "继续行驶", "掩盖泄漏物"], correct: 0, explanation: "安全员应优先疏散人员并报警，避免扩大危害。" },
+                { question: "安全员在车辆出场前需对哪些项目签字确认？", options: ["车辆技术状况", "货物装载情况", "司机精神状态", "以上都是"], correct: 3, explanation: "安全员需综合确认车辆、货物、人员状态，全部合格方可放行。" },
+                { question: "发现驾驶员疲劳驾驶，安全员应？", options: ["强制其休息", "提醒注意", "继续行程", "换另一名司机"], correct: 0, explanation: "疲劳驾驶是严重安全隐患，必须强制停车休息。" },
+                { question: "安全员对运输路线的风险评估应包括哪些？", options: ["路况", "天气", "限行规定", "以上都是"], correct: 3, explanation: "安全员需全面评估路线风险，制定应对措施。" },
+                { question: "事故发生后，安全员应首先保护现场并？", options: ["抢救伤员", "报警", "拍照记录", "移动车辆"], correct: 0, explanation: "保护现场同时应立即抢救伤员，减少伤亡。" }
             ];
 
             var driverQuestions = [
-                {
-                    question: "运输易燃液体时，车辆必须配备的消防器材是？",
-                    options: ["泡沫灭火器", "干粉灭火器", "水", "沙土"],
-                    correct: 1,
-                    explanation: "干粉灭火器适用于扑灭易燃液体火灾。"
-                },
-                {
-                    question: "货车装载货物时，货物重心应尽量位于车辆的什么位置？",
-                    options: ["前部", "后部", "中部", "任意位置"],
-                    correct: 2,
-                    explanation: "重心居中有利于车辆稳定，防止侧翻。"
-                },
-                {
-                    question: "发现货物有散落风险，应首先采取的措施是？",
-                    options: ["继续行驶", "停车加固", "加速通过", "鸣笛警示"],
-                    correct: 1,
-                    explanation: "立即停车加固货物，避免散落造成事故。"
-                },
-                {
-                    question: "危险品运输车辆必须悬挂的标志是？",
-                    options: ["红色旗帜", "危险品标志牌", "公司标志", "速度警示"],
-                    correct: 1,
-                    explanation: "危险品车辆必须悬挂醒目的危险品标志牌。"
-                },
-                {
-                    question: "长途运输前，驾驶员必须检查的关键项目不包括？",
-                    options: ["轮胎气压", "刹车系统", "货物捆绑", "车内音响"],
-                    correct: 3,
-                    explanation: "车内音响不属于安全关键项目，可忽略。"
-                },
-                {
-                    question: "车辆在高速公路上突发故障，应首先开启什么灯？",
-                    options: ["远光灯", "双闪警示灯", "雾灯", "倒车灯"],
-                    correct: 1,
-                    explanation: "双闪警示灯可提醒后方车辆，避免追尾。"
-                },
-                {
-                    question: "运输中发现货物冒烟，且无法立即扑灭，应？",
-                    options: ["继续行驶找水源", "停车远离并报警", "打开车厢通风", "用棉被覆盖"],
-                    correct: 1,
-                    explanation: "远离并报警是最安全做法，避免人员伤亡。"
-                },
-                {
-                    question: "驾驶货车通过长下坡路段时，正确的做法是？",
-                    options: ["空挡滑行", "持续踩刹车", "低挡控速", "关闭发动机"],
-                    correct: 2,
-                    explanation: "低挡位利用发动机制动，避免刹车过热。"
-                },
-                {
-                    question: "货车超载的主要危害不包括？",
-                    options: ["制动距离延长", "轮胎负荷过大", "油耗降低", "转向失控风险"],
-                    correct: 2,
-                    explanation: "超载会增加油耗，而非降低。"
-                },
-                {
-                    question: "遇到恶劣天气（如大雾）能见度低，应？",
-                    options: ["开启远光灯加速", "降低车速并开启雾灯", "靠边停车睡觉", "跟随前车近距离行驶"],
-                    correct: 1,
-                    explanation: "降低车速、开启雾灯可提高安全性。"
-                }
+                { question: "运输易燃液体时，车辆必须配备的消防器材是？", options: ["泡沫灭火器", "干粉灭火器", "水", "沙土"], correct: 1, explanation: "干粉灭火器适用于扑灭易燃液体火灾。" },
+                { question: "货车装载货物时，货物重心应尽量位于车辆的什么位置？", options: ["前部", "后部", "中部", "任意位置"], correct: 2, explanation: "重心居中有利于车辆稳定，防止侧翻。" },
+                { question: "发现货物有散落风险，应首先采取的措施是？", options: ["继续行驶", "停车加固", "加速通过", "鸣笛警示"], correct: 1, explanation: "立即停车加固货物，避免散落造成事故。" },
+                { question: "危险品运输车辆必须悬挂的标志是？", options: ["红色旗帜", "危险品标志牌", "公司标志", "速度警示"], correct: 1, explanation: "危险品车辆必须悬挂醒目的危险品标志牌。" },
+                { question: "长途运输前，驾驶员必须检查的关键项目不包括？", options: ["轮胎气压", "刹车系统", "货物捆绑", "车内音响"], correct: 3, explanation: "车内音响不属于安全关键项目，可忽略。" },
+                { question: "车辆在高速公路上突发故障，应首先开启什么灯？", options: ["远光灯", "双闪警示灯", "雾灯", "倒车灯"], correct: 1, explanation: "双闪警示灯可提醒后方车辆，避免追尾。" },
+                { question: "运输中发现货物冒烟，且无法立即扑灭，应？", options: ["继续行驶找水源", "停车远离并报警", "打开车厢通风", "用棉被覆盖"], correct: 1, explanation: "远离并报警是最安全做法，避免人员伤亡。" },
+                { question: "驾驶货车通过长下坡路段时，正确的做法是？", options: ["空挡滑行", "持续踩刹车", "低挡控速", "关闭发动机"], correct: 2, explanation: "低挡位利用发动机制动，避免刹车过热。" },
+                { question: "货车超载的主要危害不包括？", options: ["制动距离延长", "轮胎负荷过大", "油耗降低", "转向失控风险"], correct: 2, explanation: "超载会增加油耗，而非降低。" },
+                { question: "遇到恶劣天气（如大雾）能见度低，应？", options: ["开启远光灯加速", "降低车速并开启雾灯", "靠边停车睡觉", "跟随前车近距离行驶"], correct: 1, explanation: "降低车速、开启雾灯可提高安全性。" }
             ];
 
             function generateQuiz(type) {
@@ -1074,7 +986,6 @@
                 container.setAttribute('data-quiz-type', type);
             }
 
-            // 提交答卷
             var btnSubmitQuiz = document.getElementById('btnSubmitQuiz');
             if (btnSubmitQuiz) {
                 btnSubmitQuiz.addEventListener('click', function() {
@@ -1141,6 +1052,12 @@
                         if (passed) {
                             showGameModal('考核通过', msg, function() {
                                 showPage('announce');
+                                // 自动播放音频
+                                if (announceAudio) {
+                                    announceAudio.play().catch(function(err) {
+                                        console.log('自动播放被阻止，需要用户交互');
+                                    });
+                                }
                             });
                         } else {
                             showGameModal('考核未通过', msg + '<br>请重新答题。', function() {

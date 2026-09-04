@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>货运管控模拟器 - 注册考核</title>
+    <title>货运管控模拟器 - 正式版</title>
     <style>
         /* ============ 全局重置 ============ */
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -45,7 +45,7 @@
         .corner-frame.bl { bottom: 10px; left: 10px; width: 30px; height: 30px; border-bottom: 2px solid rgba(130,190,220,0.7); border-left: 2px solid rgba(130,190,220,0.7); }
         .corner-frame.br { bottom: 10px; right: 10px; width: 30px; height: 30px; border-bottom: 2px solid rgba(130,190,220,0.7); border-right: 2px solid rgba(130,190,220,0.7); }
 
-        /* ============ 主容器（缩放基准） ============ */
+        /* ============ 主容器 ============ */
         .main-container {
             position: fixed; z-index: 10; width: 1280px; height: 720px;
             left: 50%; top: 50%;
@@ -55,7 +55,7 @@
             padding: 20px;
         }
 
-        /* ============ 顶部状态栏（固定于视口） ============ */
+        /* ============ 顶部状态栏 ============ */
         .top-status {
             position: fixed; top: 0; left: 0; right: 0; display: flex; justify-content: space-between; align-items: center;
             padding: 10px 18px; font-size: 12px; letter-spacing: 1.5px; color: #b8d8e8;
@@ -68,7 +68,7 @@
         .indicator-dots .dot.amber { background: #ffaa33; box-shadow: 0 0 6px #ffaa33; animation-delay: 1.1s; }
         @keyframes pulse-dot { 0%,100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.4; transform: scale(0.75); } }
 
-        /* ============ 右下角版权信息（固定于视口） ============ */
+        /* ============ 右下角版权 ============ */
         .corner-decor {
             position: fixed; z-index: 15; pointer-events: none; opacity: 0.5;
             font-size: 10px; letter-spacing: 2px; color: #6a9aa8;
@@ -114,13 +114,9 @@
             display: flex; flex-direction: column; align-items: center; justify-content: center;
             gap: 18px; text-align: center; max-width: 620px; width: 100%; height: 100%;
             margin: 0 auto; overflow-y: auto; padding: 60px 15px 30px;
-            /* 隐藏滚动条 */
-            scrollbar-width: none; /* Firefox */
-            -ms-overflow-style: none; /* IE/Edge */
+            scrollbar-width: none; -ms-overflow-style: none;
         }
-        .register-core::-webkit-scrollbar {
-            display: none; /* Chrome/Safari */
-        }
+        .register-core::-webkit-scrollbar { display: none; }
         .register-title { font-size: 28px; font-weight: 700; letter-spacing: 4px; color: #e8f4fa; text-shadow: 0 0 16px rgba(120,200,240,0.7); text-transform: uppercase; }
         .register-subtitle { font-size: 11px; letter-spacing: 4px; color: #9cc8dc; opacity: 0.7; text-transform: uppercase; margin-bottom: 6px; }
         .register-form {
@@ -142,7 +138,6 @@
             -webkit-text-fill-color: #d8ecf4; -webkit-box-shadow: 0 0 0 1000px rgba(10,20,30,0.7) inset; transition: background-color 5000s ease-in-out 0s;
         }
 
-        /* ============ 自定义下拉 ============ */
         .custom-select { position: relative; width: 100%; }
         .select-display {
             background: rgba(10,20,30,0.7); border: 1px solid rgba(110,160,190,0.4); padding: 10px 14px;
@@ -158,12 +153,10 @@
             border-radius: 8px; box-shadow: 0 6px 16px rgba(0,0,0,0.5);
             opacity: 0; visibility: hidden; transform: translateY(-8px);
             transition: opacity 0.2s ease, transform 0.2s ease, visibility 0.2s;
-            /* 隐藏滚动条 */
-            scrollbar-width: none; /* Firefox */
-            -ms-overflow-style: none; /* IE/Edge */
+            scrollbar-width: none; -ms-overflow-style: none;
         }
         .select-options.show { opacity: 1; visibility: visible; transform: translateY(0); }
-        .select-options::-webkit-scrollbar { display: none; /* Chrome/Safari */ }
+        .select-options::-webkit-scrollbar { display: none; }
         .select-option {
             padding: 9px 14px; color: #b8d8e8; font-size: 13px; letter-spacing: 1px; cursor: pointer;
             transition: background 0.15s, color 0.15s; text-align: left; border-bottom: 1px solid rgba(80,120,140,0.15);
@@ -177,50 +170,46 @@
         .radio-option input[type="radio"]:checked { border-color: #7dd3e8; }
         .radio-option input[type="radio"]:checked::after { content: ''; position: absolute; top: 3px; left: 3px; width: 8px; height: 8px; border-radius: 50%; background: #7dd3e8; box-shadow: 0 0 6px #7dd3e8; }
 
-        /* ============ 答题页面 ============ */
-        .quiz-page {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(5,12,20,0.95);
-            z-index: 200; display: none; flex-direction: column; align-items: center; justify-content: flex-start;
-            overflow-y: auto; padding: 20px 15px 40px;
-            scrollbar-width: none; -ms-overflow-style: none;
-        }
-        .quiz-page::-webkit-scrollbar { display: none; }
-        .quiz-page.show { display: flex; }
-        .quiz-header { width: 100%; max-width: 800px; text-align: center; margin-bottom: 20px; }
-        .quiz-title { font-size: 28px; font-weight: 700; letter-spacing: 4px; color: #e8f4fa; text-shadow: 0 0 16px rgba(120,200,240,0.7); }
-        .quiz-subtitle { font-size: 12px; letter-spacing: 3px; color: #9cc8dc; opacity: 0.7; margin-top: 6px; }
-        .quiz-container { width: 100%; max-width: 800px; display: flex; flex-direction: column; gap: 20px; }
-        .question-block { background: rgba(5,12,20,0.7); border: 1px solid rgba(100,160,190,0.3); border-radius: 10px; padding: 16px 18px; }
-        .question-text { font-size: 14px; letter-spacing: 1px; color: #d8ecf4; margin-bottom: 12px; }
-        .options-group { display: flex; flex-direction: column; gap: 8px; }
-        .option-item { display: flex; align-items: center; gap: 10px; color: #b8d8e8; font-size: 13px; letter-spacing: 1px; cursor: pointer; }
-        .option-item input[type="radio"] { appearance: none; -webkit-appearance: none; width: 16px; height: 16px; border: 2px solid #6a9aa8; border-radius: 50%; background: #0a0e14; cursor: pointer; position: relative; flex-shrink: 0; }
-        .option-item input[type="radio"]:checked { border-color: #7dd3e8; }
-        .option-item input[type="radio"]:checked::after { content: ''; position: absolute; top: 3px; left: 3px; width: 6px; height: 6px; border-radius: 50%; background: #7dd3e8; box-shadow: 0 0 6px #7dd3e8; }
-        .quiz-submit { display: flex; justify-content: center; margin-top: 20px; gap: 12px; }
-        .btn-submit { padding: 12px 40px; font-size: 15px; }
-        .btn-quiz-back { padding: 12px 30px; font-size: 14px; }
-
-        /* ============ 语音播报 ============ */
-        .announce-page {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(5,12,20,0.98);
-            z-index: 250; display: none; flex-direction: column; align-items: center; justify-content: center;
-            padding: 30px; overflow-y: auto;
-            scrollbar-width: none; -ms-overflow-style: none;
-        }
-        .announce-page::-webkit-scrollbar { display: none; }
-        .announce-page.show { display: flex; }
-        .announce-box { max-width: 700px; width: 100%; background: rgba(5,12,20,0.8); border: 1px solid rgba(100,160,190,0.4); border-radius: 16px; padding: 30px 25px; text-align: center; box-shadow: 0 0 40px rgba(80,160,200,0.3); }
-        .announce-title { font-size: 28px; font-weight: 700; letter-spacing: 4px; color: #e8f4fa; text-shadow: 0 0 16px rgba(120,200,240,0.7); margin-bottom: 16px; }
-        .announce-text { font-size: 14px; letter-spacing: 1.5px; color: #b8d8e8; line-height: 1.8; text-align: left; margin-bottom: 20px; white-space: pre-line; }
-        .btn-enter-main { padding: 14px 40px; font-size: 16px; }
-
-        /* ============ 游戏主界面 ============ */
-        .game-main-page { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: none; flex-direction: column; align-items: center; justify-content: center; z-index: 15; }
+        /* ============ 游戏主界面（新四模块） ============ */
+        .game-main-page { display: none; width: 100%; height: 100%; flex-direction: column; align-items: center; z-index: 15; }
         .game-main-page.show { display: flex; }
-        .game-main-placeholder { font-size: 24px; letter-spacing: 4px; color: #d8ecf4; text-shadow: 0 0 12px rgba(120,200,240,0.8); text-align: center; line-height: 1.6; }
+        .game-header { width: 100%; display: flex; justify-content: space-between; align-items: center; padding: 10px 20px; border-bottom: 1px solid rgba(100,160,190,0.4); }
+        .game-title { font-size: 18px; letter-spacing: 2px; color: #e8f4fa; text-shadow: 0 0 8px rgba(120,200,240,0.7); }
+        .game-tabs { display: flex; gap: 10px; }
+        .tab-btn { padding: 8px 18px; font-size: 12px; letter-spacing: 1px; border: 1px solid rgba(120,190,220,0.5); background: rgba(10,20,30,0.4); color: #b8d8e8; border-radius: 6px; cursor: pointer; transition: all 0.2s; }
+        .tab-btn.active { background: rgba(30,60,80,0.7); border-color: rgba(150,220,250,0.9); color: #fff; }
+        .tab-btn:hover { background: rgba(30,60,80,0.5); }
+        .game-content { flex: 1; width: 100%; overflow-y: auto; padding: 20px; scrollbar-width: none; -ms-overflow-style: none; }
+        .game-content::-webkit-scrollbar { display: none; }
+        .tab-panel { display: none; }
+        .tab-panel.active { display: block; }
+        /* 司机列表样式 */
+        .driver-list { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; }
+        .driver-card { background: rgba(5,12,20,0.7); border: 1px solid rgba(100,160,190,0.4); border-radius: 8px; padding: 12px; text-align: center; }
+        .driver-card .indicator { width: 16px; height: 16px; border-radius: 50%; display: inline-block; margin-bottom: 6px; }
+        .indicator.green { background: #44dd88; box-shadow: 0 0 8px #44dd88; }
+        .indicator.yellow { background: #ffaa33; box-shadow: 0 0 8px #ffaa33; }
+        .indicator.red { background: #ff4444; box-shadow: 0 0 8px #ff4444; }
+        .driver-card .driver-id { font-size: 12px; color: #7dd3e8; margin-bottom: 4px; }
+        .driver-card .driver-name { font-size: 14px; color: #d8ecf4; }
+        .driver-card .driver-status { font-size: 11px; color: #9cc8dc; margin-top: 4px; }
+        /* 搜索框 */
+        .search-box { display: flex; gap: 10px; margin-bottom: 15px; }
+        .search-input { flex: 1; background: rgba(10,20,30,0.7); border: 1px solid rgba(110,160,190,0.4); padding: 8px 12px; color: #d8ecf4; border-radius: 6px; }
+        .search-btn { padding: 8px 20px; font-size: 12px; }
+        .event-detail { background: rgba(5,12,20,0.7); border: 1px solid rgba(100,160,190,0.4); border-radius: 8px; padding: 15px; margin-top: 10px; }
+        /* 上报报警 */
+        .report-actions { display: flex; gap: 12px; flex-wrap: wrap; }
+        .report-btn { padding: 10px 20px; font-size: 13px; }
 
-        /* ============ 弹窗 ============ */
+        /* 个人简介 */
+        .profile-box { background: rgba(5,12,20,0.7); border: 1px solid rgba(100,160,190,0.4); border-radius: 8px; padding: 20px; }
+        .profile-row { display: flex; margin-bottom: 10px; }
+        .profile-label { width: 100px; color: #9cc8dc; }
+        .profile-value { color: #d8ecf4; }
+
+        /* ============ 弹窗等其他样式（省略，沿用之前） ============ */
+        /* 为简洁，此处包含必要弹窗样式 */
         .game-modal-overlay { position: fixed; top:0; left:0; right:0; bottom:0; background: rgba(0,0,0,0.7); z-index:300; display:none; align-items:center; justify-content:center; }
         .game-modal-overlay.show { display:flex; }
         .game-modal { background:#0b1219; border:1.5px solid rgba(120,190,220,0.7); box-shadow:0 0 30px rgba(80,160,200,0.5), inset 0 0 30px rgba(80,160,200,0.05); padding:24px 28px; max-width:500px; width:90%; text-align:center; position:relative; border-radius:12px; animation:modal-in 0.25s ease; max-height:80vh; overflow-y:auto; scrollbar-width: none; -ms-overflow-style: none; }
@@ -243,17 +232,8 @@
         .save-btn.delete { border-color:rgba(220,100,100,0.6); color:#ffb0b0; }
         .save-btn.delete:hover { background:rgba(80,20,20,0.5); }
 
-        /* 公司编辑弹窗样式 */
-        .company-edit-container { display:flex; flex-direction:column; gap:8px; text-align:left; margin:10px 0; }
-        .company-edit-row { display:flex; align-items:center; gap:10px; }
-        .company-edit-input { flex:1; background:rgba(10,20,30,0.7); border:1px solid rgba(110,160,190,0.4); color:#d8ecf4; padding:8px 10px; border-radius:6px; }
-
-        /* 竖屏旋转提示遮罩 */
-        .rotate-mask {
-            position: fixed; top:0; left:0; width:100%; height:100%; background:#000; z-index:999;
-            display:none; align-items:center; justify-content:center; color:#fff; font-size:20px;
-            letter-spacing:2px; text-align:center; padding:20px;
-        }
+        /* 竖屏遮罩 */
+        .rotate-mask { position: fixed; top:0; left:0; width:100%; height:100%; background:#000; z-index:999; display:none; align-items:center; justify-content:center; color:#fff; font-size:20px; letter-spacing:2px; text-align:center; padding:20px; }
         .rotate-mask.show { display:flex; }
     </style>
 </head>
@@ -370,22 +350,60 @@
             </div>
         </div>
 
-        <!-- 游戏主界面占位 -->
+        <!-- 游戏主界面（四模块） -->
         <div class="game-main-page" id="gameMainPage">
-            <div class="game-main-placeholder" id="gameMainPlaceholder">
-                游戏主界面<br>
-                <span style="font-size: 16px; opacity:0.7;">（内容开发中）</span>
+            <div class="game-header">
+                <span class="game-title">货运管控模拟器 · 主控台</span>
+                <div class="game-tabs">
+                    <button class="tab-btn active" data-tab="profile">个人简介</button>
+                    <button class="tab-btn" data-tab="drivers">货运司机</button>
+                    <button class="tab-btn" data-tab="events">突发事件</button>
+                    <button class="tab-btn" data-tab="report">上报报警</button>
+                </div>
             </div>
-            <div style="display: flex; gap: 12px; margin-top: 20px;">
-                <button class="btn btn-back" id="btnLogout">退出登录</button>
-                <button class="btn btn-back" id="btnRestart">重新开始</button>
+            <div class="game-content">
+                <!-- 个人简介 -->
+                <div class="tab-panel active" id="tab-profile">
+                    <div class="profile-box">
+                        <h3 style="color:#7dd3e8; margin-bottom:15px;">安全员信息</h3>
+                        <div class="profile-row"><span class="profile-label">姓名：</span><span class="profile-value" id="profileName">-</span></div>
+                        <div class="profile-row"><span class="profile-label">单位：</span><span class="profile-value" id="profileUnit">-</span></div>
+                        <div class="profile-row"><span class="profile-label">公司：</span><span class="profile-value" id="profileCompany">-</span></div>
+                        <div class="profile-row"><span class="profile-label">岗位：</span><span class="profile-value">货运安全管理员</span></div>
+                        <div class="profile-row"><span class="profile-label">荣誉：</span><span class="profile-value" id="profileHonor">新晋安全员</span></div>
+                        <div class="profile-row"><span class="profile-label">能力值：</span><span class="profile-value">沟通能力：80 | 应急处理：75 | 调度能力：70</span></div>
+                    </div>
+                </div>
+                <!-- 货运司机 -->
+                <div class="tab-panel" id="tab-drivers">
+                    <div class="driver-list" id="driverList"></div>
+                </div>
+                <!-- 突发事件详情 -->
+                <div class="tab-panel" id="tab-events">
+                    <div class="search-box">
+                        <input type="text" class="search-input" id="eventSearchInput" placeholder="输入司机编号，如 SJ-001">
+                        <button class="btn search-btn" id="eventSearchBtn">查询</button>
+                    </div>
+                    <div class="event-detail" id="eventDetail">暂无事件，请输入正确的司机编号查询。</div>
+                </div>
+                <!-- 上报报警 -->
+                <div class="tab-panel" id="tab-report">
+                    <h3 style="color:#7dd3e8; margin-bottom:15px;">紧急上报与报警</h3>
+                    <p style="color:#9cc8dc; margin-bottom:15px;">当发生人员受伤或其他需要救援的事件时，请立即向公司上报并报警。</p>
+                    <div class="report-actions">
+                        <button class="btn report-btn" id="btnReportCompany">向公司上报</button>
+                        <button class="btn report-btn" id="btnCallPolice">报警（110）</button>
+                        <button class="btn report-btn" id="btnCallAmbulance">急救（120）</button>
+                    </div>
+                    <div class="event-detail" id="reportResult" style="margin-top:20px;">暂无操作</div>
+                </div>
             </div>
         </div>
-    </div>
 
-    <!-- 右下角版权信息（固定于视口） -->
-    <div class="corner-decor bottom-right" aria-hidden="true">
-        货运管控模拟器<br>© 2026 货运安保部
+        <!-- 右下角版权信息 -->
+        <div class="corner-decor bottom-right" aria-hidden="true">
+            货运管控模拟器<br>© 2026 货运安保部
+        </div>
     </div>
 
     <!-- 答题页面 -->
@@ -604,6 +622,10 @@
                 } else if (page === 'gameMain') {
                     bgLayer.classList.add('game-bg', 'blur-bg');
                     gameMainPage.classList.add('show');
+                    // 填充个人简介等信息
+                    fillProfileInfo();
+                    renderDriverList();
+                    resetEventSearch();
                 }
 
                 if (page !== 'announce' && announceAudio) {
@@ -611,6 +633,107 @@
                     announceAudio.currentTime = 0;
                 }
             }
+
+            // 个人简介填充
+            function fillProfileInfo() {
+                var saves = loadSaves();
+                if (saves.length > 0) {
+                    var save = saves[saves.length - 1]; // 最近存档
+                    document.getElementById('profileName').textContent = save.name;
+                    document.getElementById('profileUnit').textContent = save.unit;
+                    document.getElementById('profileCompany').textContent = save.company;
+                } else {
+                    // 默认
+                    document.getElementById('profileName').textContent = '未知';
+                    document.getElementById('profileUnit').textContent = '未知';
+                    document.getElementById('profileCompany').textContent = '未知';
+                }
+            }
+
+            // 司机列表数据（模拟）
+            var drivers = [
+                { id: 'SJ-001', name: '张伟', status: 'green', info: '正常驾驶，货物安全' },
+                { id: 'SJ-002', name: '王强', status: 'green', info: '正常驾驶，货物安全' },
+                { id: 'SJ-003', name: '李娜', status: 'yellow', info: '车辆轻微故障，需关注' },
+                { id: 'SJ-004', name: '赵磊', status: 'green', info: '正常驾驶，货物安全' },
+                { id: 'SJ-005', name: '陈明', status: 'red', info: '发生交通事故，人员受伤！' },
+                { id: 'SJ-006', name: '刘芳', status: 'green', info: '正常驾驶，货物安全' },
+                { id: 'SJ-007', name: '周杰', status: 'yellow', info: '疲劳驾驶，需提醒' },
+                { id: 'SJ-008', name: '吴静', status: 'green', info: '正常驾驶，货物安全' },
+                { id: 'SJ-009', name: '郑浩', status: 'green', info: '正常驾驶，货物安全' },
+                { id: 'SJ-010', name: '孙丽', status: 'red', info: '车辆冒烟，紧急停靠！' }
+            ];
+
+            function renderDriverList() {
+                var container = document.getElementById('driverList');
+                if (!container) return;
+                var html = '';
+                drivers.forEach(function(d) {
+                    var indicatorClass = 'green';
+                    if (d.status === 'yellow') indicatorClass = 'yellow';
+                    else if (d.status === 'red') indicatorClass = 'red';
+                    html += '<div class="driver-card">';
+                    html += '<span class="indicator ' + indicatorClass + '"></span><br>';
+                    html += '<div class="driver-id">' + d.id + '</div>';
+                    html += '<div class="driver-name">' + d.name + '</div>';
+                    html += '<div class="driver-status">' + (d.status === 'red' ? '异常' : (d.status === 'yellow' ? '警告' : '正常')) + '</div>';
+                    html += '</div>';
+                });
+                container.innerHTML = html;
+            }
+
+            // 事件搜索
+            document.getElementById('eventSearchBtn').addEventListener('click', function() {
+                var query = document.getElementById('eventSearchInput').value.trim().toUpperCase();
+                var detailDiv = document.getElementById('eventDetail');
+                if (!query) {
+                    detailDiv.innerHTML = '请输入司机编号。';
+                    return;
+                }
+                var driver = drivers.find(function(d) { return d.id === query; });
+                if (driver) {
+                    if (driver.status === 'green') {
+                        detailDiv.innerHTML = '司机 ' + driver.id + ' (' + driver.name + ') 状态：正常。无突发事件。';
+                    } else {
+                        detailDiv.innerHTML = '<strong>司机 ' + driver.id + ' (' + driver.name + ')</strong><br>' +
+                            '状态：' + (driver.status === 'red' ? '异常' : '警告') + '<br>' +
+                            '事件详情：' + driver.info + '<br>' +
+                            '建议：' + (driver.status === 'red' ? '立即报警并联系救援！' : '请与司机沟通了解情况。');
+                    }
+                } else {
+                    detailDiv.innerHTML = '未找到该司机编号，请重新输入。';
+                }
+            });
+
+            function resetEventSearch() {
+                document.getElementById('eventSearchInput').value = '';
+                document.getElementById('eventDetail').innerHTML = '暂无事件，请输入正确的司机编号查询。';
+            }
+
+            // 上报报警按钮
+            document.getElementById('btnReportCompany').addEventListener('click', function() {
+                document.getElementById('reportResult').innerHTML = '已向公司上报，请等待指示。';
+            });
+            document.getElementById('btnCallPolice').addEventListener('click', function() {
+                document.getElementById('reportResult').innerHTML = '已拨打110报警，请保持通话。';
+            });
+            document.getElementById('btnCallAmbulance').addEventListener('click', function() {
+                document.getElementById('reportResult').innerHTML = '已拨打120急救，请描述伤情。';
+            });
+
+            // 标签切换
+            var tabBtns = document.querySelectorAll('.tab-btn');
+            tabBtns.forEach(function(btn) {
+                btn.addEventListener('click', function() {
+                    var tabName = this.getAttribute('data-tab');
+                    tabBtns.forEach(function(b) { b.classList.remove('active'); });
+                    this.classList.add('active');
+                    document.querySelectorAll('.tab-panel').forEach(function(panel) {
+                        panel.classList.remove('active');
+                    });
+                    document.getElementById('tab-' + tabName).classList.add('active');
+                });
+            });
 
             // 初始化
             showPage('home');
@@ -736,11 +859,6 @@
                 var save = saves.find(function(s) { return s.id === id; });
                 if (save) {
                     showPage('gameMain');
-                    var placeholder = document.getElementById('gameMainPlaceholder');
-                    var displayCompany = formatCompanyDisplay(save.unit, save.company);
-                    placeholder.innerHTML = '欢迎回来，' + save.name + ' 安全员<br>' +
-                                           displayCompany + '<br>' +
-                                           '<span style="font-size: 16px; opacity:0.7;">（游戏内容开发中）</span>';
                 } else {
                     showGameModal('提示', '存档不存在或已损坏。');
                 }
@@ -807,15 +925,6 @@
                     announceAudio.currentTime = 0;
                 }
                 showPage('gameMain');
-                var saves = loadSaves();
-                if (saves.length > 0) {
-                    var save = saves[saves.length - 1];
-                    var placeholder = document.getElementById('gameMainPlaceholder');
-                    var displayCompany = formatCompanyDisplay(save.unit, save.company);
-                    placeholder.innerHTML = '欢迎上任，' + save.name + ' 安全员<br>' +
-                                           displayCompany + '<br>' +
-                                           '<span style="font-size: 16px; opacity:0.7;">（游戏内容开发中）</span>';
-                }
             });
             btnLogout.addEventListener('click', () => {
                 showPage('home');

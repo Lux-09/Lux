@@ -142,6 +142,10 @@
         .game-top-bar .timer { font-size:17px; font-weight:bold; color:#ffaa33; flex-shrink:0; }
         .game-top-bar-btns { display:flex; gap:4px; flex-shrink:0; }
         .top-btn { padding:4px 8px; font-size:10px; font-family:inherit; border-radius:4px; border:1px solid; cursor:pointer; transition:all .2s; color:#d8ecf4; background:rgba(15,30,45,0.85); white-space:nowrap; }
+        .top-btn.pause { border-color:#4a90c4; color:#7dd3e8; }
+        .top-btn.pause:hover { background:rgba(30,80,120,0.9); border-color:#7dd3e8; }
+        .top-btn.resume { border-color:#44aa77; color:#88e0aa; }
+        .top-btn.resume:hover { background:rgba(20,80,50,0.85); border-color:#66dd99; }
         .top-btn.restart { border-color:#c44a4a; color:#ff8888; }
         .top-btn.restart:hover { background:rgba(100,30,30,0.9); border-color:#ff4444; }
         .top-btn.logout { border-color:#888; color:#aaa; }
@@ -288,6 +292,15 @@
         .summary-award { font-size:12px; padding:12px; border:1.5px solid #ffaa33; border-radius:8px; color:#ffaa33; background:rgba(255,170,51,0.08); text-align:left; line-height:1.6; white-space:pre-wrap; }
         .summary-actions { display:flex; justify-content:center; gap:12px; margin-top:4px; }
 
+        .pause-overlay { position:fixed; top:0; left:0; width:100vw; height:100vh; z-index:1200; display:none; align-items:center; justify-content:center; background:rgba(2,6,12,0.86); backdrop-filter:blur(5px); }
+        .pause-overlay.show { display:flex; }
+        .pause-card { width:min(92vw,430px); background:rgba(8,16,26,0.97); border:1.5px solid rgba(120,190,220,0.65); border-radius:14px; padding:28px 22px; text-align:center; box-shadow:0 0 40px rgba(0,0,0,0.85),0 0 25px rgba(80,160,200,0.25); }
+        .pause-title { font-size:24px; color:#e8f4fa; letter-spacing:4px; margin-bottom:10px; font-weight:bold; }
+        .pause-message { font-size:12px; color:#9cc8dc; line-height:1.8; margin-bottom:18px; }
+        .pause-btns { display:flex; justify-content:center; gap:10px; flex-wrap:wrap; }
+        .case-time-badge { display:inline-block; margin:4px 0 6px; padding:3px 8px; border:1px solid rgba(255,170,51,0.5); border-radius:6px; color:#ffaa33; background:rgba(255,170,51,0.08); font-size:11px; font-weight:bold; }
+        .mobile-case-focus { display:none; }
+
         .toast { position:fixed; bottom:20px; left:50%; transform:translateX(-50%); background:rgba(8,16,26,0.95); border:1px solid rgba(120,190,220,0.8); padding:10px 20px; border-radius:8px; color:#d8ecf4; z-index:500; font-size:12px; box-shadow:0 4px 20px rgba(0,0,0,0.8); text-align:center; max-width:90%; }
 
         .rotate-mask { position:fixed; top:0; left:0; width:100%; height:100%; background:#000; z-index:999; display:none; align-items:center; justify-content:center; color:#fff; font-size:18px; letter-spacing:2px; text-align:center; padding:20px; }
@@ -309,9 +322,20 @@
             .info-label { width:56px; }
             .summary-grid { grid-template-columns:1fr; }
             .duration-select-list { grid-template-columns:1fr 1fr; }
+            .game-grid { grid-template-columns:1fr 1fr; grid-template-rows:1fr 1.45fr 1fr; gap:5px; }
+            .game-grid .region-card:nth-child(3), .game-grid .region-card:nth-child(4) { grid-column:1 / -1; }
+            .game-grid .region-card:nth-child(3) { min-height:0; }
+            .event-box { font-size:12px; line-height:1.7; padding:6px 2px; }
+            .event-select-mobile-note { display:block; }
+            #eventSelectDisplay { min-height:40px; padding:10px 12px; font-size:12px; }
+            #eventSelectOptions { max-height:180px; }
+            #eventSelectOptions .select-option { padding:11px 12px; font-size:12px; }
+            .case-time-badge { font-size:12px; padding:4px 9px; }
+            .report-btn { min-height:38px; }
         }
         @media (max-width:480px) {
-            .game-grid { grid-template-columns:1fr 1fr; grid-template-rows:1fr 1fr; gap:3px; }
+            .game-grid { grid-template-columns:1fr 1fr; grid-template-rows:0.92fr 1.6fr 1fr; gap:3px; }
+            .game-grid .region-card:nth-child(3), .game-grid .region-card:nth-child(4) { grid-column:1 / -1; }
             .game-top-bar { padding:3px 6px; gap:4px; }
             .game-top-bar .top-bar-center { font-size:8px; padding:2px 4px; min-width:40px; }
             .driver-grid { gap:2px; }
@@ -336,6 +360,11 @@
             .game-top-bar .timer { font-size:12px; }
             .top-btn { font-size:7px; padding:2px 5px; }
             .game-top-bar .sys-name { font-size:9px; }
+            .game-grid { grid-template-rows:0.92fr 1.55fr 1fr; gap:3px; }
+            .event-box { font-size:11px; line-height:1.65; }
+            #eventSelectDisplay { min-height:38px; font-size:11px; }
+            #eventSelectOptions .select-option { padding:10px; font-size:11px; }
+            .pause-title { font-size:20px; }
         }
     </style>
 </head>
@@ -469,6 +498,7 @@
             <div class="top-bar-center">⚠️ 回答正确率关乎事件频率（当前：<span id="accuracyDisplay">100%</span>）</div>
             <span class="timer" id="timerDisplay">20:00</span>
             <div class="game-top-bar-btns">
+                <button class="top-btn pause" id="btnGamePause">⏸ 暂停</button>
                 <button class="top-btn restart" id="btnTopRestart">🔄 重开</button>
                 <button class="top-btn logout" id="btnGameLogout">退出</button>
             </div>
@@ -518,6 +548,7 @@
                         </div>
                         <div class="select-options" id="eventSelectOptions"></div>
                     </div>
+                    <div class="case-time-badge" id="caseTimerBadge" style="display:none;">案件剩余：30 秒</div>
                     <div class="event-box" id="eventDetail">暂无事件，请选择司机编号查看详情。</div>
                 </div>
             </div>
@@ -531,6 +562,17 @@
                     </div>
                     <div class="report-log" id="reportLog">暂无操作记录。</div>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========== 游戏暂停覆盖层 ========== -->
+    <div class="pause-overlay" id="pauseOverlay">
+        <div class="pause-card">
+            <div class="pause-title">⏸ 游戏已暂停</div>
+            <div class="pause-message">班次计时、突发事件生成以及当前案件倒计时均已冻结。<br>恢复后将从暂停前的位置继续。</div>
+            <div class="pause-btns">
+                <button class="modal-btn" id="btnResumeGame" style="padding:10px 28px;font-weight:bold;border-color:#44aa77;color:#88e0aa;">▶ 继续游戏</button>
             </div>
         </div>
     </div>
@@ -899,7 +941,8 @@
                     personalAbility: personalAbility,
                     drivers: JSON.parse(JSON.stringify(drivers || [])),
                     playLog: Array.isArray(window._gamePlayLog) ? window._gamePlayLog.slice() : [],
-                    reportLogHtml: document.getElementById('reportLog') ? document.getElementById('reportLog').innerHTML : ''
+                    reportLogHtml: document.getElementById('reportLog') ? document.getElementById('reportLog').innerHTML : '',
+                    caseRemainingMs: pendingEventDriver ? Math.max(0, caseDeadlineAt ? (gamePaused ? caseRemainingMs : caseDeadlineAt - Date.now()) : 30000) : 0
                 };
 
                 var existingIndex = saves.findIndex(function(s) { return s.id === resumeData.id; });
@@ -958,6 +1001,9 @@
             var btnQuizBack = document.getElementById('btnQuizBack');
             var btnEnterMain = document.getElementById('btnEnterMain');
             var btnGameLogout = document.getElementById('btnGameLogout');
+            var btnGamePause = document.getElementById('btnGamePause');
+            var pauseOverlay = document.getElementById('pauseOverlay');
+            var btnResumeGame = document.getElementById('btnResumeGame');
             var announceAudio = document.getElementById('announceAudio');
 
             var saveListOverlay = document.getElementById('saveListOverlay');
@@ -1120,6 +1166,8 @@
                 var save = saves.find(function(s) { return s.id === id; });
                 if (save && Array.isArray(save.drivers) && typeof save.gameTime === 'number') {
                     activeResumeId = save.id;
+                    if (pauseOverlay) pauseOverlay.classList.remove('show');
+                    gamePaused = false;
                     currentGameCompleted = false;
                     window._playerInfo = {
                         name: save.name || '',
@@ -1161,6 +1209,10 @@
                     selectedAlarms = [];
                     companyReported = false;
                     redEventInspected = false;
+                    pendingEventDriver = drivers.find(function(d) { return d.status === 'red' || d.status === 'yellow'; }) || null;
+                    pendingRedDriver = pendingEventDriver && pendingEventDriver.status === 'red' ? pendingEventDriver : null;
+                    caseRemainingMs = Math.max(0, Number(save.caseRemainingMs) || (pendingEventDriver ? 30000 : 0));
+                    caseDeadlineAt = caseRemainingMs > 0 ? Date.now() + caseRemainingMs : 0;
 
                     document.querySelectorAll('.modal-overlay.show').forEach(function(el) { el.classList.remove('show'); });
                     document.querySelectorAll('.game-modal-overlay.show').forEach(function(el) { el.classList.remove('show'); });
@@ -1178,6 +1230,7 @@
                     if (pendingEventStartTimeout) { clearTimeout(pendingEventStartTimeout); pendingEventStartTimeout = null; }
                     startTimer();
                     adjustEventInterval();
+                    if (pendingEventDriver) startCaseTimeout(caseRemainingMs || 30000);
                     showPage('gameMain');
                     updateContinueButton();
                 } else {
@@ -1334,12 +1387,17 @@
             function resetRuntimeStateForNewGame() {
                 clearInterval(timerInterval);
                 clearInterval(eventInterval);
+                clearInterval(caseCountdownInterval);
+                if (caseTimeoutHandle) { clearTimeout(caseTimeoutHandle); caseTimeoutHandle = null; }
+                caseDeadlineAt = 0;
+                caseRemainingMs = 0;
                 if (pendingEventStartTimeout) {
                     clearTimeout(pendingEventStartTimeout);
                     pendingEventStartTimeout = null;
                 }
 
                 gameRunning = false;
+                gamePaused = false;
                 window._gameInitialized = false;
                 activeResumeId = null;
                 currentGameCompleted = false;
@@ -1352,6 +1410,7 @@
                 personalAbility = 0;
                 drivers = [];
                 pendingRedDriver = null;
+                pendingEventDriver = null;
                 currentChatDriver = null;
                 currentReportType = null;
                 selectedReportDriverId = null;
@@ -1409,6 +1468,20 @@
                     var quizType = (licenseValue === '没有') ? 'driver' : 'safety';
                     showPage('quiz');
                     generateQuiz(quizType);
+                });
+            }
+
+            // 注册页/考核页返回按钮：保证页面切换可逆，且不清空当前填写内容。
+            if (btnBackHome) {
+                btnBackHome.addEventListener('click', function() {
+                    document.querySelectorAll('.game-modal-overlay.show').forEach(function(el) { el.classList.remove('show'); });
+                    showPage('home');
+                });
+            }
+            if (btnQuizBack) {
+                btnQuizBack.addEventListener('click', function() {
+                    document.querySelectorAll('.game-modal-overlay.show').forEach(function(el) { el.classList.remove('show'); });
+                    showPage('register');
                 });
             }
 
@@ -1579,9 +1652,16 @@
             var wrongAnswers = 0;
             var personalAbility = 0;
             var gameRunning = false;
+            var gamePaused = false;
             var eventInterval, timerInterval;
             var currentInterval = 30000;
             var pendingRedDriver = null;
+            var pendingEventDriver = null;
+            var caseTimeoutHandle = null;
+            var caseCountdownInterval = null;
+            var caseDeadlineAt = 0;
+            var caseRemainingMs = 0;
+            var pauseStartedAt = 0;
             var companyReported = false;
             var redEventInspected = false;
             var currentChatDriver = null;
@@ -1871,6 +1951,8 @@
             }
 
             function resetEventPanel() {
+                var caseBadge = document.getElementById('caseTimerBadge');
+                if (caseBadge) { caseBadge.style.display = 'none'; caseBadge.textContent = '案件剩余：30 秒'; }
                 document.getElementById('eventSelectText').textContent = '-- 请选择司机编号查询 --';
                 document.getElementById('eventDetail').innerHTML = '暂无事件，请选择司机编号查看详情。';
                 var wrap = document.getElementById('eventSelectWrap');
@@ -1878,9 +1960,74 @@
                 document.getElementById('eventSelectOptions').classList.remove('show');
             }
 
+            function clearCaseTimeout() {
+                if (caseTimeoutHandle) { clearTimeout(caseTimeoutHandle); caseTimeoutHandle = null; }
+                clearInterval(caseCountdownInterval);
+                caseCountdownInterval = null;
+                caseDeadlineAt = 0;
+                caseRemainingMs = 0;
+                var badge = document.getElementById('caseTimerBadge');
+                if (badge) { badge.style.display = 'none'; badge.textContent = '案件剩余：30 秒'; }
+            }
+
+            function startCaseTimeout(ms) {
+                clearCaseTimeout();
+                ms = Math.max(1000, Number(ms) || 30000);
+                caseRemainingMs = ms;
+                caseDeadlineAt = Date.now() + ms;
+                var badge = document.getElementById('caseTimerBadge');
+                if (badge) badge.style.display = 'inline-block';
+                function updateCaseCountdown() {
+                    if (!pendingEventDriver || !gameRunning || gamePaused) return;
+                    caseRemainingMs = Math.max(0, caseDeadlineAt - Date.now());
+                    var sec = Math.ceil(caseRemainingMs / 1000);
+                    if (badge) badge.textContent = '案件剩余：' + sec + ' 秒';
+                }
+                updateCaseCountdown();
+                caseCountdownInterval = setInterval(updateCaseCountdown, 250);
+                caseTimeoutHandle = setTimeout(function() {
+                    caseTimeoutHandle = null;
+                    caseRemainingMs = 0;
+                    endGame('⏰ 突发案件超过 30 秒未处理，安全管控流程被强制终止！', false);
+                }, ms);
+            }
+
+            function pauseGame() {
+                if (!gameRunning || gamePaused) return;
+                gamePaused = true;
+                pauseStartedAt = Date.now();
+                clearInterval(timerInterval);
+                clearInterval(eventInterval);
+                if (pendingEventStartTimeout) { clearTimeout(pendingEventStartTimeout); pendingEventStartTimeout = null; }
+                if (pendingEventDriver && caseDeadlineAt) {
+                    caseRemainingMs = Math.max(0, caseDeadlineAt - Date.now());
+                    if (caseTimeoutHandle) { clearTimeout(caseTimeoutHandle); caseTimeoutHandle = null; }
+                    clearInterval(caseCountdownInterval);
+                    caseCountdownInterval = null;
+                }
+                var badge = document.getElementById('caseTimerBadge');
+                if (badge && pendingEventDriver) badge.textContent = '案件剩余：' + Math.ceil(caseRemainingMs / 1000) + ' 秒（已暂停）';
+                if (pauseOverlay) pauseOverlay.classList.add('show');
+                if (btnGamePause) { btnGamePause.textContent = '▶ 继续'; btnGamePause.classList.remove('pause'); btnGamePause.classList.add('resume'); }
+            }
+
+            function resumeGame() {
+                if (!gameRunning || !gamePaused) return;
+                gamePaused = false;
+                pauseStartedAt = 0;
+                if (pauseOverlay) pauseOverlay.classList.remove('show');
+                if (btnGamePause) { btnGamePause.textContent = '⏸ 暂停'; btnGamePause.classList.remove('resume'); btnGamePause.classList.add('pause'); }
+                startTimer();
+                adjustEventInterval();
+                if (pendingEventDriver) startCaseTimeout(caseRemainingMs || 30000);
+                else if (!pendingEventStartTimeout) {
+                    pendingEventStartTimeout = setTimeout(function() { pendingEventStartTimeout = null; generateRandomEvent(); }, 1200);
+                }
+            }
+
             function adjustEventInterval() {
                 clearInterval(eventInterval);
-                if (!gameRunning) return;
+                if (!gameRunning || gamePaused) return;
                 var durationFactor = selectedGameDuration / 1200;
                 var baseIntervalByTime = 30000 * durationFactor;
                 var accuracy = totalEvents > 0 ? (successEvents / totalEvents) : 1.0;
@@ -1909,6 +2056,8 @@
                         updateReportButtons(); }
                     renderDrivers();
                 }
+                clearCaseTimeout();
+                pendingEventDriver = null;
                 resetEventPanel();
                 updateStats();
                 if (wrongAnswers >= 3) {
@@ -2012,6 +2161,8 @@
                             personalAbility = Math.min(100, personalAbility + (1.5 * abilityStep));
                             successEvents++;
                             totalEvents++;
+                            clearCaseTimeout();
+                            pendingEventDriver = null;
                             adjustEventInterval();
                             resetEventPanel();
                             updateStats();
@@ -2251,6 +2402,8 @@
                     personalAbility = Math.min(100, personalAbility + (2.5 * abilityStep));
                     successEvents++;
                     totalEvents++;
+                    clearCaseTimeout();
+                    pendingEventDriver = null;
                     adjustEventInterval();
                     var alarmStr = selectedAlarms.map(function(r) {
                         return r === 'police' ? '110警察' : (r === 'fire' ? '119火警' : '120急救');
@@ -2274,15 +2427,17 @@
             btnAlarmCenter.addEventListener('click', function() { openReportSelection('alarm'); });
 
             function generateRandomEvent() {
-                if (!gameRunning || pendingRedDriver) return;
+                if (!gameRunning || gamePaused || pendingEventDriver) return;
                 var available = drivers.filter(function(d) { return d.status === 'green'; });
                 if (!available.length) return;
                 var driver = available[Math.floor(Math.random() * available.length)];
-                var isRed = Math.random() < 0.35;
+                var isRed = Math.random() < 0.18;
                 var player = window._playerInfo || window._registerInfo || {};
                 var unitLocations = getLocationsForUnit(player.unit || '');
                 var randomLoc = unitLocations[Math.floor(Math.random() * unitLocations.length)];
                 driver.location = randomLoc;
+                pendingEventDriver = driver;
+                startCaseTimeout(caseRemainingMs > 0 ? caseRemainingMs : 30000);
                 driver.yellowInspected = false;
                 if (isRed) {
                     var evt = redEvents[Math.floor(Math.random() * redEvents.length)];
@@ -2314,6 +2469,7 @@
 
             function startTimer() {
                 timerInterval = setInterval(function() {
+                    if (!gameRunning || gamePaused) return;
                     if (gameTime > 0) { gameTime--;
                         updateClockDisplay(); } else { endGame('⏰ 值班管控时间结束，完成本次班次调度！', true); }
                 }, 1000);
@@ -2330,6 +2486,13 @@
             function endGame(reason, isComplete) {
                 if (!gameRunning) return;
                 gameRunning = false;
+                gamePaused = false;
+                if (pauseOverlay) pauseOverlay.classList.remove('show');
+                if (caseTimeoutHandle) { clearTimeout(caseTimeoutHandle); caseTimeoutHandle = null; }
+                clearInterval(caseCountdownInterval); caseCountdownInterval = null;
+                caseDeadlineAt = 0; caseRemainingMs = 0;
+                pendingEventDriver = null;
+                if (btnGamePause) { btnGamePause.textContent = '⏸ 暂停'; btnGamePause.classList.remove('resume'); btnGamePause.classList.add('pause'); }
                 if (pendingEventStartTimeout) { clearTimeout(pendingEventStartTimeout); pendingEventStartTimeout = null; }
                 clearInterval(timerInterval);
                 clearInterval(eventInterval);
@@ -2435,8 +2598,10 @@
                     showConfirmModal('保存并退出', '是否保存当前班次进度并退出？下次可从【继续游戏】恢复。', function() {
                         var saved = saveResumeState();
                         gameRunning = false;
+                        gamePaused = false;
                         clearInterval(timerInterval);
                         clearInterval(eventInterval);
+                        clearCaseTimeout();
                         document.querySelectorAll('.modal-overlay.show').forEach(function(el) { el.classList.remove('show'); });
                         document.querySelectorAll('.game-modal-overlay.show').forEach(function(el) { el.classList.remove('show'); });
                         showPage('home');
@@ -2448,6 +2613,10 @@
             });
 
             var restartConfirmModal = document.getElementById('restartConfirmModal');
+            if (btnGamePause) btnGamePause.addEventListener('click', function() {
+                if (gamePaused) resumeGame(); else pauseGame();
+            });
+            if (btnResumeGame) btnResumeGame.addEventListener('click', resumeGame);
             document.getElementById('btnTopRestart').addEventListener('click', function() {
                 if (gameRunning) {
                     restartConfirmModal.classList.add('show');
@@ -2457,6 +2626,7 @@
             });
             document.getElementById('confirmRestartModalBtn').addEventListener('click', function() {
                 clearResumeSaves(activeResumeId);
+                clearCaseTimeout();
                 location.reload();
             });
             document.getElementById('cancelRestartModalBtn').addEventListener('click', function() {
@@ -2486,6 +2656,8 @@
 
             document.getElementById('confirmStartBtn').addEventListener('click', function() {
                 resetRuntimeStateForNewGame();
+                pendingEventDriver = null;
+                clearCaseTimeout();
                 window._gamePlayLog = [];
                 gameTime = selectedGameDuration;
                 document.getElementById('startModal').classList.remove('show');

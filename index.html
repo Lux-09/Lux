@@ -8,14 +8,10 @@
         /* ============ 全局重置 ============ */
         * { margin: 0; padding: 0; box-sizing: border-box; }
         html, body {
-            width: 100%;
-            height: 100%;
-            overflow: hidden;
+            width: 100%; height: 100%; overflow: hidden;
             font-family: "Courier New", "Consolas", "Monaco", "PingFang SC", "Microsoft YaHei", monospace;
-            background-color: #0a0e14;
-            -webkit-tap-highlight-color: transparent;
-            user-select: none;
-            -webkit-user-select: none;
+            background-color: #0a0e14; -webkit-tap-highlight-color: transparent;
+            user-select: none; -webkit-user-select: none;
         }
 
         /* ============ 背景层 ============ */
@@ -25,12 +21,8 @@
             background-image: url('https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEaXBRqmB-Du5k_LwKaKBZ_pP8Xe8F-RAACPDIAAm9BwFTn4jHKMQj3BT0E.png');
             transition: background-image 0.4s ease, filter 0.4s ease;
         }
-        .bg-layer.home-bg {
-            background-image: url('https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEaXPlqmCgPFdbETtBhvt5_FvJoa5-xSwACVTMAAm9BwFTsCXSES1qFaD0E.png');
-        }
-        .bg-layer.game-bg {
-            background-image: url('https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEaa1NqmW5X2WitN5yFwAyu_a_aDvITegACdyAAAm9B0FQqncKhQmdWmz0E.png');
-        }
+        .bg-layer.home-bg { background-image: url('https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEaXPlqmCgPFdbETtBhvt5_FvJoa5-xSwACVTMAAm9BwFTsCXSES1qFaD0E.png'); }
+        .bg-layer.game-bg { background-image: url('https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEaa1NqmW5X2WitN5yFwAyu_a_aDvITegACdyAAAm9B0FQqncKhQmdWmz0E.png'); }
         .bg-layer.blur-bg { filter: blur(8px); }
         @media (max-width: 768px) {
             .bg-layer { background-image: url('https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEaXZFqmCyWXGUO-7hbwsVc3eTM48K1FwAC8zMAAm9BwFTDFpVwPEdWMD0E.png'); }
@@ -241,6 +233,11 @@
         .save-btn.delete { border-color:rgba(220,100,100,0.6); color:#ffb0b0; }
         .save-btn.delete:hover { background:rgba(80,20,20,0.5); }
 
+        /* 公司编辑弹窗样式 */
+        .company-edit-container { display:flex; flex-direction:column; gap:8px; text-align:left; margin:10px 0; }
+        .company-edit-row { display:flex; align-items:center; gap:10px; }
+        .company-edit-input { flex:1; background:rgba(10,20,30,0.7); border:1px solid rgba(110,160,190,0.4); color:#d8ecf4; padding:8px 10px; border-radius:6px; }
+
         @media (max-width:768px) {
             .form-row { flex-direction:column; align-items:stretch; }
             .form-label { width:100%; text-align:left; margin-bottom:4px; }
@@ -335,16 +332,8 @@
                         <div class="form-control">
                             <div class="custom-select" data-select="company">
                                 <div class="select-display"><span class="selected-text">请选择应聘公司</span><span class="arrow">▼</span></div>
-                                <div class="select-options">
-                                    <div class="select-option" data-value="顺驰速运">顺驰速运</div>
-                                    <div class="select-option" data-value="京驰物流">京驰物流</div>
-                                    <div class="select-option" data-value="国邮快递">国邮快递</div>
-                                    <div class="select-option" data-value="德远货运">德远货运</div>
-                                    <div class="select-option" data-value="中驰快运">中驰快运</div>
-                                    <div class="select-option" data-value="圆驰物流">圆驰物流</div>
-                                    <div class="select-option" data-value="申达快运">申达快运</div>
-                                    <div class="select-option" data-value="运达速运">运达速运</div>
-                                    <div class="select-option" data-value="吉兔速递">吉兔速递</div>
+                                <div class="select-options" id="companyOptions">
+                                    <!-- 动态生成公司选项 -->
                                 </div>
                             </div>
                         </div>
@@ -460,9 +449,45 @@
             updateClock();
             setInterval(updateClock, 1000);
 
+            // ========== 公司列表管理 ==========
+            var DEFAULT_COMPANIES = ['顺驰速运', '京驰物流', '国邮快递', '德远货运', '中驰快运', '圆驰物流', '申达快运', '运达速运', '吉兔速递'];
+            var COMPANY_LIST_KEY = 'companyListOverride';
+
+            function loadCompanyList() {
+                try {
+                    var raw = localStorage.getItem(COMPANY_LIST_KEY);
+                    return raw ? JSON.parse(raw) : DEFAULT_COMPANIES.slice();
+                } catch (e) {
+                    return DEFAULT_COMPANIES.slice();
+                }
+            }
+
+            function saveCompanyList(list) {
+                try {
+                    localStorage.setItem(COMPANY_LIST_KEY, JSON.stringify(list));
+                } catch (e) {
+                    console.error('保存公司列表失败', e);
+                }
+            }
+
+            function getDefaultCompanyList() {
+                return DEFAULT_COMPANIES.slice();
+            }
+
+            // 生成公司下拉选项
+            function renderCompanyOptions() {
+                var container = document.getElementById('companyOptions');
+                if (!container) return;
+                var companies = loadCompanyList();
+                var html = '';
+                companies.forEach(function(company) {
+                    html += '<div class="select-option" data-value="' + company + '">' + company + '</div>';
+                });
+                container.innerHTML = html;
+            }
+
             // ========== 存档系统 ==========
             var SAVE_KEY = 'freightSecuritySave_v1';
-            var COMPANY_OVERRIDE_KEY = 'customCompanyName';
 
             function loadSaves() {
                 try {
@@ -497,26 +522,10 @@
                 }
             }
 
-            // 自定义公司名操作
-            function getCustomCompany() {
-                return localStorage.getItem(COMPANY_OVERRIDE_KEY) || '';
-            }
-
-            function setCustomCompany(name) {
-                if (name.trim()) {
-                    localStorage.setItem(COMPANY_OVERRIDE_KEY, name.trim());
-                } else {
-                    localStorage.removeItem(COMPANY_OVERRIDE_KEY);
-                }
-            }
-
-            // 显示公司名格式化
+            // 格式化公司显示
             function formatCompanyDisplay(unit, company) {
-                var custom = getCustomCompany();
-                var companyName = custom || company || '';
-                // 单位如“重庆市货运安全部”，提取地区名
                 var region = unit.replace(/货运安全部$/, '');
-                return region + companyName + '货运安全部';
+                return region + company + '货运安全部';
             }
 
             // 页面元素
@@ -536,7 +545,6 @@
             var btnChangeCompany = document.getElementById('btnChangeCompany');
             var announceAudio = document.getElementById('announceAudio');
 
-            // 弹窗元素
             var saveListOverlay = document.getElementById('saveListOverlay');
             var saveListContainer = document.getElementById('saveListContainer');
             var closeSaveListBtn = document.getElementById('closeSaveList');
@@ -561,6 +569,7 @@
                     updateContinueButton();
                 } else if (page === 'register') {
                     registerPage.classList.add('active');
+                    renderCompanyOptions(); // 确保公司列表最新
                 } else if (page === 'quiz') {
                     quizPage.classList.add('show');
                 } else if (page === 'announce') {
@@ -579,6 +588,7 @@
             // 初始化
             showPage('home');
             updateContinueButton();
+            renderCompanyOptions();
 
             // 公司名字更改按钮
             btnChangeCompany.addEventListener('click', function() {
@@ -586,30 +596,56 @@
             });
 
             function openCompanyEditModal() {
-                var currentCompany = getCustomCompany();
-                modalTitle.textContent = '修改公司名字';
-                modalMessage.innerHTML = '当前自定义公司名：' + (currentCompany || '未设置，使用默认公司') + '<br><br>' +
-                    '请输入新的公司名称（留空则恢复默认）：<br>' +
-                    '<input type="text" id="companyInput" class="text-input" style="width:100%; margin-top:5px;" placeholder="例如：国邮" value="' + (currentCompany || '') + '">';
+                var companies = loadCompanyList();
+                var html = '<div class="company-edit-container">';
+                html += '<p style="color:#b8d8e8; margin-bottom:10px;">修改公司名称（留空则使用默认）：</p>';
+                companies.forEach(function(company, index) {
+                    html += '<div class="company-edit-row">';
+                    html += '<span style="color:#9cc8dc; width:30px;">' + (index+1) + '.</span>';
+                    html += '<input type="text" class="company-edit-input" data-index="' + index + '" value="' + company + '">';
+                    html += '</div>';
+                });
+                html += '<div style="display:flex; justify-content:space-between; margin-top:15px;">';
+                html += '<button class="btn btn-back" id="btnRestoreCompanies">恢复默认</button>';
+                html += '</div>';
+                html += '</div>';
+
+                modalTitle.textContent = '修改公司列表';
+                modalMessage.innerHTML = html;
                 modalOverlay.classList.add('show');
                 modalBtn.textContent = '保存';
                 modalCancelBtn.style.display = 'inline-flex';
 
+                // 恢复默认按钮
+                var btnRestore = document.getElementById('btnRestoreCompanies');
+                if (btnRestore) {
+                    btnRestore.addEventListener('click', function() {
+                        var inputs = document.querySelectorAll('.company-edit-input');
+                        var defaults = getDefaultCompanyList();
+                        inputs.forEach(function(input, idx) {
+                            input.value = defaults[idx] || '';
+                        });
+                    });
+                }
+
                 modalBtn.onclick = function() {
-                    var input = document.getElementById('companyInput');
-                    if (input) {
-                        var newName = input.value.trim();
-                        if (newName) {
-                            setCustomCompany(newName);
-                            showGameModal('提示', '公司名称已更新为：' + newName);
+                    var inputs = document.querySelectorAll('.company-edit-input');
+                    var newList = [];
+                    inputs.forEach(function(input) {
+                        var val = input.value.trim();
+                        if (val) {
+                            newList.push(val);
                         } else {
-                            setCustomCompany('');
-                            showGameModal('提示', '已恢复使用默认公司名称。');
+                            // 留空则使用默认对应位置的名称
+                            var defaults = getDefaultCompanyList();
+                            var idx = parseInt(input.getAttribute('data-index'));
+                            newList.push(defaults[idx] || '');
                         }
-                        modalOverlay.classList.remove('show');
-                        // 刷新存档列表显示
-                        renderSaveList();
-                    }
+                    });
+                    saveCompanyList(newList);
+                    modalOverlay.classList.remove('show');
+                    renderCompanyOptions(); // 刷新注册页公司列表
+                    showGameModal('提示', '公司列表已更新。');
                 };
                 modalCancelBtn.onclick = function() {
                     modalOverlay.classList.remove('show');
@@ -800,7 +836,7 @@
                 unitOptionsContainer.innerHTML = unitHtml;
             }
 
-            // 事件委托处理下拉
+            // 事件委托处理所有下拉列表交互
             document.addEventListener('click', function(e) {
                 var display = e.target.closest('.select-display');
                 if (display) {
@@ -876,7 +912,7 @@
                 });
             }
 
-            // 题库
+            // ============ 两套题库 ============
             var safetyQuestions = [
                 { question: "安全员在货物装车前应重点检查什么？", options: ["货物数量", "车辆技术状况及货物捆绑", "司机驾驶证", "天气情况"], correct: 1, explanation: "安全员需确认车辆状态良好及货物固定牢靠，防止运输途中发生意外。" },
                 { question: "发现安全隐患时，安全员首先应？", options: ["自行处理", "立即上报并停止相关作业", "忽视继续工作", "通知司机处理"], correct: 1, explanation: "安全员应立即上报隐患，确保人员安全，不得擅自冒险作业。" },

@@ -18,22 +18,18 @@
         .bg-layer {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0;
             background-size: cover; background-position: center center; background-repeat: no-repeat;
-            background-image: url('https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEaXBRqmB-Du5k_LwKaKBZ_pP8Xe8F-RAACPDIAAm9BwFTn4jHKMQj3BT0E.png');
+            background-image: url('https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEaXPlqmCgPFdbETtBhvt5_FvJoa5-xSwACVTMAAm9BwFTsCXSES1qFaD0E.png');
             transition: background-image 0.4s ease, filter 0.4s ease;
         }
-        .bg-layer.home-bg { background-image: url('https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEaXPlqmCgPFdbETtBhvt5_FvJoa5-xSwACVTMAAm9BwFTsCXSES1qFaD0E.png'); }
-        .bg-layer.game-bg { background-image: url('https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEaa1NqmW5X2WitN5yFwAyu_a_aDvITegACdyAAAm9B0FQqncKhQmdWmz0E.png'); }
-        .bg-layer.blur-bg { filter: blur(8px); }
-        @media (max-width: 768px) {
-            .bg-layer { background-image: url('https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEaXZFqmCyWXGUO-7hbwsVc3eTM48K1FwAC8zMAAm9BwFTDFpVwPEdWMD0E.png'); }
-            .bg-layer.home-bg { background-image: url('https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEaXZFqmCyWXGUO-7hbwsVc3eTM48K1FwAC8zMAAm9BwFTDFpVwPEdWMD0E.png'); }
-            .bg-layer.game-bg { background-image: url('https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEaa1FqmW3qYwqgvS0Ui_vmm98-canbagACdSAAAm9B0FTlU4gfLXu6_j0E.png'); }
+        .bg-layer.game-bg {
+            background-image: url('https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEaa1NqmW5X2WitN5yFwAyu_a_aDvITegACdyAAAm9B0FQqncKhQmdWmz0E.png');
         }
+        .bg-layer.blur-bg { filter: blur(8px); }
+
         .bg-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 1;
             background: rgba(4, 8, 15, 0.45); pointer-events: none;
         }
-        @media (max-width: 768px) { .bg-overlay { background: rgba(4, 8, 15, 0.52); } }
         .scanlines {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 2;
             pointer-events: none;
@@ -85,7 +81,7 @@
         .divider-line { display: flex; align-items: center; gap: 12px; width: 80%; max-width: 420px; margin: 4px 0 6px; }
         .divider-line .line { flex: 1; height: 1px; background: linear-gradient(90deg, transparent, rgba(140,200,230,0.5), transparent); }
         .divider-line .diamond { width: 8px; height: 8px; background: #7dd3e8; transform: rotate(45deg); box-shadow: 0 0 10px #7dd3e8; flex-shrink: 0; }
-        /* ★★★ 版本号修改位置：修改下方 V:0.1.4 即可，注意大写 V 和冒号 ★★★ */
+        /* ★★★ 版本号修改位置：修改下方 V:0.1.5 即可，注意大写 V 和冒号 ★★★ */
         .version-tag { font-size: 10px; letter-spacing: 3px; color: #6a8fa0; opacity: 0.6; margin-top: 2px; }
         .button-area { display: flex; flex-direction: column; align-items: center; gap: 16px; margin-top: 18px; width: 100%; }
 
@@ -238,19 +234,7 @@
         .company-edit-row { display:flex; align-items:center; gap:10px; }
         .company-edit-input { flex:1; background:rgba(10,20,30,0.7); border:1px solid rgba(110,160,190,0.4); color:#d8ecf4; padding:8px 10px; border-radius:6px; }
 
-        @media (max-width:768px) {
-            .form-row { flex-direction:column; align-items:stretch; }
-            .form-label { width:100%; text-align:left; margin-bottom:4px; }
-            .register-core { padding:50px 12px 20px; }
-            .register-form { padding:18px 14px; }
-            .corner-decor { font-size:8px; }
-            .corner-decor.bottom-right { bottom:10px; right:10px; }
-            .quiz-page { padding:15px 10px 30px; }
-            .quiz-submit { flex-direction:column; align-items:center; }
-            .announce-page { padding:20px 15px; }
-            .announce-box { padding:20px 15px; }
-            .game-main-placeholder { font-size:18px; }
-        }
+        /* 注意：已移除所有针对竖屏的媒体查询，全面适配横屏设计 */
     </style>
 </head>
 <body>
@@ -285,7 +269,8 @@
                     <span class="diamond"></span>
                     <span class="line"></span>
                 </div>
-                <span class="version-tag">V:0.1.4 &nbsp;|&nbsp; BUILD 2026.09</span>
+                <!-- ★★★ 版本号修改位置：修改下方 V:0.1.5 即可，注意大写 V 和冒号 ★★★ -->
+                <span class="version-tag">V:0.1.5 &nbsp;|&nbsp; BUILD 2026.09</span>
                 <div class="button-area">
                     <button class="btn btn-start" id="btnStartGame" type="button">开始游戏</button>
                     <button class="btn btn-start" id="btnContinueGame" type="button" style="display: none;">继续游戏</button>
@@ -561,15 +546,14 @@
                 announcePage.classList.remove('show');
                 gameMainPage.classList.remove('show');
 
-                bgLayer.classList.remove('home-bg', 'game-bg', 'blur-bg');
+                bgLayer.classList.remove('game-bg', 'blur-bg');
 
                 if (page === 'home') {
-                    bgLayer.classList.add('home-bg');
                     homePage.classList.add('active');
                     updateContinueButton();
                 } else if (page === 'register') {
                     registerPage.classList.add('active');
-                    renderCompanyOptions(); // 确保公司列表最新
+                    renderCompanyOptions();
                 } else if (page === 'quiz') {
                     quizPage.classList.add('show');
                 } else if (page === 'announce') {
@@ -616,7 +600,6 @@
                 modalBtn.textContent = '保存';
                 modalCancelBtn.style.display = 'inline-flex';
 
-                // 恢复默认按钮
                 var btnRestore = document.getElementById('btnRestoreCompanies');
                 if (btnRestore) {
                     btnRestore.addEventListener('click', function() {
@@ -636,7 +619,6 @@
                         if (val) {
                             newList.push(val);
                         } else {
-                            // 留空则使用默认对应位置的名称
                             var defaults = getDefaultCompanyList();
                             var idx = parseInt(input.getAttribute('data-index'));
                             newList.push(defaults[idx] || '');
@@ -644,7 +626,7 @@
                     });
                     saveCompanyList(newList);
                     modalOverlay.classList.remove('show');
-                    renderCompanyOptions(); // 刷新注册页公司列表
+                    renderCompanyOptions();
                     showGameModal('提示', '公司列表已更新。');
                 };
                 modalCancelBtn.onclick = function() {
@@ -1057,7 +1039,7 @@
                 });
             }
 
-            // 防止移动端双击缩放
+            // 防止移动端双击缩放（已移除竖屏限制）
             document.addEventListener('dblclick', function(e) {
                 if (window.innerWidth <= 768) e.preventDefault();
             }, { passive: false });

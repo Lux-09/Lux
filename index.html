@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>货运安全管控系统 - 注册考核</title>
+    <title>货运管控模拟器 - 注册考核</title>
     <style>
         /* ============ 全局重置 ============ */
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -47,8 +47,7 @@
 
         /* ============ 主容器（缩放基准） ============ */
         .main-container {
-            position: relative; z-index: 10; width: 1280px; height: 720px;
-            /* 设计基准宽度 1280，高度 720，通过JS缩放适配 */
+            position: fixed; z-index: 10; width: 1280px; height: 720px;
             left: 50%; top: 50%;
             transform: translate(-50%, -50%) scale(1);
             transform-origin: center center;
@@ -56,10 +55,10 @@
             padding: 20px;
         }
 
-        /* ============ 顶部状态栏 ============ */
+        /* ============ 顶部状态栏（固定于视口） ============ */
         .top-status {
-            position: absolute; top: 0; left: 0; right: 0; display: flex; justify-content: space-between; align-items: center;
-            padding: 14px 22px; font-size: 12px; letter-spacing: 1.5px; color: #b8d8e8;
+            position: fixed; top: 0; left: 0; right: 0; display: flex; justify-content: space-between; align-items: center;
+            padding: 10px 18px; font-size: 12px; letter-spacing: 1.5px; color: #b8d8e8;
             text-shadow: 0 0 8px rgba(100,180,220,0.5); z-index: 20; pointer-events: none;
         }
         .top-status .sys-name { font-weight: bold; color: #7dd3e8; font-size: 13px; letter-spacing: 2px; opacity: 0.9; }
@@ -68,6 +67,13 @@
         .indicator-dots .dot { width: 8px; height: 8px; border-radius: 50%; background: #44dd88; box-shadow: 0 0 6px #44dd88; animation: pulse-dot 2.2s ease-in-out infinite; }
         .indicator-dots .dot.amber { background: #ffaa33; box-shadow: 0 0 6px #ffaa33; animation-delay: 1.1s; }
         @keyframes pulse-dot { 0%,100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.4; transform: scale(0.75); } }
+
+        /* ============ 右下角版权信息（固定于视口） ============ */
+        .corner-decor {
+            position: fixed; z-index: 15; pointer-events: none; opacity: 0.5;
+            font-size: 10px; letter-spacing: 2px; color: #6a9aa8;
+        }
+        .corner-decor.bottom-right { bottom: 10px; right: 14px; text-align: right; line-height: 1.7; }
 
         /* ============ 页面切换 ============ */
         .page { display: none; width: 100%; height: 100%; position: relative; }
@@ -84,7 +90,6 @@
         .divider-line { display: flex; align-items: center; gap: 12px; width: 80%; max-width: 420px; margin: 4px 0 6px; }
         .divider-line .line { flex: 1; height: 1px; background: linear-gradient(90deg, transparent, rgba(140,200,230,0.5), transparent); }
         .divider-line .diamond { width: 8px; height: 8px; background: #7dd3e8; transform: rotate(45deg); box-shadow: 0 0 10px #7dd3e8; flex-shrink: 0; }
-        /* ★★★ 版本号修改位置：修改下方 V:0.1.5 即可，注意大写 V 和冒号 ★★★ */
         .version-tag { font-size: 10px; letter-spacing: 3px; color: #6a8fa0; opacity: 0.6; margin-top: 2px; }
         .button-area { display: flex; flex-direction: column; align-items: center; gap: 16px; margin-top: 18px; width: 100%; }
 
@@ -131,7 +136,6 @@
             -webkit-text-fill-color: #d8ecf4; -webkit-box-shadow: 0 0 0 1000px rgba(10,20,30,0.7) inset; transition: background-color 5000s ease-in-out 0s;
         }
 
-        /* ============ 自定义下拉 ============ */
         .custom-select { position: relative; width: 100%; }
         .select-display {
             background: rgba(10,20,30,0.7); border: 1px solid rgba(110,160,190,0.4); padding: 10px 14px;
@@ -206,10 +210,6 @@
         .game-main-page.show { display: flex; }
         .game-main-placeholder { font-size: 24px; letter-spacing: 4px; color: #d8ecf4; text-shadow: 0 0 12px rgba(120,200,240,0.8); text-align: center; line-height: 1.6; }
 
-        .corner-decor { position: absolute; z-index: 15; pointer-events: none; opacity: 0.45; font-size: 10px; letter-spacing: 2px; color: #6a9aa8; }
-        .corner-decor.bottom-left { bottom: 16px; left: 20px; text-align: left; line-height: 1.7; display: none; }
-        .corner-decor.bottom-right { bottom: 16px; right: 20px; text-align: right; line-height: 1.7; }
-
         /* ============ 弹窗 ============ */
         .game-modal-overlay { position: fixed; top:0; left:0; right:0; bottom:0; background: rgba(0,0,0,0.7); z-index:300; display:none; align-items:center; justify-content:center; }
         .game-modal-overlay.show { display:flex; }
@@ -237,7 +237,7 @@
         .company-edit-row { display:flex; align-items:center; gap:10px; }
         .company-edit-input { flex:1; background:rgba(10,20,30,0.7); border:1px solid rgba(110,160,190,0.4); color:#d8ecf4; padding:8px 10px; border-radius:6px; }
 
-        /* ============ 竖屏旋转提示遮罩 ============ */
+        /* 竖屏旋转提示遮罩 */
         .rotate-mask {
             position: fixed; top:0; left:0; width:100%; height:100%; background:#000; z-index:999;
             display:none; align-items:center; justify-content:center; color:#fff; font-size:20px;
@@ -247,10 +247,7 @@
     </style>
 </head>
 <body>
-    <!-- 竖屏旋转提示层 -->
-    <div class="rotate-mask" id="rotateMask">
-        请将设备旋转至横屏模式
-    </div>
+    <div class="rotate-mask" id="rotateMask">请将设备旋转至横屏模式</div>
 
     <div class="bg-layer" id="bgLayer" aria-hidden="true"></div>
     <div class="bg-overlay" aria-hidden="true"></div>
@@ -265,7 +262,7 @@
         <div class="indicator-dots">
             <span class="dot" aria-hidden="true"></span>
             <span class="dot amber" aria-hidden="true"></span>
-            <span class="sys-name">FSCS · 主控中心</span>
+            <span class="sys-name">货运管控模拟器 · 主控中心</span>
         </div>
         <span class="sys-time" id="sysTime">--:--:--</span>
     </div>
@@ -275,15 +272,14 @@
         <div class="page active" id="homePage">
             <div class="home-core">
                 <div class="title-block">
-                    <h1 class="game-main-title">货运安全管控系统</h1>
-                    <p class="game-sub-title">Freight Security Control System</p>
+                    <h1 class="game-main-title">货运管控模拟器</h1>
+                    <p class="game-sub-title">Freight Control Simulator</p>
                 </div>
                 <div class="divider-line">
                     <span class="line"></span>
                     <span class="diamond"></span>
                     <span class="line"></span>
                 </div>
-                <!-- ★★★ 版本号修改位置：修改下方 V:0.1.5 即可，注意大写 V 和冒号 ★★★ -->
                 <span class="version-tag">V:0.1.5 &nbsp;|&nbsp; BUILD 2026.09</span>
                 <div class="button-area">
                     <button class="btn btn-start" id="btnStartGame" type="button">开始游戏</button>
@@ -374,9 +370,11 @@
                 <button class="btn btn-back" id="btnRestart">重新开始</button>
             </div>
         </div>
+    </div>
 
-        <div class="corner-decor bottom-left" id="nodeInfo" aria-hidden="true">节点: 未创建 &nbsp;|&nbsp; 线路: 未创建<br>延迟: -- &nbsp;|&nbsp; 加密: --</div>
-        <div class="corner-decor bottom-right" aria-hidden="true">FSCS 安全管控系统<br>© 2026 货运安保部</div>
+    <!-- 右下角版权信息（固定于视口） -->
+    <div class="corner-decor bottom-right" aria-hidden="true">
+        货运管控模拟器<br>© 2026 货运安保部
     </div>
 
     <!-- 答题页面 -->
@@ -459,11 +457,9 @@
                 var scaleX = vw / DESIGN_WIDTH;
                 var scaleY = vh / DESIGN_HEIGHT;
                 var scale = Math.min(scaleX, scaleY);
-                // 允许稍大但不超过原始大小，保证可读性
                 if (scale > 1) scale = 1;
                 mainContainer.style.transform = 'translate(-50%, -50%) scale(' + scale + ')';
             }
-
             window.addEventListener('resize', handleScale);
             window.addEventListener('load', handleScale);
             handleScale();
@@ -493,18 +489,12 @@
                     return DEFAULT_COMPANIES.slice();
                 }
             }
-
             function saveCompanyList(list) {
                 try {
                     localStorage.setItem(COMPANY_LIST_KEY, JSON.stringify(list));
-                } catch (e) {
-                    console.error('保存公司列表失败', e);
-                }
+                } catch (e) { console.error('保存公司列表失败', e); }
             }
-
-            function getDefaultCompanyList() {
-                return DEFAULT_COMPANIES.slice();
-            }
+            function getDefaultCompanyList() { return DEFAULT_COMPANIES.slice(); }
 
             function renderCompanyOptions() {
                 var container = document.getElementById('companyOptions');
@@ -526,7 +516,6 @@
                     return raw ? JSON.parse(raw) : [];
                 } catch (e) { return []; }
             }
-
             function saveGame(data) {
                 var saves = loadSaves();
                 data.id = Date.now().toString();
@@ -534,7 +523,6 @@
                 saves.push(data);
                 localStorage.setItem(SAVE_KEY, JSON.stringify(saves));
             }
-
             function deleteSave(id) {
                 var saves = loadSaves();
                 var filtered = saves.filter(function(s) { return s.id !== id; });
@@ -542,7 +530,6 @@
                 updateContinueButton();
                 renderSaveList();
             }
-
             function updateContinueButton() {
                 var saves = loadSaves();
                 var btnContinue = document.getElementById('btnContinueGame');
@@ -755,7 +742,6 @@
                 });
             }
 
-            // 通用弹窗
             function showGameModal(title, message, callback) {
                 modalTitle.textContent = title;
                 modalMessage.innerHTML = message.replace(/\n/g, '<br>');
@@ -792,7 +778,6 @@
                 };
             }
 
-            // 关闭存档列表
             closeSaveListBtn.addEventListener('click', function() {
                 saveListOverlay.classList.remove('show');
             });
@@ -803,7 +788,6 @@
                 if (e.target === modalOverlay) modalOverlay.classList.remove('show');
             });
 
-            // 其他按钮
             btnBackHome.addEventListener('click', () => showPage('home'));
             btnQuizBack.addEventListener('click', () => showPage('register'));
             btnEnterMain.addEventListener('click', () => {

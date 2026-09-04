@@ -3,263 +3,347 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>货运管控模拟器 - 注册考核</title>
+    <title>货运管控模拟器 - 完整版</title>
     <style>
         /* ============ 全局重置 ============ */
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        html, body {
-            width: 100%; height: 100%; overflow: hidden;
-            font-family: "Courier New", "Consolas", "Monaco", "PingFang SC", "Microsoft YaHei", monospace;
-            background-color: #0a0e14; -webkit-tap-highlight-color: transparent;
-            user-select: none; -webkit-user-select: none;
-        }
+        * { margin:0; padding:0; box-sizing:border-box; }
+        html,body { width:100%; height:100%; overflow:hidden; font-family:"Courier New","Consolas","PingFang SC","Microsoft YaHei",monospace; background:#0a0e14; -webkit-tap-highlight-color:transparent; user-select:none; }
 
         /* ============ 背景层 ============ */
-        .bg-layer {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0;
-            background-size: cover; background-position: center center; background-repeat: no-repeat;
-            background-image: url('https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEaXPlqmCgPFdbETtBhvt5_FvJoa5-xSwACVTMAAm9BwFTsCXSES1qFaD0E.png');
-            transition: background-image 0.4s ease, filter 0.4s ease;
-        }
-        .bg-layer.game-bg { background-image: url('https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEaa1NqmW5X2WitN5yFwAyu_a_aDvITegACdyAAAm9B0FQqncKhQmdWmz0E.png'); }
-        .bg-layer.blur-bg { filter: blur(8px); }
+        .bg-layer { position:fixed; top:0; left:0; width:100%; height:100%; z-index:0; background-size:cover; background-position:center; background-image:url('https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEaXPlqmCgPFdbETtBhvt5_FvJoa5-xSwACVTMAAm9BwFTsCXSES1qFaD0E.png'); transition:background-image .4s,filter .4s; }
+        .bg-layer.game-bg { background-image:url('https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEaa1NqmW5X2WitN5yFwAyu_a_aDvITegACdyAAAm9B0FQqncKhQmdWmz0E.png'); }
+        .bg-layer.blur-bg { filter:blur(8px); }
+        .bg-overlay { position:fixed; top:0; left:0; width:100%; height:100%; z-index:1; background:rgba(4,8,15,0.45); pointer-events:none; }
+        .scanlines { position:fixed; top:0; left:0; width:100%; height:100%; z-index:2; pointer-events:none; background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.03) 2px,rgba(0,0,0,0.03) 4px); }
+        .noise { position:fixed; top:0; left:0; width:100%; height:100%; z-index:3; pointer-events:none; opacity:0.018; background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); background-repeat:repeat; background-size:256px 256px; }
+        .corner-frame { position:fixed; z-index:5; pointer-events:none; opacity:0.5; }
+        .corner-frame.tl { top:10px; left:10px; width:30px; height:30px; border-top:2px solid rgba(130,190,220,0.7); border-left:2px solid rgba(130,190,220,0.7); }
+        .corner-frame.tr { top:10px; right:10px; width:30px; height:30px; border-top:2px solid rgba(130,190,220,0.7); border-right:2px solid rgba(130,190,220,0.7); }
+        .corner-frame.bl { bottom:10px; left:10px; width:30px; height:30px; border-bottom:2px solid rgba(130,190,220,0.7); border-left:2px solid rgba(130,190,220,0.7); }
+        .corner-frame.br { bottom:10px; right:10px; width:30px; height:30px; border-bottom:2px solid rgba(130,190,220,0.7); border-right:2px solid rgba(130,190,220,0.7); }
 
-        .bg-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 1;
-            background: rgba(4, 8, 15, 0.45); pointer-events: none;
-        }
-        .scanlines {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 2;
-            pointer-events: none;
-            background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.03) 2px, rgba(0,0,0,0.03) 4px);
-        }
-        .noise {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 3; pointer-events: none;
-            opacity: 0.018;
-            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-            background-repeat: repeat; background-size: 256px 256px;
-        }
-        .corner-frame { position: fixed; z-index: 5; pointer-events: none; opacity: 0.5; }
-        .corner-frame.tl { top: 10px; left: 10px; width: 30px; height: 30px; border-top: 2px solid rgba(130,190,220,0.7); border-left: 2px solid rgba(130,190,220,0.7); }
-        .corner-frame.tr { top: 10px; right: 10px; width: 30px; height: 30px; border-top: 2px solid rgba(130,190,220,0.7); border-right: 2px solid rgba(130,190,220,0.7); }
-        .corner-frame.bl { bottom: 10px; left: 10px; width: 30px; height: 30px; border-bottom: 2px solid rgba(130,190,220,0.7); border-left: 2px solid rgba(130,190,220,0.7); }
-        .corner-frame.br { bottom: 10px; right: 10px; width: 30px; height: 30px; border-bottom: 2px solid rgba(130,190,220,0.7); border-right: 2px solid rgba(130,190,220,0.7); }
+        /* ============ 顶部状态栏（非游戏页） ============ */
+        .top-status { position:fixed; top:0; left:0; right:0; display:flex; justify-content:space-between; align-items:center; padding:10px 18px; font-size:12px; letter-spacing:1.5px; color:#b8d8e8; text-shadow:0 0 8px rgba(100,180,220,0.5); z-index:20; pointer-events:none; transition:opacity .3s; }
+        .top-status .sys-name { font-weight:bold; color:#7dd3e8; font-size:13px; letter-spacing:2px; opacity:0.9; }
+        .top-status .sys-time { font-variant-numeric:tabular-nums; font-size:13px; opacity:0.75; letter-spacing:1px; }
+        .indicator-dots { display:flex; gap:8px; align-items:center; pointer-events:none; }
+        .indicator-dots .dot { width:8px; height:8px; border-radius:50%; background:#44dd88; box-shadow:0 0 6px #44dd88; animation:pulse-dot 2.2s ease-in-out infinite; }
+        .indicator-dots .dot.amber { background:#ffaa33; box-shadow:0 0 6px #ffaa33; animation-delay:1.1s; }
+        @keyframes pulse-dot { 0%,100%{ opacity:1; transform:scale(1); } 50%{ opacity:0.4; transform:scale(0.75); } }
 
-        /* ============ 主容器（缩放基准） ============ */
-        .main-container {
-            position: fixed; z-index: 10; width: 1280px; height: 720px;
-            left: 50%; top: 50%;
-            transform: translate(-50%, -50%) scale(1);
-            transform-origin: center center;
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            padding: 20px;
-        }
+        .corner-decor { position:fixed; z-index:15; pointer-events:none; opacity:0.5; font-size:10px; letter-spacing:2px; color:#6a9aa8; transition:opacity .3s; }
+        .corner-decor.bottom-right { bottom:10px; right:14px; text-align:right; line-height:1.7; }
 
-        /* ============ 顶部状态栏（固定于视口） ============ */
-        .top-status {
-            position: fixed; top: 0; left: 0; right: 0; display: flex; justify-content: space-between; align-items: center;
-            padding: 10px 18px; font-size: 12px; letter-spacing: 1.5px; color: #b8d8e8;
-            text-shadow: 0 0 8px rgba(100,180,220,0.5); z-index: 20; pointer-events: none;
-        }
-        .top-status .sys-name { font-weight: bold; color: #7dd3e8; font-size: 13px; letter-spacing: 2px; opacity: 0.9; }
-        .top-status .sys-time { font-variant-numeric: tabular-nums; font-size: 13px; opacity: 0.75; letter-spacing: 1px; }
-        .indicator-dots { display: flex; gap: 8px; align-items: center; pointer-events: none; }
-        .indicator-dots .dot { width: 8px; height: 8px; border-radius: 50%; background: #44dd88; box-shadow: 0 0 6px #44dd88; animation: pulse-dot 2.2s ease-in-out infinite; }
-        .indicator-dots .dot.amber { background: #ffaa33; box-shadow: 0 0 6px #ffaa33; animation-delay: 1.1s; }
-        @keyframes pulse-dot { 0%,100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.4; transform: scale(0.75); } }
-
-        /* ============ 右下角版权信息（固定于视口） ============ */
-        .corner-decor {
-            position: fixed; z-index: 15; pointer-events: none; opacity: 0.5;
-            font-size: 10px; letter-spacing: 2px; color: #6a9aa8;
-        }
-        .corner-decor.bottom-right { bottom: 10px; right: 14px; text-align: right; line-height: 1.7; }
+        /* ============ 主容器（非游戏页） ============ */
+        .main-container { position:fixed; z-index:10; width:1280px; height:720px; left:50%; top:50%; transform:translate(-50%,-50%) scale(1); transform-origin:center center; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:20px; }
 
         /* ============ 页面切换 ============ */
-        .page { display: none; width: 100%; height: 100%; position: relative; }
-        .page.active { display: block; }
+        .page { display:none; width:100%; height:100%; position:relative; }
+        .page.active { display:block; }
 
-        /* ============ 首页核心区 ============ */
-        .home-core {
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            gap: 24px; text-align: center; max-width: 680px; width: 100%; height: 100%; margin: 0 auto;
-        }
-        .title-block { display: flex; flex-direction: column; align-items: center; gap: 10px; }
-        .game-main-title { font-size: 44px; font-weight: 700; letter-spacing: 6px; color: #e8f4fa; text-shadow: 0 0 16px rgba(120,200,240,0.7), 0 0 40px rgba(80,160,200,0.4), 0 2px 4px rgba(0,0,0,0.6); line-height: 1.15; text-transform: uppercase; }
-        .game-sub-title { font-size: 15px; letter-spacing: 8px; color: #9cc8dc; text-shadow: 0 0 10px rgba(100,180,220,0.5); text-transform: uppercase; opacity: 0.8; margin-top: 4px; }
-        .divider-line { display: flex; align-items: center; gap: 12px; width: 80%; max-width: 420px; margin: 4px 0 6px; }
-        .divider-line .line { flex: 1; height: 1px; background: linear-gradient(90deg, transparent, rgba(140,200,230,0.5), transparent); }
-        .divider-line .diamond { width: 8px; height: 8px; background: #7dd3e8; transform: rotate(45deg); box-shadow: 0 0 10px #7dd3e8; flex-shrink: 0; }
-        .version-tag { font-size: 10px; letter-spacing: 3px; color: #6a8fa0; opacity: 0.6; margin-top: 2px; }
-        .button-area { display: flex; flex-direction: column; align-items: center; gap: 16px; margin-top: 18px; width: 100%; }
+        /* ============ 首页 ============ */
+        .home-core { display:flex; flex-direction:column; align-items:center; justify-content:center; gap:24px; text-align:center; max-width:680px; width:100%; height:100%; margin:0 auto; }
+        .title-block { display:flex; flex-direction:column; align-items:center; gap:10px; }
+        .game-main-title { font-size:44px; font-weight:700; letter-spacing:6px; color:#e8f4fa; text-shadow:0 0 16px rgba(120,200,240,0.7),0 0 40px rgba(80,160,200,0.4),0 2px 4px rgba(0,0,0,0.6); line-height:1.15; text-transform:uppercase; }
+        .game-sub-title { font-size:15px; letter-spacing:8px; color:#9cc8dc; text-shadow:0 0 10px rgba(100,180,220,0.5); text-transform:uppercase; opacity:0.8; margin-top:4px; }
+        .divider-line { display:flex; align-items:center; gap:12px; width:80%; max-width:420px; margin:4px 0 6px; }
+        .divider-line .line { flex:1; height:1px; background:linear-gradient(90deg,transparent,rgba(140,200,230,0.5),transparent); }
+        .divider-line .diamond { width:8px; height:8px; background:#7dd3e8; transform:rotate(45deg); box-shadow:0 0 10px #7dd3e8; flex-shrink:0; }
+        .version-tag { font-size:10px; letter-spacing:3px; color:#6a8fa0; opacity:0.6; margin-top:2px; }
+        .button-area { display:flex; flex-direction:column; align-items:center; gap:16px; margin-top:18px; width:100%; }
 
-        /* ============ 统一按钮风格 ============ */
-        .btn {
-            display: inline-flex; align-items: center; justify-content: center; font-family: inherit;
-            font-weight: 600; letter-spacing: 3px; text-transform: uppercase; border-radius: 8px;
-            cursor: pointer; transition: all 0.25s ease; outline: none; -webkit-appearance: none; appearance: none;
-            background-clip: padding-box; text-shadow: 0 0 8px rgba(150,210,240,0.6);
-            box-shadow: 0 0 20px rgba(80,160,200,0.2), inset 0 0 18px rgba(80,160,200,0.08);
-            color: #d8ecf4; background: rgba(10,20,30,0.55); border: 1.5px solid rgba(120,190,220,0.6);
-        }
-        .btn:hover { background: rgba(15,30,42,0.7); border-color: rgba(150,220,250,0.85); box-shadow: 0 0 32px rgba(100,190,230,0.4), inset 0 0 24px rgba(100,190,230,0.12); color: #f0f8fc; transform: translateY(-1px); }
-        .btn:active { transform: translateY(1px); box-shadow: 0 0 14px rgba(80,160,200,0.3), inset 0 0 20px rgba(80,160,200,0.15); background: rgba(8,16,24,0.8); }
-        .btn-start { padding: 16px 52px; font-size: 18px; }
-        .btn-register { padding: 12px 40px; font-size: 15px; }
-        .btn-back { padding: 8px 20px; font-size: 12px; background: rgba(10,20,30,0.35); border-color: rgba(110,150,170,0.5); box-shadow: 0 0 10px rgba(80,160,200,0.1); }
-        .btn-back:hover { background: rgba(20,40,55,0.6); border-color: rgba(150,220,250,0.8); }
+        /* ============ 统一按钮 ============ */
+        .btn { display:inline-flex; align-items:center; justify-content:center; font-family:inherit; font-weight:600; letter-spacing:3px; text-transform:uppercase; border-radius:8px; cursor:pointer; transition:all .25s; outline:none; -webkit-appearance:none; background-clip:padding-box; text-shadow:0 0 8px rgba(150,210,240,0.6); box-shadow:0 0 20px rgba(80,160,200,0.2),inset 0 0 18px rgba(80,160,200,0.08); color:#d8ecf4; background:rgba(10,20,30,0.55); border:1.5px solid rgba(120,190,220,0.6); }
+        .btn:hover { background:rgba(15,30,42,0.7); border-color:rgba(150,220,250,0.85); box-shadow:0 0 32px rgba(100,190,230,0.4),inset 0 0 24px rgba(100,190,230,0.12); color:#f0f8fc; transform:translateY(-1px); }
+        .btn:active { transform:translateY(1px); box-shadow:0 0 14px rgba(80,160,200,0.3),inset 0 0 20px rgba(80,160,200,0.15); background:rgba(8,16,24,0.8); }
+        .btn-start { padding:16px 52px; font-size:18px; }
+        .btn-register { padding:12px 40px; font-size:15px; }
+        .btn-back { padding:8px 20px; font-size:12px; background:rgba(10,20,30,0.35); border-color:rgba(110,150,170,0.5); box-shadow:0 0 10px rgba(80,160,200,0.1); }
+        .btn-back:hover { background:rgba(20,40,55,0.6); border-color:rgba(150,220,250,0.8); }
 
-        /* ============ 注册页面核心区 ============ */
-        .register-core {
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            gap: 18px; text-align: center; max-width: 620px; width: 100%; height: 100%;
-            margin: 0 auto; overflow-y: auto; padding: 60px 15px 30px;
-            /* 隐藏滚动条 */
-            scrollbar-width: none; /* Firefox */
-            -ms-overflow-style: none; /* IE/Edge */
-        }
-        .register-core::-webkit-scrollbar {
-            display: none; /* Chrome/Safari */
-        }
-        .register-title { font-size: 28px; font-weight: 700; letter-spacing: 4px; color: #e8f4fa; text-shadow: 0 0 16px rgba(120,200,240,0.7); text-transform: uppercase; }
-        .register-subtitle { font-size: 11px; letter-spacing: 4px; color: #9cc8dc; opacity: 0.7; text-transform: uppercase; margin-bottom: 6px; }
-        .register-form {
-            display: flex; flex-direction: column; gap: 14px; width: 100%;
-            background: rgba(5,12,20,0.6); padding: 24px 20px; border: 1px solid rgba(100,160,190,0.25);
-            border-radius: 12px; box-shadow: 0 0 20px rgba(0,0,0,0.4);
-        }
-        .form-row { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
-        .form-label { width: 100px; text-align: right; color: #9cc8dc; font-size: 13px; letter-spacing: 1px; }
-        .form-control { flex: 1; min-width: 180px; }
-        .text-input {
-            width: 100%; background: rgba(10,20,30,0.7); border: 1px solid rgba(110,160,190,0.4);
-            color: #d8ecf4; padding: 10px 14px; font-family: inherit; font-size: 14px; letter-spacing: 1px;
-            outline: none; border-radius: 8px; transition: border 0.2s;
-            -webkit-box-shadow: 0 0 0 1000px rgba(10,20,30,0.7) inset; box-shadow: 0 0 0 1000px rgba(10,20,30,0.7) inset;
-        }
-        .text-input:focus { border-color: rgba(150,220,250,0.8); box-shadow: 0 0 10px rgba(100,190,230,0.2), 0 0 0 1000px rgba(10,20,30,0.7) inset; }
-        .text-input:-webkit-autofill, .text-input:-webkit-autofill:hover, .text-input:-webkit-autofill:focus {
-            -webkit-text-fill-color: #d8ecf4; -webkit-box-shadow: 0 0 0 1000px rgba(10,20,30,0.7) inset; transition: background-color 5000s ease-in-out 0s;
-        }
+        /* ============ 注册页 ============ */
+        .register-core { display:flex; flex-direction:column; align-items:center; justify-content:center; gap:18px; text-align:center; max-width:620px; width:100%; height:100%; margin:0 auto; overflow-y:auto; padding:60px 15px 30px; scrollbar-width:none; -ms-overflow-style:none; }
+        .register-core::-webkit-scrollbar { display:none; }
+        .register-title { font-size:28px; font-weight:700; letter-spacing:4px; color:#e8f4fa; text-shadow:0 0 16px rgba(120,200,240,0.7); text-transform:uppercase; }
+        .register-subtitle { font-size:11px; letter-spacing:4px; color:#9cc8dc; opacity:0.7; text-transform:uppercase; margin-bottom:6px; }
+        .register-form { display:flex; flex-direction:column; gap:14px; width:100%; background:rgba(5,12,20,0.6); padding:24px 20px; border:1px solid rgba(100,160,190,0.25); border-radius:12px; box-shadow:0 0 20px rgba(0,0,0,0.4); }
+        .form-row { display:flex; flex-wrap:wrap; align-items:center; gap:10px; }
+        .form-label { width:100px; text-align:right; color:#9cc8dc; font-size:13px; letter-spacing:1px; }
+        .form-control { flex:1; min-width:180px; }
+        .text-input { width:100%; background:rgba(10,20,30,0.7); border:1px solid rgba(110,160,190,0.4); color:#d8ecf4; padding:10px 14px; font-family:inherit; font-size:14px; letter-spacing:1px; outline:none; border-radius:8px; transition:border .2s; -webkit-box-shadow:0 0 0 1000px rgba(10,20,30,0.7) inset; box-shadow:0 0 0 1000px rgba(10,20,30,0.7) inset; }
+        .text-input:focus { border-color:rgba(150,220,250,0.8); box-shadow:0 0 10px rgba(100,190,230,0.2),0 0 0 1000px rgba(10,20,30,0.7) inset; }
+        .text-input:-webkit-autofill { -webkit-text-fill-color:#d8ecf4; -webkit-box-shadow:0 0 0 1000px rgba(10,20,30,0.7) inset; transition:background-color 5000s ease-in-out 0s; }
 
-        /* ============ 自定义下拉 ============ */
-        .custom-select { position: relative; width: 100%; }
-        .select-display {
-            background: rgba(10,20,30,0.7); border: 1px solid rgba(110,160,190,0.4); padding: 10px 14px;
-            color: #d8ecf4; font-size: 14px; letter-spacing: 1px; cursor: pointer;
-            display: flex; justify-content: space-between; align-items: center; border-radius: 8px; transition: border 0.2s;
-        }
-        .select-display:hover { border-color: rgba(150,220,250,0.6); }
-        .select-display .arrow { font-size: 12px; color: #7dd3e8; transition: transform 0.3s; }
-        .custom-select.open .select-display .arrow { transform: rotate(180deg); }
-        .select-options {
-            position: absolute; top: calc(100% + 6px); left: 0; right: 0; background: #0c151f;
-            border: 1px solid rgba(110,160,190,0.5); max-height: 220px; overflow-y: auto; z-index: 50;
-            border-radius: 8px; box-shadow: 0 6px 16px rgba(0,0,0,0.5);
-            opacity: 0; visibility: hidden; transform: translateY(-8px);
-            transition: opacity 0.2s ease, transform 0.2s ease, visibility 0.2s;
-            /* 隐藏滚动条 */
-            scrollbar-width: none; /* Firefox */
-            -ms-overflow-style: none; /* IE/Edge */
-        }
-        .select-options.show { opacity: 1; visibility: visible; transform: translateY(0); }
-        .select-options::-webkit-scrollbar { display: none; /* Chrome/Safari */ }
-        .select-option {
-            padding: 9px 14px; color: #b8d8e8; font-size: 13px; letter-spacing: 1px; cursor: pointer;
-            transition: background 0.15s, color 0.15s; text-align: left; border-bottom: 1px solid rgba(80,120,140,0.15);
-        }
-        .select-option:last-child { border-bottom: none; }
-        .select-option:hover { background: rgba(70,140,180,0.3); color: #ffffff; }
+        .custom-select { position:relative; width:100%; }
+        .select-display { background:rgba(10,20,30,0.7); border:1px solid rgba(110,160,190,0.4); padding:10px 14px; color:#d8ecf4; font-size:14px; letter-spacing:1px; cursor:pointer; display:flex; justify-content:space-between; align-items:center; border-radius:8px; transition:border .2s; }
+        .select-display:hover { border-color:rgba(150,220,250,0.6); }
+        .select-display .arrow { font-size:12px; color:#7dd3e8; transition:transform .3s; }
+        .custom-select.open .select-display .arrow { transform:rotate(180deg); }
+        .select-options { position:absolute; top:calc(100% + 6px); left:0; right:0; background:#0c151f; border:1px solid rgba(110,160,190,0.5); max-height:220px; overflow-y:auto; z-index:50; border-radius:8px; box-shadow:0 6px 16px rgba(0,0,0,0.5); opacity:0; visibility:hidden; transform:translateY(-8px); transition:opacity .2s,transform .2s,visibility .2s; scrollbar-width:none; -ms-overflow-style:none; }
+        .select-options.show { opacity:1; visibility:visible; transform:translateY(0); }
+        .select-options::-webkit-scrollbar { display:none; }
+        .select-option { padding:9px 14px; color:#b8d8e8; font-size:13px; letter-spacing:1px; cursor:pointer; transition:background .15s,color .15s; text-align:left; border-bottom:1px solid rgba(80,120,140,0.15); }
+        .select-option:last-child { border-bottom:none; }
+        .select-option:hover { background:rgba(70,140,180,0.3); color:#fff; }
 
-        .radio-group { display: flex; gap: 20px; }
-        .radio-option { display: flex; align-items: center; gap: 8px; color: #b8d8e8; font-size: 14px; cursor: pointer; letter-spacing: 1px; }
-        .radio-option input[type="radio"] { appearance: none; -webkit-appearance: none; width: 18px; height: 18px; border: 2px solid #6a9aa8; border-radius: 50%; background: #0a0e14; cursor: pointer; position: relative; transition: border 0.2s; }
-        .radio-option input[type="radio"]:checked { border-color: #7dd3e8; }
-        .radio-option input[type="radio"]:checked::after { content: ''; position: absolute; top: 3px; left: 3px; width: 8px; height: 8px; border-radius: 50%; background: #7dd3e8; box-shadow: 0 0 6px #7dd3e8; }
+        .radio-group { display:flex; gap:20px; }
+        .radio-option { display:flex; align-items:center; gap:8px; color:#b8d8e8; font-size:14px; cursor:pointer; letter-spacing:1px; }
+        .radio-option input[type="radio"] { appearance:none; -webkit-appearance:none; width:18px; height:18px; border:2px solid #6a9aa8; border-radius:50%; background:#0a0e14; cursor:pointer; position:relative; transition:border .2s; }
+        .radio-option input[type="radio"]:checked { border-color:#7dd3e8; }
+        .radio-option input[type="radio"]:checked::after { content:''; position:absolute; top:3px; left:3px; width:8px; height:8px; border-radius:50%; background:#7dd3e8; box-shadow:0 0 6px #7dd3e8; }
 
-        /* ============ 答题页面 ============ */
-        .quiz-page {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(5,12,20,0.95);
-            z-index: 200; display: none; flex-direction: column; align-items: center; justify-content: flex-start;
-            overflow-y: auto; padding: 20px 15px 40px;
-            scrollbar-width: none; -ms-overflow-style: none;
-        }
-        .quiz-page::-webkit-scrollbar { display: none; }
-        .quiz-page.show { display: flex; }
-        .quiz-header { width: 100%; max-width: 800px; text-align: center; margin-bottom: 20px; }
-        .quiz-title { font-size: 28px; font-weight: 700; letter-spacing: 4px; color: #e8f4fa; text-shadow: 0 0 16px rgba(120,200,240,0.7); }
-        .quiz-subtitle { font-size: 12px; letter-spacing: 3px; color: #9cc8dc; opacity: 0.7; margin-top: 6px; }
-        .quiz-container { width: 100%; max-width: 800px; display: flex; flex-direction: column; gap: 20px; }
-        .question-block { background: rgba(5,12,20,0.7); border: 1px solid rgba(100,160,190,0.3); border-radius: 10px; padding: 16px 18px; }
-        .question-text { font-size: 14px; letter-spacing: 1px; color: #d8ecf4; margin-bottom: 12px; }
-        .options-group { display: flex; flex-direction: column; gap: 8px; }
-        .option-item { display: flex; align-items: center; gap: 10px; color: #b8d8e8; font-size: 13px; letter-spacing: 1px; cursor: pointer; }
-        .option-item input[type="radio"] { appearance: none; -webkit-appearance: none; width: 16px; height: 16px; border: 2px solid #6a9aa8; border-radius: 50%; background: #0a0e14; cursor: pointer; position: relative; flex-shrink: 0; }
-        .option-item input[type="radio"]:checked { border-color: #7dd3e8; }
-        .option-item input[type="radio"]:checked::after { content: ''; position: absolute; top: 3px; left: 3px; width: 6px; height: 6px; border-radius: 50%; background: #7dd3e8; box-shadow: 0 0 6px #7dd3e8; }
-        .quiz-submit { display: flex; justify-content: center; margin-top: 20px; gap: 12px; }
-        .btn-submit { padding: 12px 40px; font-size: 15px; }
-        .btn-quiz-back { padding: 12px 30px; font-size: 14px; }
+        /* ============ 答题页 ============ */
+        .quiz-page { position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(5,12,20,0.95); z-index:200; display:none; flex-direction:column; align-items:center; justify-content:flex-start; overflow-y:auto; padding:20px 15px 40px; scrollbar-width:none; -ms-overflow-style:none; }
+        .quiz-page::-webkit-scrollbar { display:none; }
+        .quiz-page.show { display:flex; }
+        .quiz-header { width:100%; max-width:800px; text-align:center; margin-bottom:20px; }
+        .quiz-title { font-size:28px; font-weight:700; letter-spacing:4px; color:#e8f4fa; text-shadow:0 0 16px rgba(120,200,240,0.7); }
+        .quiz-subtitle { font-size:12px; letter-spacing:3px; color:#9cc8dc; opacity:0.7; margin-top:6px; }
+        .quiz-container { width:100%; max-width:800px; display:flex; flex-direction:column; gap:20px; }
+        .question-block { background:rgba(5,12,20,0.7); border:1px solid rgba(100,160,190,0.3); border-radius:10px; padding:16px 18px; }
+        .question-text { font-size:14px; letter-spacing:1px; color:#d8ecf4; margin-bottom:12px; }
+        .options-group { display:flex; flex-direction:column; gap:8px; }
+        .option-item { display:flex; align-items:center; gap:10px; color:#b8d8e8; font-size:13px; letter-spacing:1px; cursor:pointer; }
+        .option-item input[type="radio"] { appearance:none; -webkit-appearance:none; width:16px; height:16px; border:2px solid #6a9aa8; border-radius:50%; background:#0a0e14; cursor:pointer; position:relative; flex-shrink:0; }
+        .option-item input[type="radio"]:checked { border-color:#7dd3e8; }
+        .option-item input[type="radio"]:checked::after { content:''; position:absolute; top:3px; left:3px; width:6px; height:6px; border-radius:50%; background:#7dd3e8; box-shadow:0 0 6px #7dd3e8; }
+        .quiz-submit { display:flex; justify-content:center; margin-top:20px; gap:12px; }
+        .btn-submit { padding:12px 40px; font-size:15px; }
+        .btn-quiz-back { padding:12px 30px; font-size:14px; }
 
         /* ============ 语音播报 ============ */
-        .announce-page {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(5,12,20,0.98);
-            z-index: 250; display: none; flex-direction: column; align-items: center; justify-content: center;
-            padding: 30px; overflow-y: auto;
-            scrollbar-width: none; -ms-overflow-style: none;
+        .announce-page { position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(5,12,20,0.98); z-index:250; display:none; flex-direction:column; align-items:center; justify-content:center; padding:30px; overflow-y:auto; scrollbar-width:none; -ms-overflow-style:none; }
+        .announce-page::-webkit-scrollbar { display:none; }
+        .announce-page.show { display:flex; }
+        .announce-box { max-width:700px; width:100%; background:rgba(5,12,20,0.8); border:1px solid rgba(100,160,190,0.4); border-radius:16px; padding:30px 25px; text-align:center; box-shadow:0 0 40px rgba(80,160,200,0.3); }
+        .announce-title { font-size:28px; font-weight:700; letter-spacing:4px; color:#e8f4fa; text-shadow:0 0 16px rgba(120,200,240,0.7); margin-bottom:16px; }
+        .announce-text { font-size:14px; letter-spacing:1.5px; color:#b8d8e8; line-height:1.8; text-align:left; margin-bottom:20px; white-space:pre-line; }
+        .btn-enter-main { padding:14px 40px; font-size:16px; }
+
+        /* ============ 游戏主界面（全屏固定） ============ */
+        .game-main-page {
+            position:fixed; top:0; left:0; width:100vw; height:100vh; z-index:30;
+            background:rgba(4,8,15,0.98);
+            display:none; flex-direction:column;
+            padding:8px 12px;
+            overflow:hidden;
+            background-image:url('https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEaa1NqmW5X2WitN5yFwAyu_a_aDvITegACdyAAAm9B0FQqncKhQmdWmz0E.png');
+            background-size:cover; background-position:center; background-blend-mode:overlay;
         }
-        .announce-page::-webkit-scrollbar { display: none; }
-        .announce-page.show { display: flex; }
-        .announce-box { max-width: 700px; width: 100%; background: rgba(5,12,20,0.8); border: 1px solid rgba(100,160,190,0.4); border-radius: 16px; padding: 30px 25px; text-align: center; box-shadow: 0 0 40px rgba(80,160,200,0.3); }
-        .announce-title { font-size: 28px; font-weight: 700; letter-spacing: 4px; color: #e8f4fa; text-shadow: 0 0 16px rgba(120,200,240,0.7); margin-bottom: 16px; }
-        .announce-text { font-size: 14px; letter-spacing: 1.5px; color: #b8d8e8; line-height: 1.8; text-align: left; margin-bottom: 20px; white-space: pre-line; }
-        .btn-enter-main { padding: 14px 40px; font-size: 16px; }
+        .game-main-page.show { display:flex; }
 
-        /* ============ 游戏主界面 ============ */
-        .game-main-page { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: none; flex-direction: column; align-items: center; justify-content: center; z-index: 15; }
-        .game-main-page.show { display: flex; }
-        .game-main-placeholder { font-size: 24px; letter-spacing: 4px; color: #d8ecf4; text-shadow: 0 0 12px rgba(120,200,240,0.8); text-align: center; line-height: 1.6; }
+        .game-top-bar {
+            display:flex; justify-content:space-between; align-items:center;
+            padding:6px 12px; color:#b8d8e8; border-bottom:1px solid rgba(100,160,190,0.3);
+            margin-bottom:6px; gap:8px; flex-shrink:0; flex-wrap:wrap;
+        }
+        .game-top-bar .sys-name { font-weight:bold; color:#7dd3e8; font-size:14px; flex-shrink:0; }
+        .game-top-bar .top-bar-center { font-size:11px; color:#ffcc66; font-weight:bold; text-align:center; flex:1; background:rgba(255,170,51,0.1); padding:3px 8px; border-radius:4px; border:1px solid rgba(255,170,51,0.25); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; min-width:60px; }
+        .game-top-bar .timer { font-size:17px; font-weight:bold; color:#ffaa33; flex-shrink:0; }
+        .game-top-bar-btns { display:flex; gap:4px; flex-shrink:0; }
+        .top-btn { padding:4px 8px; font-size:10px; font-family:inherit; border-radius:4px; border:1px solid; cursor:pointer; transition:all .2s; color:#d8ecf4; background:rgba(15,30,45,0.85); white-space:nowrap; }
+        .top-btn.restart { border-color:#c44a4a; color:#ff8888; }
+        .top-btn.restart:hover { background:rgba(100,30,30,0.9); border-color:#ff4444; }
+        .top-btn.logout { border-color:#888; color:#aaa; }
+        .top-btn.logout:hover { background:rgba(60,60,60,0.8); }
 
-        /* ============ 弹窗 ============ */
-        .game-modal-overlay { position: fixed; top:0; left:0; right:0; bottom:0; background: rgba(0,0,0,0.7); z-index:300; display:none; align-items:center; justify-content:center; }
+        .game-grid {
+            display:grid; grid-template-columns:1fr 1fr; grid-template-rows:1fr 1fr;
+            gap:8px; flex:1; min-height:0;
+        }
+        .region-card {
+            background:rgba(8,16,26,0.85); border:1px solid rgba(100,160,190,0.35);
+            border-radius:8px; padding:10px 12px; display:flex; flex-direction:column;
+            overflow:hidden; min-height:0;
+        }
+        .region-card .region-title { font-size:13px; font-weight:700; color:#7dd3e8; margin-bottom:6px; flex-shrink:0; }
+        .region-content { flex:1; overflow-y:auto; scrollbar-width:none; -ms-overflow-style:none; }
+        .region-content::-webkit-scrollbar { display:none; }
+
+        .driver-grid {
+            display:grid; grid-template-columns:repeat(5,1fr); grid-template-rows:repeat(2,1fr);
+            gap:5px; height:100%; width:100%;
+        }
+        .driver-item {
+            background:rgba(5,12,20,0.8); border:1px solid rgba(100,160,190,0.3);
+            border-radius:6px; padding:4px 2px; text-align:center; cursor:pointer;
+            transition:all .3s; min-width:0; overflow:hidden;
+            display:flex; flex-direction:column; justify-content:center; align-items:center; height:100%;
+        }
+        .driver-item:hover { border-color:rgba(150,220,250,0.7); box-shadow:0 0 12px rgba(80,160,200,0.25); transform:translateY(-2px); }
+        .indicator { width:8px; height:8px; border-radius:50%; display:inline-block; margin-bottom:2px; animation:indicator-glow 2s ease-in-out infinite; }
+        @keyframes indicator-glow { 0%,100%{ box-shadow:0 0 4px currentColor; } 50%{ box-shadow:0 0 12px currentColor; } }
+        .indicator.green { background:#44dd88; color:#44dd88; }
+        .indicator.yellow { background:#ffaa33; color:#ffaa33; }
+        .indicator.red { background:#ff4444; color:#ff4444; }
+        .driver-id { font-size:9px; color:#7dd3e8; margin-bottom:1px; white-space:nowrap; }
+        .driver-name { font-size:11px; color:#e8f4fa; font-weight:600; margin-bottom:1px; white-space:nowrap; }
+        .driver-status { font-size:9px; color:#9cc8dc; white-space:nowrap; }
+        .pending-badge { display:inline-block; margin-top:1px; padding:1px 4px; background:rgba(255,68,68,0.3); border:1px solid #ff4444; border-radius:10px; font-size:7px; color:#ff8888; }
+
+        .info-row { display:flex; margin-bottom:3px; font-size:11px; }
+        .info-label { width:68px; color:#9cc8dc; flex-shrink:0; }
+        .info-value { color:#d8ecf4; word-break:break-all; font-size:11px; }
+        .error-badge { color:#ff4444; font-weight:bold; }
+        .stat-bar { margin-bottom:4px; }
+        .stat-name { font-size:10px; color:#9cc8dc; margin-bottom:2px; display:flex; justify-content:space-between; }
+        .bar-bg { width:100%; height:6px; background:rgba(15,30,45,0.9); border-radius:4px; overflow:hidden; border:1px solid rgba(100,160,190,0.2); }
+        .bar-fill { height:100%; background:linear-gradient(90deg,#3b82f6,#06b6d4,#10b981); width:0%; transition:width .5s; }
+        .trophy-box { margin-top:6px; padding:5px 8px; background:rgba(15,30,45,0.7); border:1px dashed rgba(255,170,51,0.5); border-radius:6px; display:flex; align-items:center; gap:8px; }
+        .trophy-icon { font-size:20px; }
+        .trophy-info { display:flex; flex-direction:column; }
+        .trophy-title { font-size:11px; color:#ffaa33; font-weight:bold; }
+        .trophy-desc { font-size:9px; color:#9cc8dc; margin-top:1px; }
+
+        .event-box { color:#d8ecf4 !important; font-size:11px; line-height:1.5; padding:4px 0; }
+        .report-btns { display:flex; flex-direction:column; gap:5px; }
+        .report-btn { padding:7px 10px; font-size:11px; border-radius:6px; cursor:pointer; border:1.5px solid; transition:all .2s; font-family:inherit; background:rgba(8,16,26,0.9); color:#d8ecf4; text-align:left; }
+        .report-btn.company { border-color:#4a90c4; color:#c8e8ff; }
+        .report-btn.alarm-center { border-color:#c44a4a; color:#ffd0d0; }
+        .report-btn:disabled { opacity:0.35; cursor:not-allowed; filter:grayscale(80%); }
+        .report-log { background:rgba(4,8,15,0.8); border:1px solid rgba(100,160,190,0.3); border-radius:6px; padding:6px; color:#d8ecf4; font-size:10px; min-height:30px; max-height:80px; overflow-y:auto; margin-top:4px; scrollbar-width:thin; scrollbar-color:#6a9aa8 #08101a; }
+        .report-log::-webkit-scrollbar { width:4px; }
+        .report-log::-webkit-scrollbar-track { background:#08101a; }
+        .report-log::-webkit-scrollbar-thumb { background:#6a9aa8; border-radius:3px; }
+
+        /* ============ 通用弹窗 ============ */
+        .game-modal-overlay { position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.7); z-index:300; display:none; align-items:center; justify-content:center; }
         .game-modal-overlay.show { display:flex; }
-        .game-modal { background:#0b1219; border:1.5px solid rgba(120,190,220,0.7); box-shadow:0 0 30px rgba(80,160,200,0.5), inset 0 0 30px rgba(80,160,200,0.05); padding:24px 28px; max-width:500px; width:90%; text-align:center; position:relative; border-radius:12px; animation:modal-in 0.25s ease; max-height:80vh; overflow-y:auto; scrollbar-width: none; -ms-overflow-style: none; }
-        .game-modal::-webkit-scrollbar { display: none; }
-        @keyframes modal-in { from { transform:scale(0.9); opacity:0; } to { transform:scale(1); opacity:1; } }
-        .game-modal .modal-title { font-size:15px; letter-spacing:2px; color:#e8f4fa; margin-bottom:12px; text-shadow:0 0 8px rgba(100,180,220,0.6); }
-        .game-modal .modal-message { font-size:13px; letter-spacing:1px; color:#b8d8e8; line-height:1.6; margin-bottom:18px; word-break:break-word; text-align:left; }
-        .modal-btns { display:flex; justify-content:center; gap:12px; }
-        .game-modal .modal-btn { padding:8px 28px; font-family:inherit; font-size:13px; letter-spacing:2px; color:#d8ecf4; background:rgba(10,20,30,0.7); border:1px solid rgba(120,190,220,0.6); border-radius:8px; cursor:pointer; transition:all 0.2s; text-transform:uppercase; }
+        .game-modal { background:#0b1219; border:1.5px solid rgba(120,190,220,0.7); box-shadow:0 0 30px rgba(80,160,200,0.5),inset 0 0 30px rgba(80,160,200,0.05); padding:20px 24px; max-width:500px; width:92%; text-align:center; position:relative; border-radius:12px; animation:modal-in .25s; max-height:80vh; overflow-y:auto; scrollbar-width:none; -ms-overflow-style:none; }
+        .game-modal::-webkit-scrollbar { display:none; }
+        @keyframes modal-in { from{ transform:scale(0.9); opacity:0; } to{ transform:scale(1); opacity:1; } }
+        .game-modal .modal-title { font-size:15px; letter-spacing:2px; color:#e8f4fa; margin-bottom:10px; text-shadow:0 0 8px rgba(100,180,220,0.6); }
+        .game-modal .modal-message { font-size:13px; letter-spacing:1px; color:#b8d8e8; line-height:1.6; margin-bottom:16px; word-break:break-word; text-align:left; }
+        .modal-btns { display:flex; justify-content:center; gap:10px; flex-wrap:wrap; }
+        .game-modal .modal-btn { padding:8px 24px; font-family:inherit; font-size:13px; letter-spacing:2px; color:#d8ecf4; background:rgba(10,20,30,0.7); border:1px solid rgba(120,190,220,0.6); border-radius:8px; cursor:pointer; transition:all .2s; text-transform:uppercase; }
         .game-modal .modal-btn:hover { background:rgba(20,40,55,0.8); border-color:rgba(150,220,250,0.9); }
         .game-modal .modal-cancel-btn { background:rgba(30,20,20,0.5); border-color:rgba(200,100,100,0.6); color:#ffb0b0; }
         .game-modal .modal-cancel-btn:hover { background:rgba(60,20,20,0.7); border-color:rgba(220,120,120,0.9); }
 
-        .save-list-container { display:flex; flex-direction:column; gap:8px; margin:15px 0; text-align:left; }
-        .save-item { display:flex; justify-content:space-between; align-items:center; background:rgba(10,20,30,0.5); padding:8px 12px; border-radius:6px; border:1px solid rgba(110,160,190,0.3); }
-        .save-item-info { flex:1; font-size:12px; color:#b8d8e8; }
-        .save-item-actions { display:flex; gap:8px; }
-        .save-btn { padding:4px 12px; font-size:11px; letter-spacing:1px; border-radius:4px; cursor:pointer; border:1px solid rgba(120,190,220,0.6); background:rgba(10,20,30,0.7); color:#d8ecf4; transition:all 0.2s; }
+        .save-list-container { display:flex; flex-direction:column; gap:8px; margin:12px 0; text-align:left; }
+        .save-item { display:flex; justify-content:space-between; align-items:center; background:rgba(10,20,30,0.5); padding:6px 10px; border-radius:6px; border:1px solid rgba(110,160,190,0.3); }
+        .save-item-info { flex:1; font-size:11px; color:#b8d8e8; }
+        .save-item-actions { display:flex; gap:6px; }
+        .save-btn { padding:3px 10px; font-size:10px; letter-spacing:1px; border-radius:4px; cursor:pointer; border:1px solid rgba(120,190,220,0.6); background:rgba(10,20,30,0.7); color:#d8ecf4; transition:all .2s; font-family:inherit; }
         .save-btn:hover { background:rgba(20,40,55,0.8); }
         .save-btn.delete { border-color:rgba(220,100,100,0.6); color:#ffb0b0; }
         .save-btn.delete:hover { background:rgba(80,20,20,0.5); }
 
-        /* 公司编辑弹窗样式 */
-        .company-edit-container { display:flex; flex-direction:column; gap:8px; text-align:left; margin:10px 0; }
-        .company-edit-row { display:flex; align-items:center; gap:10px; }
-        .company-edit-input { flex:1; background:rgba(10,20,30,0.7); border:1px solid rgba(110,160,190,0.4); color:#d8ecf4; padding:8px 10px; border-radius:6px; }
+        .company-edit-container { display:flex; flex-direction:column; gap:6px; text-align:left; margin:8px 0; }
+        .company-edit-row { display:flex; align-items:center; gap:8px; }
+        .company-edit-input { flex:1; background:rgba(10,20,30,0.7); border:1px solid rgba(110,160,190,0.4); color:#d8ecf4; padding:6px 8px; border-radius:6px; font-family:inherit; font-size:12px; }
 
-        /* 竖屏旋转提示遮罩 */
-        .rotate-mask {
-            position: fixed; top:0; left:0; width:100%; height:100%; background:#000; z-index:999;
-            display:none; align-items:center; justify-content:center; color:#fff; font-size:20px;
-            letter-spacing:2px; text-align:center; padding:20px;
-        }
+        /* ============ 游戏内专用弹窗 ============ */
+        .modal-overlay { position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); z-index:300; display:none; align-items:center; justify-content:center; }
+        .modal-overlay.show { display:flex; }
+        .modal-box { background:#08101a; border:1.5px solid rgba(100,160,190,0.5); padding:18px 20px; max-width:600px; width:92%; border-radius:12px; max-height:88vh; overflow-y:auto; text-align:center; box-shadow:0 0 25px rgba(0,0,0,0.8); scrollbar-width:thin; scrollbar-color:#6a9aa8 #08101a; }
+        .modal-box::-webkit-scrollbar { width:6px; }
+        .modal-box::-webkit-scrollbar-track { background:#08101a; }
+        .modal-box::-webkit-scrollbar-thumb { background:#6a9aa8; border-radius:3px; }
+        .modal-title { font-size:15px; color:#7dd3e8; font-weight:bold; margin-bottom:10px; border-bottom:1px solid rgba(100,160,190,0.25); padding-bottom:6px; }
+        .modal-message { font-size:13px; color:#b8d8e8; text-align:left; white-space:pre-wrap; line-height:1.5; }
+        .modal-btns { display:flex; justify-content:center; gap:10px; flex-wrap:wrap; margin-top:14px; }
+        .modal-btn { padding:8px 20px; background:rgba(12,25,40,0.9); border:1px solid rgba(120,190,220,0.6); color:#d8ecf4; border-radius:6px; cursor:pointer; font-family:inherit; font-size:12px; transition:all .2s; }
+        .modal-btn:hover { background:rgba(30,70,100,0.9); border-color:#7dd3e8; }
+
+        .chat-container { height:180px; border:1px solid rgba(100,160,190,0.3); border-radius:8px; background:rgba(4,8,15,0.9); padding:8px; margin-bottom:8px; overflow-y:auto; display:flex; flex-direction:column; gap:6px; }
+        .chat-msg { max-width:85%; padding:6px 10px; border-radius:10px; font-size:11px; line-height:1.4; word-break:break-all; }
+        .chat-msg.driver { background:rgba(20,50,75,0.85); color:#c0e0f0; align-self:flex-start; border:1px solid rgba(80,150,190,0.3); }
+        .chat-msg.user { background:rgba(15,70,40,0.85); color:#c0f0c0; align-self:flex-end; border:1px solid rgba(60,160,90,0.3); }
+        .chat-msg.system { background:rgba(45,30,10,0.85); color:#ffd080; align-self:center; text-align:center; border:1px solid rgba(200,140,40,0.3); }
+        .chat-options { display:flex; flex-direction:column; gap:6px; margin-top:6px; }
+        .chat-option-btn { padding:8px 12px; background:rgba(8,16,26,0.9); border:1px solid rgba(100,160,190,0.4); color:#d8ecf4; border-radius:6px; cursor:pointer; font-family:inherit; font-size:11px; text-align:left; transition:all .2s; line-height:1.3; }
+        .chat-option-btn:hover { background:rgba(25,60,90,0.9); border-color:#7dd3e8; }
+
+        .report-selection-list { display:flex; flex-direction:column; gap:6px; margin:10px 0; }
+        .report-selection-item { background:rgba(4,8,15,0.85); border:1px solid rgba(100,160,190,0.4); color:#d8ecf4; padding:8px 10px; border-radius:6px; cursor:pointer; transition:all .2s; font-size:12px; text-align:left; }
+        .report-selection-item:hover { background:rgba(20,50,80,0.8); border-color:#7dd3e8; }
+        .report-selection-item.selected { border-color:#44dd88; background:rgba(15,60,35,0.7); color:#fff; }
+
+        .alarm-multi-group { display:flex; flex-direction:column; gap:6px; margin:8px 0; }
+        .alarm-check-item { display:flex; align-items:center; justify-content:space-between; background:rgba(4,8,15,0.85); border:1px solid rgba(100,160,190,0.4); padding:8px 10px; border-radius:6px; cursor:pointer; color:#d8ecf4; transition:all .2s; font-size:12px; }
+        .alarm-check-item:hover { border-color:#7dd3e8; background:rgba(15,35,55,0.8); }
+        .alarm-check-item.active { border-color:#ffaa33; background:rgba(255,170,51,0.15); color:#fff; }
+        .alarm-check-item input[type="checkbox"] { appearance:none; -webkit-appearance:none; width:16px; height:16px; border:1.5px solid rgba(120,190,220,0.6); background:#04080f; border-radius:4px; cursor:pointer; position:relative; outline:none; transition:all .2s; margin-left:6px; pointer-events:none; flex-shrink:0; }
+        .alarm-check-item input[type="checkbox"]:checked { background:#ffaa33; border-color:#ffaa33; }
+        .alarm-check-item input[type="checkbox"]:checked::after { content:"✓"; position:absolute; color:#08101a; font-size:12px; font-weight:bold; top:50%; left:50%; transform:translate(-50%,-50%); }
+
+        .duration-select-list { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin:12px 0; }
+        .duration-item { background:rgba(4,8,15,0.85); border:1px solid rgba(100,160,190,0.4); padding:10px; border-radius:6px; color:#d8ecf4; font-size:12px; cursor:pointer; transition:all .2s; text-align:center; }
+        .duration-item:hover { border-color:#7dd3e8; background:rgba(20,50,80,0.8); }
+        .duration-item.selected { border-color:#ffaa33; background:rgba(255,170,51,0.2); color:#ffaa33; font-weight:bold; }
+
+        /* ============ 全屏班次总结 ============ */
+        .summary-fullscreen-overlay { position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(4,8,15,0.98); z-index:1000; display:none; align-items:center; justify-content:center; padding:16px; overflow-y:auto; }
+        .summary-fullscreen-overlay.show { display:flex; }
+        .summary-fullscreen-card { width:100%; max-width:800px; background:rgba(8,16,26,0.95); border:2px solid rgba(120,190,220,0.6); border-radius:12px; padding:24px; box-shadow:0 0 50px rgba(0,0,0,0.9),0 0 20px rgba(125,211,232,0.25); display:flex; flex-direction:column; gap:16px; }
+        .summary-header { text-align:center; border-bottom:1px solid rgba(100,160,190,0.3); padding-bottom:12px; }
+        .summary-title { font-size:20px; color:#ffaa33; font-weight:bold; letter-spacing:1px; }
+        .summary-subtitle { font-size:11px; color:#9cc8dc; margin-top:4px; }
+        .summary-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+        .summary-box { background:rgba(4,8,15,0.8); border:1px solid rgba(100,160,190,0.3); border-radius:8px; padding:12px; }
+        .summary-stat-item { display:flex; justify-content:space-between; font-size:12px; color:#b8d8e8; margin-bottom:6px; }
+        .summary-stat-item:last-child { margin-bottom:0; }
+        .summary-stat-item strong { font-size:13px; color:#7dd3e8; }
+        .summary-award { font-size:12px; padding:12px; border:1.5px solid #ffaa33; border-radius:8px; color:#ffaa33; background:rgba(255,170,51,0.08); text-align:left; line-height:1.6; white-space:pre-wrap; }
+        .summary-actions { display:flex; justify-content:center; gap:12px; margin-top:4px; }
+
+        .toast { position:fixed; bottom:20px; left:50%; transform:translateX(-50%); background:rgba(8,16,26,0.95); border:1px solid rgba(120,190,220,0.8); padding:10px 20px; border-radius:8px; color:#d8ecf4; z-index:500; font-size:12px; box-shadow:0 4px 20px rgba(0,0,0,0.8); text-align:center; max-width:90%; }
+
+        .rotate-mask { position:fixed; top:0; left:0; width:100%; height:100%; background:#000; z-index:999; display:none; align-items:center; justify-content:center; color:#fff; font-size:18px; letter-spacing:2px; text-align:center; padding:20px; }
         .rotate-mask.show { display:flex; }
+
+        /* ============ 响应式 ============ */
+        @media (max-width:768px) {
+            .game-main-title { font-size:28px; }
+            .game-grid { grid-template-columns:1fr 1fr; grid-template-rows:1fr 1fr; gap:4px; }
+            .region-card { padding:6px 8px; }
+            .region-card .region-title { font-size:11px; }
+            .driver-id { font-size:8px; }
+            .driver-name { font-size:9px; }
+            .driver-status { font-size:8px; }
+            .game-top-bar .sys-name { font-size:11px; }
+            .game-top-bar .timer { font-size:14px; }
+            .top-btn { font-size:8px; padding:3px 6px; }
+            .info-row { font-size:10px; }
+            .info-label { width:56px; }
+            .summary-grid { grid-template-columns:1fr; }
+            .duration-select-list { grid-template-columns:1fr 1fr; }
+        }
+        @media (max-width:480px) {
+            .game-grid { grid-template-columns:1fr 1fr; grid-template-rows:1fr 1fr; gap:3px; }
+            .game-top-bar { padding:3px 6px; gap:4px; }
+            .game-top-bar .top-bar-center { font-size:8px; padding:2px 4px; min-width:40px; }
+            .driver-grid { gap:2px; }
+            .driver-item { padding:2px 1px; }
+            .driver-id { font-size:7px; }
+            .driver-name { font-size:8px; }
+            .driver-status { font-size:7px; }
+            .pending-badge { font-size:6px; padding:0 3px; }
+            .indicator { width:6px; height:6px; }
+            .region-card .region-title { font-size:9px; margin-bottom:3px; }
+            .report-btn { font-size:9px; padding:5px 8px; }
+            .report-log { font-size:8px; max-height:50px; padding:4px; }
+            .info-row { font-size:8px; margin-bottom:1px; }
+            .info-label { width:44px; }
+            .info-value { font-size:8px; }
+            .stat-name { font-size:8px; }
+            .bar-bg { height:4px; }
+            .trophy-box { padding:3px 6px; gap:4px; }
+            .trophy-icon { font-size:14px; }
+            .trophy-title { font-size:9px; }
+            .trophy-desc { font-size:7px; }
+            .game-top-bar .timer { font-size:12px; }
+            .top-btn { font-size:7px; padding:2px 5px; }
+            .game-top-bar .sys-name { font-size:9px; }
+        }
     </style>
 </head>
 <body>
+    <!-- 横屏遮罩 -->
     <div class="rotate-mask" id="rotateMask">请将设备旋转至横屏模式</div>
 
+    <!-- 背景层 -->
     <div class="bg-layer" id="bgLayer" aria-hidden="true"></div>
     <div class="bg-overlay" aria-hidden="true"></div>
     <div class="scanlines" aria-hidden="true"></div>
@@ -269,7 +353,8 @@
     <div class="corner-frame bl" aria-hidden="true"></div>
     <div class="corner-frame br" aria-hidden="true"></div>
 
-    <div class="top-status">
+    <!-- 顶部状态栏（非游戏时显示） -->
+    <div class="top-status" id="globalTopStatus">
         <div class="indicator-dots">
             <span class="dot" aria-hidden="true"></span>
             <span class="dot amber" aria-hidden="true"></span>
@@ -278,6 +363,12 @@
         <span class="sys-time" id="sysTime">--:--:--</span>
     </div>
 
+    <!-- 右下角版权（非游戏时显示） -->
+    <div class="corner-decor bottom-right" id="globalCornerDecor" aria-hidden="true">
+        货运管控模拟器<br>© 2026 货运安保部
+    </div>
+
+    <!-- ========== 主容器（非游戏页） ========== -->
     <div class="main-container" id="mainContainer">
         <!-- 首页 -->
         <div class="page active" id="homePage">
@@ -291,10 +382,11 @@
                     <span class="diamond"></span>
                     <span class="line"></span>
                 </div>
-                <span class="version-tag">V:0.1.8 &nbsp;|&nbsp; BUILD 2026.09</span>
+                <span class="version-tag">V:0.2.0 &nbsp;|&nbsp; BUILD 2026.09</span>
                 <div class="button-area">
                     <button class="btn btn-start" id="btnStartGame" type="button">开始游戏</button>
-                    <button class="btn btn-start" id="btnContinueGame" type="button" style="display: none;">继续游戏</button>
+                    <button class="btn btn-start" id="btnContinueGame" type="button" style="display:none;">继续游戏</button>
+                    <button class="btn btn-start" id="btnArchives" type="button" style="display:none;">档案</button>
                     <button class="btn btn-back" id="btnChangeCompany" type="button">公司名字更改</button>
                 </div>
             </div>
@@ -338,9 +430,7 @@
                         <div class="form-control">
                             <div class="custom-select" data-select="company">
                                 <div class="select-display"><span class="selected-text">请选择应聘公司</span><span class="arrow">▼</span></div>
-                                <div class="select-options" id="companyOptions">
-                                    <!-- 动态生成公司选项 -->
-                                </div>
+                                <div class="select-options" id="companyOptions"></div>
                             </div>
                         </div>
                     </div>
@@ -363,32 +453,120 @@
                         </div>
                     </div>
                 </div>
-                <div style="display: flex; gap: 12px; justify-content: center; margin-top: 6px;">
+                <div style="display:flex; gap:12px; justify-content:center; margin-top:6px;">
                     <button class="btn btn-register" id="btnConfirmRegister">确认注册</button>
                     <button class="btn btn-back" id="btnBackHome">返回</button>
                 </div>
             </div>
         </div>
+    </div>
 
-        <!-- 游戏主界面占位 -->
-        <div class="game-main-page" id="gameMainPage">
-            <div class="game-main-placeholder" id="gameMainPlaceholder">
-                游戏主界面<br>
-                <span style="font-size: 16px; opacity:0.7;">（内容开发中）</span>
+    <!-- ========== 游戏主界面（全屏固定） ========== -->
+    <div class="game-main-page" id="gameMainPage">
+        <!-- 顶部栏 -->
+        <div class="game-top-bar">
+            <span class="sys-name" id="gameSysName">货运管控模拟器 · 主控台</span>
+            <div class="top-bar-center">⚠️ 回答正确率关乎事件频率（当前：<span id="accuracyDisplay">100%</span>）</div>
+            <span class="timer" id="timerDisplay">20:00</span>
+            <div class="game-top-bar-btns">
+                <button class="top-btn restart" id="btnTopRestart">🔄 重开</button>
+                <button class="top-btn logout" id="btnGameLogout">退出</button>
             </div>
-            <div style="display: flex; gap: 12px; margin-top: 20px;">
-                <button class="btn btn-back" id="btnLogout">退出登录</button>
-                <button class="btn btn-back" id="btnRestart">重新开始</button>
+        </div>
+
+        <!-- 游戏网格 -->
+        <div class="game-grid">
+            <div class="region-card">
+                <div class="region-title">📋 个人能力与调度成就</div>
+                <div class="region-content">
+                    <div class="info-row"><span class="info-label">姓名：</span><span class="info-value" id="gamePlayerName">—</span></div>
+                    <div class="info-row"><span class="info-label">公司：</span><span class="info-value" id="gamePlayerCompany">—</span></div>
+                    <div class="info-row"><span class="info-label">性别：</span><span class="info-value" id="gamePlayerGender">—</span></div>
+                    <div class="info-row"><span class="info-label">年龄：</span><span class="info-value" id="gamePlayerAge">—</span></div>
+                    <div class="info-row"><span class="info-label">岗位：</span><span class="info-value">货运安全管理员</span></div>
+                    <div class="info-row"><span class="info-label">得分：</span><span class="info-value" id="scoreDisplay">0</span></div>
+                    <div class="info-row"><span class="info-label">累计失误：</span><span class="info-value error-badge" id="errorDisplay">0 / 3</span></div>
+                    <div class="info-row"><span class="info-label">已处理：</span><span class="info-value" id="handledDisplay">0</span></div>
+                    <div style="margin-top:6px; border-top:1px solid rgba(100,160,190,0.25); padding-top:6px;">
+                        <div class="stat-bar">
+                            <div class="stat-name"><span>综合个人能力值</span><span id="abilityValText">0%</span></div>
+                            <div class="bar-bg"><div class="bar-fill" id="abilityBar"></div></div>
+                        </div>
+                    </div>
+                    <div class="trophy-box" id="trophyBox">
+                        <div class="trophy-icon" id="trophyIcon">🔒</div>
+                        <div class="trophy-info">
+                            <div class="trophy-title" id="trophyTitle">暂无勋章</div>
+                            <div class="trophy-desc" id="trophyDesc">处理突发事件积累能力值解锁勋章</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="region-card">
+                <div class="region-title">🚚 货运司机列表</div>
+                <div class="region-content driver-grid" id="driverGrid"></div>
+            </div>
+
+            <div class="region-card">
+                <div class="region-title">⚠ 突发事件面板</div>
+                <div class="region-content">
+                    <div class="custom-select" id="eventSelectWrap" style="margin-bottom:4px;">
+                        <div class="select-display" id="eventSelectDisplay">
+                            <span id="eventSelectText">-- 请选择司机编号查询 --</span>
+                            <span class="arrow">▼</span>
+                        </div>
+                        <div class="select-options" id="eventSelectOptions"></div>
+                    </div>
+                    <div class="event-box" id="eventDetail">暂无事件，请选择司机编号查看详情。</div>
+                </div>
+            </div>
+
+            <div class="region-card">
+                <div class="region-title">🆘 紧急上报与报警中心</div>
+                <div class="region-content">
+                    <div class="report-btns">
+                        <button class="report-btn company" id="btnReportCompany">📋 1. 向公司安全指挥中心上报</button>
+                        <button class="report-btn alarm-center" id="btnCallAlarmCenter">🚨 2. 启动紧急救援报警（多选警种）</button>
+                    </div>
+                    <div class="report-log" id="reportLog">暂无操作记录。</div>
+                </div>
             </div>
         </div>
     </div>
 
-    <!-- 右下角版权信息（固定于视口） -->
-    <div class="corner-decor bottom-right" aria-hidden="true">
-        货运管控模拟器<br>© 2026 货运安保部
+    <!-- ========== 弹窗与模态框（全局） ========== -->
+    <!-- 存档列表 -->
+    <div class="game-modal-overlay" id="saveListOverlay">
+        <div class="game-modal">
+            <div class="modal-title">存档列表</div>
+            <div class="save-list-container" id="saveListContainer"></div>
+            <button class="modal-btn" id="closeSaveList">关闭</button>
+        </div>
     </div>
 
-    <!-- 答题页面 -->
+    <!-- 完成档案列表 -->
+    <div class="game-modal-overlay" id="archiveListOverlay">
+        <div class="game-modal">
+            <div class="modal-title">完成档案</div>
+            <div class="save-list-container" id="archiveListContainer"></div>
+            <button class="modal-btn" id="closeArchiveList">关闭</button>
+        </div>
+    </div>
+
+    <!-- 通用弹窗 -->
+    <div class="game-modal-overlay" id="gameModalOverlay">
+        <div class="game-modal">
+            <div class="modal-title" id="modalTitle">提示</div>
+            <div class="modal-message" id="modalMessage"></div>
+            <div class="modal-btns">
+                <button class="modal-btn" id="modalBtn">确定</button>
+                <button class="modal-btn modal-cancel-btn" id="modalCancelBtn" style="display:none;">取消</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 答题页 -->
     <div class="quiz-page" id="quizPage">
         <div class="quiz-header">
             <div class="quiz-title">安全知识考核</div>
@@ -401,7 +579,7 @@
         </div>
     </div>
 
-    <!-- 语音播报界面 -->
+    <!-- 语音播报 -->
     <div class="announce-page" id="announcePage">
         <div class="announce-box">
             <div class="announce-title">恭喜您考核通过</div>
@@ -421,30 +599,110 @@
         </div>
     </div>
 
-    <!-- 存档选择弹窗 -->
-    <div class="game-modal-overlay" id="saveListOverlay">
-        <div class="game-modal">
-            <div class="modal-title">存档列表</div>
-            <div class="save-list-container" id="saveListContainer"></div>
-            <button class="modal-btn" id="closeSaveList">关闭</button>
+    <!-- 游戏内启动弹窗 -->
+    <div class="modal-overlay" id="startModal">
+        <div class="modal-box">
+            <div class="modal-title">🎮 启动货运管控系统</div>
+            <div class="modal-message" style="text-align:center; margin-bottom:8px;">
+                请选择本次值班管控的计划时长：
+            </div>
+            <div class="duration-select-list" id="durationList">
+                <div class="duration-item" data-time="600">10分钟 (快速体验)</div>
+                <div class="duration-item selected" data-time="1200">20分钟 (标准班次)</div>
+                <div class="duration-item" data-time="1800">30分钟 (进阶挑战)</div>
+                <div class="duration-item" data-time="2400">40分钟 (高压管控)</div>
+                <div class="duration-item" data-time="3000">50分钟 (长途护航)</div>
+                <div class="duration-item" data-time="3600">1小时 (极限调度)</div>
+            </div>
+            <div class="modal-btns" style="margin-top:12px;">
+                <button class="modal-btn" id="confirmStartBtn" style="padding:10px 28px; font-weight:bold; border-color:#7dd3e8; color:#7dd3e8;">确认开始调度</button>
+            </div>
         </div>
     </div>
 
-    <!-- 游戏弹窗 -->
-    <div class="game-modal-overlay" id="gameModalOverlay">
-        <div class="game-modal">
-            <div class="modal-title" id="modalTitle">提示</div>
-            <div class="modal-message" id="modalMessage"></div>
+    <!-- 聊天弹窗 -->
+    <div class="modal-overlay" id="chatModal">
+        <div class="modal-box">
+            <div class="modal-title" id="chatModalTitle">💬 司机沟通</div>
+            <div class="chat-container" id="chatMessages"></div>
+            <div class="chat-options" id="chatOptions"></div>
+            <div class="modal-btns"><button class="modal-btn" id="closeChatBtn">挂断 / 关闭</button></div>
+        </div>
+    </div>
+
+    <!-- 事件通知 -->
+    <div class="modal-overlay" id="eventNotifyModal">
+        <div class="modal-box">
+            <div class="modal-title">⚠ 新突发事件预警</div>
+            <div class="modal-message" id="eventNotifyMessage"></div>
+            <div class="modal-btns"><button class="modal-btn" id="closeNotifyBtn">前往处理</button></div>
+        </div>
+    </div>
+
+    <!-- 上报选择 -->
+    <div class="modal-overlay" id="reportSelectionModal">
+        <div class="modal-box">
+            <div class="modal-title" id="reportSelectionTitle">选择</div>
+            <div class="modal-message" id="reportSelectionMessage"></div>
+            <div class="report-selection-list" id="reportSelectionList"></div>
             <div class="modal-btns">
-                <button class="modal-btn" id="modalBtn">确定</button>
-                <button class="modal-btn modal-cancel-btn" id="modalCancelBtn" style="display: none;">取消</button>
+                <button class="modal-btn" id="confirmReportSelectionBtn">确认提交</button>
+                <button class="modal-btn" id="cancelReportSelectionBtn">取消</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 重开确认 -->
+    <div class="modal-overlay" id="restartConfirmModal">
+        <div class="modal-box">
+            <div class="modal-title">🔄 确认重新开始</div>
+            <div class="modal-message" style="text-align:center; margin:12px 0;">
+                确定要重新开始当前班次吗？未保存的进度将丢失。
+            </div>
+            <div class="modal-btns">
+                <button class="modal-btn" id="confirmRestartModalBtn" style="border-color:#ff4444; color:#ff8888; font-weight:bold;">确认重新开始</button>
+                <button class="modal-btn" id="cancelRestartModalBtn">取消</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 班次总结 -->
+    <div class="summary-fullscreen-overlay" id="summaryModal">
+        <div class="summary-fullscreen-card">
+            <div class="summary-header">
+                <div class="summary-title" id="summaryHeaderTitle">📊 班次管控全景总结报告</div>
+                <div class="summary-subtitle" id="summarySubtitle">货运安全调度指挥中心 · 班次运行档案</div>
+            </div>
+            <div class="summary-grid">
+                <div class="summary-box">
+                    <div class="summary-stat-item"><span>处理事件总数：</span><strong id="sumTotal">0</strong></div>
+                    <div class="summary-stat-item"><span>成功处置险情：</span><strong id="sumSuccess" style="color:#44dd88;">0</strong></div>
+                    <div class="summary-stat-item"><span>失误/违规处置：</span><strong id="sumFail" style="color:#ff4444;">0</strong></div>
+                    <div class="summary-stat-item"><span>回答正确率：</span><strong id="sumAccuracy">100%</strong></div>
+                </div>
+                <div class="summary-box">
+                    <div class="summary-stat-item"><span>最终安全得分：</span><strong id="sumScore" style="color:#ffaa33;">0</strong></div>
+                    <div class="summary-stat-item"><span>综合个人能力：</span><strong id="sumAbilityText" style="color:#7dd3e8;">0%</strong></div>
+                    <div class="summary-stat-item"><span>获得的荣耀勋章：</span><strong id="sumTrophyName" style="color:#ffaa33;">暂无勋章</strong></div>
+                </div>
+            </div>
+            <div class="summary-award" id="sumAward">暂无评价</div>
+            <div class="summary-box" id="summaryPlayRecordBox">
+                <div style="font-size:12px;color:#7dd3e8;font-weight:bold;margin-bottom:6px;">📜 完整游玩记录</div>
+                <div class="report-log" id="summaryPlayLog" style="max-height:160px;min-height:50px;margin-top:0;">暂无操作记录。</div>
+            </div>
+            <div class="summary-actions">
+                <button class="modal-btn" id="restartBtn" style="padding:10px 28px; font-weight:bold; border-color:#7dd3e8; color:#7dd3e8; font-size:13px;">🔄 开启新一轮班次调度</button>
+                <button class="modal-btn" id="summaryArchiveBackBtn" style="padding:10px 28px; font-weight:bold; border-color:#7dd3e8; color:#7dd3e8; font-size:13px; display:none;">返回档案</button>
             </div>
         </div>
     </div>
 
     <script>
         (function() {
-            // 实时时钟
+            // ================================================================
+            // 1. 基础工具 & 时钟
+            // ================================================================
             function updateClock() {
                 var el = document.getElementById('sysTime');
                 if (!el) return;
@@ -457,26 +715,25 @@
             updateClock();
             setInterval(updateClock, 1000);
 
-            // ========== 缩放适配系统 ==========
-            var DESIGN_WIDTH = 1280;
-            var DESIGN_HEIGHT = 720;
+            // ================================================================
+            // 2. 缩放适配 & 横屏检测（仅非游戏页）
+            // ================================================================
+            var DESIGN_WIDTH = 1280,
+                DESIGN_HEIGHT = 720;
             var mainContainer = document.getElementById('mainContainer');
 
             function handleScale() {
-                var vw = window.innerWidth;
-                var vh = window.innerHeight;
-                var scaleX = vw / DESIGN_WIDTH;
-                var scaleY = vh / DESIGN_HEIGHT;
-                var scale = Math.min(scaleX, scaleY);
-                if (scale > 1) scale = 1;
+                var vw = window.innerWidth,
+                    vh = window.innerHeight;
+                var scale = Math.min(vw / DESIGN_WIDTH, vh / DESIGN_HEIGHT, 1);
                 mainContainer.style.transform = 'translate(-50%, -50%) scale(' + scale + ')';
             }
             window.addEventListener('resize', handleScale);
             window.addEventListener('load', handleScale);
             handleScale();
 
-            // ========== 竖屏检测强制横屏 ==========
             var rotateMask = document.getElementById('rotateMask');
+
             function checkOrientation() {
                 if (window.innerHeight > window.innerWidth) {
                     rotateMask.classList.add('show');
@@ -488,23 +745,22 @@
             window.addEventListener('load', checkOrientation);
             checkOrientation();
 
-            // ========== 公司列表管理 ==========
+            // ================================================================
+            // 3. 公司列表管理
+            // ================================================================
             var DEFAULT_COMPANIES = ['顺驰速运', '京驰物流', '国邮快递', '德远货运', '中驰快运', '圆驰物流', '申达快运', '运达速运', '吉兔速递'];
             var COMPANY_LIST_KEY = 'companyListOverride';
 
             function loadCompanyList() {
-                try {
-                    var raw = localStorage.getItem(COMPANY_LIST_KEY);
-                    return raw ? JSON.parse(raw) : DEFAULT_COMPANIES.slice();
-                } catch (e) {
-                    return DEFAULT_COMPANIES.slice();
-                }
+                try { var raw = localStorage.getItem(COMPANY_LIST_KEY); return raw ? JSON.parse(raw) : DEFAULT_COMPANIES.slice(); } catch (
+                e) { return DEFAULT_COMPANIES.slice(); }
             }
+
             function saveCompanyList(list) {
-                try {
-                    localStorage.setItem(COMPANY_LIST_KEY, JSON.stringify(list));
-                } catch (e) { console.error('保存公司列表失败', e); }
+                try { localStorage.setItem(COMPANY_LIST_KEY, JSON.stringify(list)); } catch (e) { console.error('保存公司列表失败',
+                    e); }
             }
+
             function getDefaultCompanyList() { return DEFAULT_COMPANIES.slice(); }
 
             function renderCompanyOptions() {
@@ -512,43 +768,164 @@
                 if (!container) return;
                 var companies = loadCompanyList();
                 var html = '';
-                companies.forEach(function(company) {
-                    html += '<div class="select-option" data-value="' + company + '">' + company + '</div>';
-                });
+                companies.forEach(function(c) { html += '<div class="select-option" data-value="' + c + '">' + c + '</div>'; });
                 container.innerHTML = html;
             }
 
-            // ========== 存档系统 ==========
+            // ================================================================
+            // 4. 存档系统
+            // ================================================================
             var SAVE_KEY = 'freightSecuritySave_v1';
+            var RESUME_KEY = 'freightSecurityResume_v3';
+            var LEGACY_RESUME_KEY = 'freightSecurityResume_v2';
+            var ARCHIVE_KEY = 'freightSecurityArchive_v2';
+            var activeResumeId = null;
+            var pendingEventStartTimeout = null;
 
             function loadSaves() {
                 try {
-                    var raw = localStorage.getItem(SAVE_KEY);
-                    return raw ? JSON.parse(raw) : [];
+                    var raw = localStorage.getItem(RESUME_KEY);
+                    var parsed = raw ? JSON.parse(raw) : [];
+                    if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+
+                    // 兼容上一版的续玩存档：发现 v2 存档后自动迁移到 v3。
+                    var legacyRaw = localStorage.getItem(LEGACY_RESUME_KEY);
+                    var legacyParsed = legacyRaw ? JSON.parse(legacyRaw) : [];
+                    if (Array.isArray(legacyParsed) && legacyParsed.length > 0) {
+                        localStorage.setItem(RESUME_KEY, JSON.stringify(legacyParsed));
+                        return legacyParsed;
+                    }
+                    // 兼容更早版本单独保存的当前进度对象。
+                    var oldSingleRaw = localStorage.getItem('freight_sim_saved_state');
+                    if (oldSingleRaw) {
+                        var oldSingle = JSON.parse(oldSingleRaw);
+                        if (oldSingle && Array.isArray(oldSingle.drivers) && typeof oldSingle.gameTime === 'number') {
+                            oldSingle.id = oldSingle.id || ('legacy_' + Date.now());
+                            oldSingle.savedAt = oldSingle.savedAt || new Date().toLocaleString();
+                            oldSingle.createdAt = oldSingle.createdAt || oldSingle.savedAt;
+                            oldSingle.playLog = Array.isArray(oldSingle.playLog) ? oldSingle.playLog : [];
+                            var migrated = [oldSingle];
+                            localStorage.setItem(RESUME_KEY, JSON.stringify(migrated));
+                            return migrated;
+                        }
+                    }
+                    return [];
                 } catch (e) { return []; }
             }
+
             function saveGame(data) {
                 var saves = loadSaves();
                 data.id = Date.now().toString();
                 data.createdAt = new Date().toLocaleString();
                 saves.push(data);
-                localStorage.setItem(SAVE_KEY, JSON.stringify(saves));
+                try { localStorage.setItem(RESUME_KEY, JSON.stringify(saves)); } catch (e) {}
             }
+
             function deleteSave(id) {
                 var saves = loadSaves();
                 var filtered = saves.filter(function(s) { return s.id !== id; });
-                localStorage.setItem(SAVE_KEY, JSON.stringify(filtered));
+                try { localStorage.setItem(RESUME_KEY, JSON.stringify(filtered)); } catch (e) {}
                 updateContinueButton();
                 renderSaveList();
             }
-            function updateContinueButton() {
-                var saves = loadSaves();
-                var btnContinue = document.getElementById('btnContinueGame');
-                if (saves.length > 0) {
-                    btnContinue.style.display = 'inline-flex';
-                } else {
-                    btnContinue.style.display = 'none';
+
+            function loadArchives() {
+                try {
+                    var raw = localStorage.getItem(ARCHIVE_KEY);
+                    var parsed = raw ? JSON.parse(raw) : [];
+                    return Array.isArray(parsed) ? parsed.filter(function(a) {
+                        return a && a.isComplete === true && Array.isArray(a.playLog);
+                    }) : [];
+                } catch (e) { return []; }
+            }
+
+            function saveCompletedArchive(data) {
+                var archives = loadArchives();
+                data.id = Date.now().toString() + '_' + Math.random().toString(36).slice(2, 8);
+                data.archivedAt = new Date().toLocaleString();
+                data.isComplete = true;
+                if (!Array.isArray(data.playLog)) data.playLog = [];
+                archives.unshift(data);
+                try { localStorage.setItem(ARCHIVE_KEY, JSON.stringify(archives)); } catch (e) {}
+                updateArchiveButton();
+            }
+
+            function deleteArchive(id) {
+                var archives = loadArchives().filter(function(a) { return a.id !== id; });
+                try { localStorage.setItem(ARCHIVE_KEY, JSON.stringify(archives)); } catch (e) {}
+                updateArchiveButton();
+                renderArchiveList();
+            }
+
+            function removeResumeSaveById(id) {
+                if (!id) return;
+                var saves = loadSaves().filter(function(s) { return s.id !== id; });
+                try { localStorage.setItem(RESUME_KEY, JSON.stringify(saves)); } catch (e) {}
+                if (activeResumeId === id) activeResumeId = null;
+                updateContinueButton();
+            }
+
+            function clearResumeSaves(id) {
+                if (id) {
+                    removeResumeSaveById(id);
+                    return;
                 }
+                if (activeResumeId) {
+                    removeResumeSaveById(activeResumeId);
+                }
+            }
+
+            function saveResumeState() {
+                if (!gameRunning) return false;
+                var player = window._playerInfo || window._registerInfo || {};
+                var saves = loadSaves();
+                var resumeData = {
+                    id: activeResumeId || ('resume_' + Date.now().toString() + '_' + Math.random().toString(36).slice(2, 8)),
+                    createdAt: '',
+                    savedAt: new Date().toLocaleString(),
+                    name: player.name || document.getElementById('gamePlayerName').textContent || '',
+                    age: player.age || '',
+                    gender: player.gender || '',
+                    company: player.company || '',
+                    unit: player.unit || '',
+                    hasLicense: !!player.hasLicense,
+                    gameTime: gameTime,
+                    selectedGameDuration: selectedGameDuration,
+                    score: score,
+                    totalEvents: totalEvents,
+                    successEvents: successEvents,
+                    failEvents: failEvents,
+                    wrongAnswers: wrongAnswers,
+                    personalAbility: personalAbility,
+                    drivers: JSON.parse(JSON.stringify(drivers || [])),
+                    playLog: Array.isArray(window._gamePlayLog) ? window._gamePlayLog.slice() : [],
+                    reportLogHtml: document.getElementById('reportLog') ? document.getElementById('reportLog').innerHTML : ''
+                };
+
+                var existingIndex = saves.findIndex(function(s) { return s.id === resumeData.id; });
+                if (existingIndex >= 0) {
+                    resumeData.createdAt = saves[existingIndex].createdAt || resumeData.savedAt;
+                    saves[existingIndex] = resumeData;
+                } else {
+                    resumeData.createdAt = resumeData.savedAt;
+                    saves.unshift(resumeData);
+                }
+
+                try {
+                    localStorage.setItem(RESUME_KEY, JSON.stringify(saves));
+                    activeResumeId = resumeData.id;
+                    updateContinueButton();
+                    return true;
+                } catch (e) {
+                    return false;
+                }
+            }
+
+            function updateArchiveButton() {
+                var btnArchives = document.getElementById('btnArchives');
+                if (!btnArchives) return;
+                var archives = loadArchives();
+                btnArchives.style.display = archives.length > 0 ? 'inline-flex' : 'none';
             }
 
             function formatCompanyDisplay(unit, company) {
@@ -556,26 +933,39 @@
                 return region + company + '货运安全部';
             }
 
-            // 页面元素
+            function updateContinueButton() {
+                var saves = loadSaves();
+                var btnContinue = document.getElementById('btnContinueGame');
+                if (saves.length > 0) { btnContinue.style.display = 'inline-flex'; } else { btnContinue.style.display = 'none'; }
+                updateArchiveButton();
+            }
+
+            // ================================================================
+            // 5. 页面切换（含游戏全屏控制）
+            // ================================================================
             var bgLayer = document.getElementById('bgLayer');
             var homePage = document.getElementById('homePage');
             var registerPage = document.getElementById('registerPage');
             var quizPage = document.getElementById('quizPage');
             var announcePage = document.getElementById('announcePage');
             var gameMainPage = document.getElementById('gameMainPage');
+            var globalTopStatus = document.getElementById('globalTopStatus');
+            var globalCornerDecor = document.getElementById('globalCornerDecor');
             var btnStartGame = document.getElementById('btnStartGame');
             var btnContinueGame = document.getElementById('btnContinueGame');
+            var btnArchives = document.getElementById('btnArchives');
             var btnBackHome = document.getElementById('btnBackHome');
             var btnQuizBack = document.getElementById('btnQuizBack');
             var btnEnterMain = document.getElementById('btnEnterMain');
-            var btnLogout = document.getElementById('btnLogout');
-            var btnRestart = document.getElementById('btnRestart');
-            var btnChangeCompany = document.getElementById('btnChangeCompany');
+            var btnGameLogout = document.getElementById('btnGameLogout');
             var announceAudio = document.getElementById('announceAudio');
 
             var saveListOverlay = document.getElementById('saveListOverlay');
             var saveListContainer = document.getElementById('saveListContainer');
             var closeSaveListBtn = document.getElementById('closeSaveList');
+            var archiveListOverlay = document.getElementById('archiveListOverlay');
+            var archiveListContainer = document.getElementById('archiveListContainer');
+            var closeArchiveListBtn = document.getElementById('closeArchiveList');
             var modalOverlay = document.getElementById('gameModalOverlay');
             var modalTitle = document.getElementById('modalTitle');
             var modalMessage = document.getElementById('modalMessage');
@@ -588,53 +978,52 @@
                 quizPage.classList.remove('show');
                 announcePage.classList.remove('show');
                 gameMainPage.classList.remove('show');
-
                 bgLayer.classList.remove('game-bg', 'blur-bg');
 
-                if (page === 'home') {
-                    homePage.classList.add('active');
-                    updateContinueButton();
-                } else if (page === 'register') {
-                    registerPage.classList.add('active');
-                    renderCompanyOptions();
-                } else if (page === 'quiz') {
-                    quizPage.classList.add('show');
-                } else if (page === 'announce') {
-                    announcePage.classList.add('show');
-                } else if (page === 'gameMain') {
+                // 控制全局顶部状态栏和角落装饰
+                if (page === 'gameMain') {
+                    globalTopStatus.style.opacity = '0';
+                    globalCornerDecor.style.opacity = '0';
+                } else {
+                    globalTopStatus.style.opacity = '1';
+                    globalCornerDecor.style.opacity = '1';
+                }
+
+                if (page === 'home') { homePage.classList.add('active');
+                    updateContinueButton(); } else if (page === 'register') { registerPage.classList.add('active');
+                    renderCompanyOptions(); } else if (page === 'quiz') { quizPage.classList.add('show'); } else if (page ===
+                    'announce') { announcePage.classList.add('show'); } else if (page === 'gameMain') {
                     bgLayer.classList.add('game-bg', 'blur-bg');
                     gameMainPage.classList.add('show');
+                    // 如果游戏未初始化，弹出启动弹窗
+                    if (!window._gameInitialized) {
+                        document.getElementById('startModal').classList.add('show');
+                    }
                 }
-
-                if (page !== 'announce' && announceAudio) {
-                    announceAudio.pause();
-                    announceAudio.currentTime = 0;
-                }
+                if (page !== 'announce' && announceAudio) { announceAudio.pause();
+                    announceAudio.currentTime = 0; }
             }
-
-            // 初始化
             showPage('home');
             updateContinueButton();
+            updateArchiveButton();
             renderCompanyOptions();
 
-            // 公司名字更改按钮
-            btnChangeCompany.addEventListener('click', function() {
-                openCompanyEditModal();
-            });
-
-            function openCompanyEditModal() {
+            // ================================================================
+            // 6. 公司更改弹窗
+            // ================================================================
+            document.getElementById('btnChangeCompany').addEventListener('click', function() {
                 var companies = loadCompanyList();
                 var html = '<div class="company-edit-container">';
-                html += '<p style="color:#b8d8e8; margin-bottom:10px;">修改公司名称（留空则使用默认）：</p>';
-                companies.forEach(function(company, index) {
+                html += '<p style="color:#b8d8e8; margin-bottom:8px;">修改公司名称（留空则使用默认）：</p>';
+                companies.forEach(function(c, idx) {
                     html += '<div class="company-edit-row">';
-                    html += '<span style="color:#9cc8dc; width:30px;">' + (index+1) + '.</span>';
-                    html += '<input type="text" class="company-edit-input" data-index="' + index + '" value="' + company + '">';
+                    html += '<span style="color:#9cc8dc; width:26px;font-size:12px;">' + (idx + 1) + '.</span>';
+                    html += '<input type="text" class="company-edit-input" data-index="' + idx + '" value="' + c +
+                        '">';
                     html += '</div>';
                 });
-                html += '<div style="display:flex; justify-content:space-between; margin-top:15px;">';
-                html += '<button class="btn btn-back" id="btnRestoreCompanies">恢复默认</button>';
-                html += '</div>';
+                html +=
+                '<div style="display:flex; justify-content:space-between; margin-top:12px;"><button class="btn btn-back" id="btnRestoreCompanies">恢复默认</button></div>';
                 html += '</div>';
 
                 modalTitle.textContent = '修改公司列表';
@@ -648,77 +1037,72 @@
                     btnRestore.addEventListener('click', function() {
                         var inputs = document.querySelectorAll('.company-edit-input');
                         var defaults = getDefaultCompanyList();
-                        inputs.forEach(function(input, idx) {
-                            input.value = defaults[idx] || '';
-                        });
+                        inputs.forEach(function(inp, idx) { inp.value = defaults[idx] || ''; });
                     });
                 }
-
                 modalBtn.onclick = function() {
                     var inputs = document.querySelectorAll('.company-edit-input');
                     var newList = [];
-                    inputs.forEach(function(input) {
-                        var val = input.value.trim();
-                        if (val) {
-                            newList.push(val);
-                        } else {
-                            var defaults = getDefaultCompanyList();
-                            var idx = parseInt(input.getAttribute('data-index'));
-                            newList.push(defaults[idx] || '');
-                        }
+                    inputs.forEach(function(inp) {
+                        var val = inp.value.trim();
+                        var idx = parseInt(inp.getAttribute('data-index'));
+                        var defaults = getDefaultCompanyList();
+                        newList.push(val || defaults[idx] || '');
                     });
                     saveCompanyList(newList);
                     modalOverlay.classList.remove('show');
                     renderCompanyOptions();
                     showGameModal('提示', '公司列表已更新。');
                 };
-                modalCancelBtn.onclick = function() {
-                    modalOverlay.classList.remove('show');
-                };
-            }
-
-            // 开始游戏按钮：检查存档
-            btnStartGame.addEventListener('click', function() {
-                var saves = loadSaves();
-                if (saves.length > 0) {
-                    showConfirmModal('提示', '已有创建档案，是否继续创建新存档？', function() {
-                        showPage('register');
-                    });
-                } else {
-                    showPage('register');
-                }
+                modalCancelBtn.onclick = function() { modalOverlay.classList.remove('show'); };
             });
 
-            // 继续游戏按钮：打开存档列表
+            // ================================================================
+            // 7. 游戏开始/继续
+            // ================================================================
+            btnStartGame.addEventListener('click', function() {
+                showPage('register');
+            });
+
             btnContinueGame.addEventListener('click', function() {
                 renderSaveList();
                 saveListOverlay.classList.add('show');
             });
 
+            if (btnArchives) {
+                btnArchives.addEventListener('click', function() {
+                    renderArchiveList();
+                    archiveListOverlay.classList.add('show');
+                });
+            }
+
+            if (closeArchiveListBtn) {
+                closeArchiveListBtn.addEventListener('click', function() {
+                    archiveListOverlay.classList.remove('show');
+                });
+            }
+
             function renderSaveList() {
                 var saves = loadSaves();
                 var html = '';
-                if (saves.length === 0) {
-                    html = '<div style="color:#b8d8e8; text-align:center;">暂无存档</div>';
-                } else {
+                if (saves.length === 0) { html = '<div style="color:#b8d8e8;text-align:center;">暂无存档</div>'; } else {
                     saves.forEach(function(save) {
-                        var displayCompany = formatCompanyDisplay(save.unit, save.company);
+                        var displayCompany = formatCompanyDisplay(save.unit || '', save.company || '');
                         html += '<div class="save-item">';
                         html += '<div class="save-item-info">';
                         html += '<strong>' + save.name + '</strong> - ' + displayCompany + '<br>';
-                        html += '<small>创建时间：' + save.createdAt + '</small>';
+                        html += '<small>保存时间：' + (save.savedAt || save.createdAt || '—') + '</small>';
                         html += '</div>';
                         html += '<div class="save-item-actions">';
                         html += '<button class="save-btn" data-action="load" data-id="' + save.id + '">进入</button>';
-                        html += '<button class="save-btn delete" data-action="delete" data-id="' + save.id + '">删除</button>';
-                        html += '</div>';
-                        html += '</div>';
+                        html += '<button class="save-btn delete" data-action="delete" data-id="' + save.id +
+                            '">删除</button>';
+                        html += '</div></div>';
                     });
                 }
                 saveListContainer.innerHTML = html;
-
                 saveListContainer.querySelectorAll('.save-btn').forEach(function(btn) {
-                    btn.addEventListener('click', function(e) {
+                    btn.addEventListener('click', function() {
                         var action = this.getAttribute('data-action');
                         var id = this.getAttribute('data-id');
                         if (action === 'load') {
@@ -734,16 +1118,111 @@
             function loadSaveById(id) {
                 var saves = loadSaves();
                 var save = saves.find(function(s) { return s.id === id; });
-                if (save) {
+                if (save && Array.isArray(save.drivers) && typeof save.gameTime === 'number') {
+                    activeResumeId = save.id;
+                    currentGameCompleted = false;
+                    window._playerInfo = {
+                        name: save.name || '',
+                        age: save.age || '',
+                        gender: save.gender || '',
+                        company: save.company || '',
+                        unit: save.unit || '',
+                        hasLicense: !!save.hasLicense
+                    };
+
+                    selectedGameDuration = Number(save.selectedGameDuration) || 1200;
+                    gameTime = Math.max(0, Number(save.gameTime) || 0);
+                    score = Number(save.score) || 0;
+                    totalEvents = Number(save.totalEvents) || 0;
+                    successEvents = Number(save.successEvents) || 0;
+                    failEvents = Number(save.failEvents) || 0;
+                    wrongAnswers = Number(save.wrongAnswers) || 0;
+                    personalAbility = Number(save.personalAbility) || 0;
+                    drivers = JSON.parse(JSON.stringify(save.drivers));
+                    window._gamePlayLog = Array.isArray(save.playLog) ? save.playLog.slice() : [];
+
+                    var player = window._playerInfo;
+                    document.getElementById('gamePlayerName').textContent = player.name || '—';
+                    document.getElementById('gamePlayerCompany').textContent = player.company ? formatCompanyDisplay(player.unit || '', player.company) : '—';
+                    document.getElementById('gamePlayerGender').textContent = player.gender || '—';
+                    document.getElementById('gamePlayerAge').textContent = player.age ? player.age + '岁' : '—';
+
+                    var savedReportLog = document.getElementById('reportLog');
+                    if (savedReportLog) {
+                        savedReportLog.innerHTML = save.reportLogHtml || '暂无操作记录。';
+                    }
+
+                    pendingRedDriver = null;
+                    currentChatDriver = null;
+                    currentReportType = null;
+                    selectionStep = 'driver';
+                    selectedReportDriverId = null;
+                    selectedLocation = null;
+                    selectedAlarms = [];
+                    companyReported = false;
+                    redEventInspected = false;
+
+                    document.querySelectorAll('.modal-overlay.show').forEach(function(el) { el.classList.remove('show'); });
+                    document.querySelectorAll('.game-modal-overlay.show').forEach(function(el) { el.classList.remove('show'); });
+
+                    window._gameInitialized = true;
+                    gameRunning = true;
+                    renderDrivers();
+                    populateSelectOptions();
+                    updateClockDisplay();
+                    updateStats();
+                    updateReportButtons();
+                    resetEventPanel();
+                    clearInterval(timerInterval);
+                    clearInterval(eventInterval);
+                    if (pendingEventStartTimeout) { clearTimeout(pendingEventStartTimeout); pendingEventStartTimeout = null; }
+                    startTimer();
+                    adjustEventInterval();
                     showPage('gameMain');
-                    var placeholder = document.getElementById('gameMainPlaceholder');
-                    var displayCompany = formatCompanyDisplay(save.unit, save.company);
-                    placeholder.innerHTML = '欢迎回来，' + save.name + ' 安全员<br>' +
-                                           displayCompany + '<br>' +
-                                           '<span style="font-size: 16px; opacity:0.7;">（游戏内容开发中）</span>';
+                    updateContinueButton();
                 } else {
-                    showGameModal('提示', '存档不存在或已损坏。');
+                    showGameModal('提示', '存档不存在、已损坏或不是可继续的完整进度。');
                 }
+            }
+
+            function renderArchiveList() {
+                var archives = loadArchives();
+                var html = '';
+                if (archives.length === 0) {
+                    html = '<div style="color:#b8d8e8;text-align:center;">暂无完成档案</div>';
+                } else {
+                    archives.forEach(function(archive) {
+                        var displayCompany = archive.company ? formatCompanyDisplay(archive.unit || '', archive.company) : '—';
+                        html += '<div class="save-item">';
+                        html += '<div class="save-item-info">';
+                        html += '<strong>' + (archive.name || '未命名') + '</strong> - ' + displayCompany + '<br>';
+                        html += '<small>完成时间：' + (archive.archivedAt || '—') + '　得分：' + (archive.score || 0) + '　正确率：' + (archive.accuracy || 100) + '%</small>';
+                        html += '</div>';
+                        html += '<div class="save-item-actions">';
+                        html += '<button class="save-btn" data-archive-action="view" data-id="' + archive.id + '">查看</button>';
+                        html += '<button class="save-btn delete" data-archive-action="delete" data-id="' + archive.id + '">删除</button>';
+                        html += '</div></div>';
+                    });
+                }
+                archiveListContainer.innerHTML = html;
+                archiveListContainer.querySelectorAll('.save-btn').forEach(function(btn) {
+                    btn.addEventListener('click', function() {
+                        var action = this.getAttribute('data-archive-action');
+                        var id = this.getAttribute('data-id');
+                        if (action === 'view') {
+                            var archive = loadArchives().find(function(a) { return a.id === id; });
+                            if (archive) {
+                                archiveListOverlay.classList.remove('show');
+                                showArchiveSummary(archive);
+                            }
+                        } else if (action === 'delete') {
+                            showConfirmModal('删除完成档案', '确定要删除该完成档案吗？此操作不可恢复。', function() {
+                                deleteArchive(id);
+                                showGameModal('提示', '完成档案已删除。');
+                            });
+                        }
+                    });
+                });
             }
 
             function confirmDeleteSave(id) {
@@ -753,6 +1232,15 @@
                 });
             }
 
+            closeSaveListBtn.addEventListener('click', function() { saveListOverlay.classList.remove('show'); });
+            saveListOverlay.addEventListener('click', function(e) { if (e.target === saveListOverlay) saveListOverlay.classList
+                    .remove('show'); });
+            modalOverlay.addEventListener('click', function(e) { if (e.target === modalOverlay) modalOverlay.classList.remove(
+                    'show'); });
+
+            // ================================================================
+            // 8. 通用弹窗
+            // ================================================================
             function showGameModal(title, message, callback) {
                 modalTitle.textContent = title;
                 modalMessage.innerHTML = message.replace(/\n/g, '<br>');
@@ -760,18 +1248,12 @@
                 modalCancelBtn.style.display = 'none';
                 modalBtn.textContent = '确定';
                 if (typeof callback === 'function') {
-                    modalBtn.onclick = function() {
-                        modalOverlay.classList.remove('show');
-                        callback();
-                    };
+                    modalBtn.onclick = function() { modalOverlay.classList.remove('show');
+                        callback(); };
                 } else {
-                    modalBtn.onclick = function() {
-                        modalOverlay.classList.remove('show');
-                    };
+                    modalBtn.onclick = function() { modalOverlay.classList.remove('show'); };
                 }
-                modalCancelBtn.onclick = function() {
-                    modalOverlay.classList.remove('show');
-                };
+                modalCancelBtn.onclick = function() { modalOverlay.classList.remove('show'); };
             }
 
             function showConfirmModal(title, message, onConfirm) {
@@ -784,81 +1266,35 @@
                     modalOverlay.classList.remove('show');
                     if (typeof onConfirm === 'function') onConfirm();
                 };
-                modalCancelBtn.onclick = function() {
-                    modalOverlay.classList.remove('show');
-                };
+                modalCancelBtn.onclick = function() { modalOverlay.classList.remove('show'); };
             }
 
-            closeSaveListBtn.addEventListener('click', function() {
-                saveListOverlay.classList.remove('show');
-            });
-            saveListOverlay.addEventListener('click', function(e) {
-                if (e.target === saveListOverlay) saveListOverlay.classList.remove('show');
-            });
-            modalOverlay.addEventListener('click', function(e) {
-                if (e.target === modalOverlay) modalOverlay.classList.remove('show');
-            });
-
-            btnBackHome.addEventListener('click', () => showPage('home'));
-            btnQuizBack.addEventListener('click', () => showPage('register'));
-            btnEnterMain.addEventListener('click', () => {
-                if (announceAudio) {
-                    announceAudio.pause();
-                    announceAudio.currentTime = 0;
-                }
-                showPage('gameMain');
-                var saves = loadSaves();
-                if (saves.length > 0) {
-                    var save = saves[saves.length - 1];
-                    var placeholder = document.getElementById('gameMainPlaceholder');
-                    var displayCompany = formatCompanyDisplay(save.unit, save.company);
-                    placeholder.innerHTML = '欢迎上任，' + save.name + ' 安全员<br>' +
-                                           displayCompany + '<br>' +
-                                           '<span style="font-size: 16px; opacity:0.7;">（游戏内容开发中）</span>';
-                }
-            });
-            btnLogout.addEventListener('click', () => {
-                showPage('home');
-            });
-            btnRestart.addEventListener('click', () => {
-                showPage('home');
-            });
-
-            document.addEventListener('keydown', function(e) {
-                if (e.key === 'Enter' && homePage.classList.contains('active')) {
-                    if (btnStartGame) btnStartGame.click();
-                    e.preventDefault();
-                }
-            });
-
-            // 生成年龄选项 (18-25)
+            // ================================================================
+            // 9. 注册逻辑
+            // ================================================================
             var ageOptionsContainer = document.getElementById('ageOptions');
             if (ageOptionsContainer) {
                 var ageHtml = '';
-                for (var i = 18; i <= 25; i++) {
-                    ageHtml += '<div class="select-option" data-value="' + i + '">' + i + '岁</div>';
-                }
+                for (var i = 18; i <= 25; i++) { ageHtml += '<div class="select-option" data-value="' + i + '">' + i +
+                        '岁</div>'; }
                 ageOptionsContainer.innerHTML = ageHtml;
             }
 
-            // 生成单位选项
             var provinces = [
-                '北京市','天津市','上海市','重庆市','河北省','山西省','辽宁省','吉林省',
-                '黑龙江省','江苏省','浙江省','安徽省','福建省','江西省','山东省','河南省',
-                '湖北省','湖南省','广东省','海南省','四川省','贵州省','云南省','陕西省',
-                '甘肃省','青海省','台湾省','内蒙古自治区','广西壮族自治区','西藏自治区',
-                '宁夏回族自治区','新疆维吾尔自治区','香港特别行政区','澳门特别行政区'
+                '北京市', '天津市', '上海市', '重庆市', '河北省', '山西省', '辽宁省', '吉林省',
+                '黑龙江省', '江苏省', '浙江省', '安徽省', '福建省', '江西省', '山东省', '河南省',
+                '湖北省', '湖南省', '广东省', '海南省', '四川省', '贵州省', '云南省', '陕西省',
+                '甘肃省', '青海省', '台湾省', '内蒙古自治区', '广西壮族自治区', '西藏自治区',
+                '宁夏回族自治区', '新疆维吾尔自治区', '香港特别行政区', '澳门特别行政区'
             ];
             var unitOptionsContainer = document.getElementById('unitOptions');
             if (unitOptionsContainer) {
                 var unitHtml = '';
-                provinces.forEach(function(prov) {
-                    unitHtml += '<div class="select-option" data-value="' + prov + '货运安全部">' + prov + '货运安全部</div>';
-                });
+                provinces.forEach(function(p) { unitHtml += '<div class="select-option" data-value="' + p +
+                        '货运安全部">' + p + '货运安全部</div>'; });
                 unitOptionsContainer.innerHTML = unitHtml;
             }
 
-            // 事件委托处理所有下拉列表交互
             document.addEventListener('click', function(e) {
                 var display = e.target.closest('.select-display');
                 if (display) {
@@ -866,17 +1302,14 @@
                     if (!select) return;
                     e.stopPropagation();
                     document.querySelectorAll('.custom-select.open').forEach(function(other) {
-                        if (other !== select) {
-                            other.classList.remove('open');
-                            other.querySelector('.select-options').classList.remove('show');
-                        }
+                        if (other !== select) { other.classList.remove('open');
+                            other.querySelector('.select-options').classList.remove('show'); }
                     });
                     select.classList.toggle('open');
-                    var options = select.querySelector('.select-options');
-                    if (options) options.classList.toggle('show');
+                    var opts = select.querySelector('.select-options');
+                    if (opts) opts.classList.toggle('show');
                     return;
                 }
-
                 var option = e.target.closest('.select-option');
                 if (option) {
                     var select = option.closest('.custom-select');
@@ -885,20 +1318,65 @@
                     if (selectedText) selectedText.textContent = option.textContent;
                     select.setAttribute('data-value', option.getAttribute('data-value'));
                     select.classList.remove('open');
-                    var options = select.querySelector('.select-options');
-                    if (options) options.classList.remove('show');
+                    var opts = select.querySelector('.select-options');
+                    if (opts) opts.classList.remove('show');
                     return;
                 }
-
                 if (!e.target.closest('.custom-select')) {
                     document.querySelectorAll('.custom-select.open').forEach(function(sel) {
                         sel.classList.remove('open');
-                        sel.querySelector('.select-options').classList.remove('show');
+                        var opts = sel.querySelector('.select-options');
+                        if (opts) opts.classList.remove('show');
                     });
                 }
             });
 
-            // 注册确认逻辑
+            function resetRuntimeStateForNewGame() {
+                clearInterval(timerInterval);
+                clearInterval(eventInterval);
+                if (pendingEventStartTimeout) {
+                    clearTimeout(pendingEventStartTimeout);
+                    pendingEventStartTimeout = null;
+                }
+
+                gameRunning = false;
+                window._gameInitialized = false;
+                activeResumeId = null;
+                currentGameCompleted = false;
+                gameTime = selectedGameDuration;
+                score = 0;
+                totalEvents = 0;
+                successEvents = 0;
+                failEvents = 0;
+                wrongAnswers = 0;
+                personalAbility = 0;
+                drivers = [];
+                pendingRedDriver = null;
+                currentChatDriver = null;
+                currentReportType = null;
+                selectedReportDriverId = null;
+                selectedLocation = null;
+                selectedAlarms = [];
+                selectionStep = 'driver';
+                companyReported = false;
+                redEventInspected = false;
+                window._gamePlayLog = [];
+
+                var reportLog = document.getElementById('reportLog');
+                if (reportLog) reportLog.innerHTML = '暂无操作记录。';
+                var chatMessagesEl = document.getElementById('chatMessages');
+                if (chatMessagesEl) chatMessagesEl.innerHTML = '';
+                var chatOptionsEl = document.getElementById('chatOptions');
+                if (chatOptionsEl) chatOptionsEl.innerHTML = '';
+                resetEventPanel();
+                updateClockDisplay();
+                updateStats();
+                updateReportButtons();
+                document.querySelectorAll('.modal-overlay.show').forEach(function(el) { el.classList.remove('show'); });
+                document.querySelectorAll('.game-modal-overlay.show').forEach(function(el) { el.classList.remove('show'); });
+                document.getElementById('summaryModal').classList.remove('show');
+            }
+
             var btnConfirmRegister = document.getElementById('btnConfirmRegister');
             if (btnConfirmRegister) {
                 btnConfirmRegister.addEventListener('click', function() {
@@ -912,13 +1390,13 @@
                     for (var i = 0; i < licenseRadios.length; i++) {
                         if (licenseRadios[i].checked) { licenseValue = licenseRadios[i].value; break; }
                     }
-
                     if (!name) { showGameModal('提示', '请填写姓名。'); return; }
                     if (!ageSelect.getAttribute('data-value')) { showGameModal('提示', '请选择年龄。'); return; }
                     if (!genderSelect.getAttribute('data-value')) { showGameModal('提示', '请选择性别。'); return; }
                     if (!companySelect.getAttribute('data-value')) { showGameModal('提示', '请选择应聘公司。'); return; }
                     if (!unitSelect.getAttribute('data-value')) { showGameModal('提示', '请选择货运安全部单位。'); return; }
 
+                    resetRuntimeStateForNewGame();
                     window._registerInfo = {
                         name: name,
                         age: ageSelect.getAttribute('data-value'),
@@ -934,31 +1412,53 @@
                 });
             }
 
-            // ============ 两套题库 ============
+            // ================================================================
+            // 10. 题库
+            // ================================================================
             var safetyQuestions = [
-                { question: "安全员在货物装车前应重点检查什么？", options: ["货物数量", "车辆技术状况及货物捆绑", "司机驾驶证", "天气情况"], correct: 1, explanation: "安全员需确认车辆状态良好及货物固定牢靠，防止运输途中发生意外。" },
-                { question: "发现安全隐患时，安全员首先应？", options: ["自行处理", "立即上报并停止相关作业", "忽视继续工作", "通知司机处理"], correct: 1, explanation: "安全员应立即上报隐患，确保人员安全，不得擅自冒险作业。" },
-                { question: "危险品运输车辆出车前，安全员必须核查什么证件？", options: ["行驶证", "危险品运输许可证", "营运证", "保险单"], correct: 1, explanation: "危险品运输需持有专门许可证，安全员必须核实。" },
-                { question: "货物堆码不符合规定时，安全员应如何处理？", options: ["要求重新堆码", "直接放行", "记录后放行", "增加捆绑带"], correct: 0, explanation: "堆码不稳易导致货物倒塌，必须重新堆码至符合安全标准。" },
-                { question: "应急预案演练中，安全员的主要职责是？", options: ["参与救援", "组织协调和监督执行", "驾驶车辆", "记录数据"], correct: 1, explanation: "安全员负责组织协调演练，确保流程正确执行。" },
-                { question: "运输途中发生货物泄漏，安全员应首先？", options: ["组织人员疏散并报警", "自行清理", "继续行驶", "掩盖泄漏物"], correct: 0, explanation: "安全员应优先疏散人员并报警，避免扩大危害。" },
-                { question: "安全员在车辆出场前需对哪些项目签字确认？", options: ["车辆技术状况", "货物装载情况", "司机精神状态", "以上都是"], correct: 3, explanation: "安全员需综合确认车辆、货物、人员状态，全部合格方可放行。" },
-                { question: "发现驾驶员疲劳驾驶，安全员应？", options: ["强制其休息", "提醒注意", "继续行程", "换另一名司机"], correct: 0, explanation: "疲劳驾驶是严重安全隐患，必须强制停车休息。" },
-                { question: "安全员对运输路线的风险评估应包括哪些？", options: ["路况", "天气", "限行规定", "以上都是"], correct: 3, explanation: "安全员需全面评估路线风险，制定应对措施。" },
-                { question: "事故发生后，安全员应首先保护现场并？", options: ["抢救伤员", "报警", "拍照记录", "移动车辆"], correct: 0, explanation: "保护现场同时应立即抢救伤员，减少伤亡。" }
+                { question: "安全员在货物装车前应重点检查什么？", options: ["货物数量", "车辆技术状况及货物捆绑", "司机驾驶证", "天气情况"], correct: 1,
+                explanation: "安全员需确认车辆状态良好及货物固定牢靠，防止运输途中发生意外。" },
+                { question: "发现安全隐患时，安全员首先应？", options: ["自行处理", "立即上报并停止相关作业", "忽视继续工作", "通知司机处理"], correct: 1,
+                    explanation: "安全员应立即上报隐患，确保人员安全，不得擅自冒险作业。" },
+                { question: "危险品运输车辆出车前，安全员必须核查什么证件？", options: ["行驶证", "危险品运输许可证", "营运证", "保险单"], correct: 1,
+                    explanation: "危险品运输需持有专门许可证，安全员必须核实。" },
+                { question: "货物堆码不符合规定时，安全员应如何处理？", options: ["要求重新堆码", "直接放行", "记录后放行", "增加捆绑带"], correct: 0,
+                    explanation: "堆码不稳易导致货物倒塌，必须重新堆码至符合安全标准。" },
+                { question: "应急预案演练中，安全员的主要职责是？", options: ["参与救援", "组织协调和监督执行", "驾驶车辆", "记录数据"], correct: 1,
+                    explanation: "安全员负责组织协调演练，确保流程正确执行。" },
+                { question: "运输途中发生货物泄漏，安全员应首先？", options: ["组织人员疏散并报警", "自行清理", "继续行驶", "掩盖泄漏物"], correct: 0,
+                    explanation: "安全员应优先疏散人员并报警，避免扩大危害。" },
+                { question: "安全员在车辆出场前需对哪些项目签字确认？", options: ["车辆技术状况", "货物装载情况", "司机精神状态", "以上都是"], correct: 3,
+                    explanation: "安全员需综合确认车辆、货物、人员状态，全部合格方可放行。" },
+                { question: "发现驾驶员疲劳驾驶，安全员应？", options: ["强制其休息", "提醒注意", "继续行程", "换另一名司机"], correct: 0,
+                    explanation: "疲劳驾驶是严重安全隐患，必须强制停车休息。" },
+                { question: "安全员对运输路线的风险评估应包括哪些？", options: ["路况", "天气", "限行规定", "以上都是"], correct: 3,
+                    explanation: "安全员需全面评估路线风险，制定应对措施。" },
+                { question: "事故发生后，安全员应首先保护现场并？", options: ["抢救伤员", "报警", "拍照记录", "移动车辆"], correct: 0,
+                    explanation: "保护现场同时应立即抢救伤员，减少伤亡。" }
             ];
 
             var driverQuestions = [
-                { question: "运输易燃液体时，车辆必须配备的消防器材是？", options: ["泡沫灭火器", "干粉灭火器", "水", "沙土"], correct: 1, explanation: "干粉灭火器适用于扑灭易燃液体火灾。" },
-                { question: "货车装载货物时，货物重心应尽量位于车辆的什么位置？", options: ["前部", "后部", "中部", "任意位置"], correct: 2, explanation: "重心居中有利于车辆稳定，防止侧翻。" },
-                { question: "发现货物有散落风险，应首先采取的措施是？", options: ["继续行驶", "停车加固", "加速通过", "鸣笛警示"], correct: 1, explanation: "立即停车加固货物，避免散落造成事故。" },
-                { question: "危险品运输车辆必须悬挂的标志是？", options: ["红色旗帜", "危险品标志牌", "公司标志", "速度警示"], correct: 1, explanation: "危险品车辆必须悬挂醒目的危险品标志牌。" },
-                { question: "长途运输前，驾驶员必须检查的关键项目不包括？", options: ["轮胎气压", "刹车系统", "货物捆绑", "车内音响"], correct: 3, explanation: "车内音响不属于安全关键项目，可忽略。" },
-                { question: "车辆在高速公路上突发故障，应首先开启什么灯？", options: ["远光灯", "双闪警示灯", "雾灯", "倒车灯"], correct: 1, explanation: "双闪警示灯可提醒后方车辆，避免追尾。" },
-                { question: "运输中发现货物冒烟，且无法立即扑灭，应？", options: ["继续行驶找水源", "停车远离并报警", "打开车厢通风", "用棉被覆盖"], correct: 1, explanation: "远离并报警是最安全做法，避免人员伤亡。" },
-                { question: "驾驶货车通过长下坡路段时，正确的做法是？", options: ["空挡滑行", "持续踩刹车", "低挡控速", "关闭发动机"], correct: 2, explanation: "低挡位利用发动机制动，避免刹车过热。" },
-                { question: "货车超载的主要危害不包括？", options: ["制动距离延长", "轮胎负荷过大", "油耗降低", "转向失控风险"], correct: 2, explanation: "超载会增加油耗，而非降低。" },
-                { question: "遇到恶劣天气（如大雾）能见度低，应？", options: ["开启远光灯加速", "降低车速并开启雾灯", "靠边停车睡觉", "跟随前车近距离行驶"], correct: 1, explanation: "降低车速、开启雾灯可提高安全性。" }
+                { question: "运输易燃液体时，车辆必须配备的消防器材是？", options: ["泡沫灭火器", "干粉灭火器", "水", "沙土"], correct: 1,
+                    explanation: "干粉灭火器适用于扑灭易燃液体火灾。" },
+                { question: "货车装载货物时，货物重心应尽量位于车辆的什么位置？", options: ["前部", "后部", "中部", "任意位置"], correct: 2,
+                    explanation: "重心居中有利于车辆稳定，防止侧翻。" },
+                { question: "发现货物有散落风险，应首先采取的措施是？", options: ["继续行驶", "停车加固", "加速通过", "鸣笛警示"], correct: 1,
+                    explanation: "立即停车加固货物，避免散落造成事故。" },
+                { question: "危险品运输车辆必须悬挂的标志是？", options: ["红色旗帜", "危险品标志牌", "公司标志", "速度警示"], correct: 1,
+                    explanation: "危险品车辆必须悬挂醒目的危险品标志牌。" },
+                { question: "长途运输前，驾驶员必须检查的关键项目不包括？", options: ["轮胎气压", "刹车系统", "货物捆绑", "车内音响"], correct: 3,
+                    explanation: "车内音响不属于安全关键项目，可忽略。" },
+                { question: "车辆在高速公路上突发故障，应首先开启什么灯？", options: ["远光灯", "双闪警示灯", "雾灯", "倒车灯"], correct: 1,
+                    explanation: "双闪警示灯可提醒后方车辆，避免追尾。" },
+                { question: "运输中发现货物冒烟，且无法立即扑灭，应？", options: ["继续行驶找水源", "停车远离并报警", "打开车厢通风", "用棉被覆盖"],
+                    correct: 1, explanation: "远离并报警是最安全做法，避免人员伤亡。" },
+                { question: "驾驶货车通过长下坡路段时，正确的做法是？", options: ["空挡滑行", "持续踩刹车", "低挡控速", "关闭发动机"], correct: 2,
+                    explanation: "低挡位利用发动机制动，避免刹车过热。" },
+                { question: "货车超载的主要危害不包括？", options: ["制动距离延长", "轮胎负荷过大", "油耗降低", "转向失控风险"], correct: 2,
+                    explanation: "超载会增加油耗，而非降低。" },
+                { question: "遇到恶劣天气（如大雾）能见度低，应？", options: ["开启远光灯加速", "降低车速并开启雾灯", "靠边停车睡觉", "跟随前车近距离行驶"],
+                    correct: 1, explanation: "降低车速、开启雾灯可提高安全性。" }
             ];
 
             function generateQuiz(type) {
@@ -966,17 +1466,15 @@
                 var subtitle = document.getElementById('quizSubtitle');
                 if (!container) return;
                 var questions = (type === 'safety') ? safetyQuestions : driverQuestions;
-                if (subtitle) {
-                    subtitle.textContent = (type === 'safety') ? '安全员专业知识考核' : '驾驶员安全知识考核';
-                }
+                if (subtitle) { subtitle.textContent = (type === 'safety') ? '安全员专业知识考核' : '驾驶员安全知识考核'; }
                 var html = '';
-                questions.forEach(function(q, index) {
+                questions.forEach(function(q, idx) {
                     html += '<div class="question-block">';
-                    html += '<div class="question-text">' + (index + 1) + '. ' + q.question + '</div>';
+                    html += '<div class="question-text">' + (idx + 1) + '. ' + q.question + '</div>';
                     html += '<div class="options-group">';
-                    q.options.forEach(function(opt, optIndex) {
+                    q.options.forEach(function(opt, oi) {
                         html += '<label class="option-item">';
-                        html += '<input type="radio" name="q' + index + '" value="' + optIndex + '">';
+                        html += '<input type="radio" name="q' + idx + '" value="' + oi + '">';
                         html += '<span>' + opt + '</span>';
                         html += '</label>';
                     });
@@ -992,106 +1490,1044 @@
                     var container = document.getElementById('quizContainer');
                     var type = container.getAttribute('data-quiz-type');
                     var questions = (type === 'safety') ? safetyQuestions : driverQuestions;
-                    var score = 0;
-                    var allAnswered = true;
-                    var wrongList = [];
-
-                    questions.forEach(function(q, index) {
-                        var selected = document.querySelector('input[name="q' + index + '"]:checked');
-                        if (!selected) {
-                            allAnswered = false;
-                        } else {
-                            var selectedValue = parseInt(selected.value);
-                            if (selectedValue === q.correct) {
-                                score++;
-                            } else {
-                                wrongList.push({
-                                    index: index,
-                                    question: q.question,
-                                    userAnswer: q.options[selectedValue],
-                                    correctAnswer: q.options[q.correct],
-                                    explanation: q.explanation
-                                });
+                    var score = 0,
+                        allAnswered = true,
+                        wrongList = [];
+                    questions.forEach(function(q, idx) {
+                        var selected = document.querySelector('input[name="q' + idx + '"]:checked');
+                        if (!selected) { allAnswered = false; } else {
+                            var val = parseInt(selected.value);
+                            if (val === q.correct) { score++; } else {
+                                wrongList.push({ index: idx, question: q.question, userAnswer: q.options[
+                                        val], correctAnswer: q.options[q.correct],
+                                    explanation: q.explanation });
                             }
                         }
                     });
-
-                    if (!allAnswered) {
-                        showGameModal('提示', '请完成所有题目后再提交。');
-                        return;
-                    }
-
+                    if (!allAnswered) { showGameModal('提示', '请完成所有题目后再提交。'); return; }
                     var passed = score >= 9;
-                    var msg = '您的得分：' + score + ' / 10。<br>';
-                    if (passed) {
-                        msg += '恭喜通过考核！';
-                    } else {
-                        msg += '未达到及格线（9分）。<br>';
-                    }
-
+                    var msg = '您的得分：' + score + ' / 10。<br>' + (passed ? '恭喜通过考核！' : '未达到及格线（9分）。<br>');
                     if (wrongList.length > 0) {
                         msg += '<br><b>错题解析：</b><br>';
                         wrongList.forEach(function(item) {
                             msg += '<br><b>第' + (item.index + 1) + '题：' + item.question + '</b><br>';
-                            msg += '你的答案：' + item.userAnswer + ' &nbsp;|&nbsp; 正确答案：' + item.correctAnswer + '<br>';
+                            msg += '你的答案：' + item.userAnswer + ' &nbsp;|&nbsp; 正确答案：' + item.correctAnswer +
+                                '<br>';
                             msg += '解析：' + item.explanation + '<br>';
                         });
                     }
-
                     if (type === 'driver') {
                         if (passed) {
-                            showGameModal('司机题通过', msg + '<br><br>请继续完成安全员题考试。', function() {
-                                generateQuiz('safety');
-                            });
+                            showGameModal('司机题通过', msg + '<br><br>请继续完成安全员题考试。', function() { generateQuiz(
+                                'safety'); });
                         } else {
-                            showGameModal('司机题未通过', msg + '<br>请重新答题。', function() {
-                                generateQuiz('driver');
-                            });
+                            showGameModal('司机题未通过', msg + '<br>请重新答题。', function() { generateQuiz('driver'); });
                         }
                     } else {
                         if (passed) {
                             var info = window._registerInfo;
                             if (info) {
-                                saveGame({
+                                window._playerInfo = {
                                     name: info.name,
                                     age: info.age,
                                     gender: info.gender,
                                     company: info.company,
                                     unit: info.unit,
-                                    hasLicense: info.hasLicense,
-                                    gameState: 'passed'
-                                });
+                                    hasLicense: info.hasLicense
+                                };
                             }
                             showGameModal('考核通过', msg, function() {
                                 showPage('announce');
                                 if (announceAudio) {
-                                    announceAudio.play().catch(function(err) {
-                                        console.log('自动播放被阻止，需要用户交互');
-                                    });
+                                    announceAudio.play().catch(function(err) { console.log(
+                                        '自动播放被阻止，需要用户交互'); });
                                 }
                             });
                         } else {
-                            showGameModal('考核未通过', msg + '<br>请重新答题。', function() {
-                                generateQuiz('safety');
-                            });
+                            showGameModal('考核未通过', msg + '<br>请重新答题。', function() { generateQuiz('safety'); });
                         }
                     }
                 });
             }
 
-            // 防止移动端双击缩放
-            document.addEventListener('dblclick', function(e) {
-                if (window.innerWidth <= 768) e.preventDefault();
-            }, { passive: false });
+            // ================================================================
+            // 11. 进入游戏主控台
+            // ================================================================
+            btnEnterMain.addEventListener('click', function() {
+                if (announceAudio) { announceAudio.pause();
+                    announceAudio.currentTime = 0; }
+                var player = window._playerInfo || window._registerInfo || {};
+                document.getElementById('gamePlayerName').textContent = player.name || '—';
+                document.getElementById('gamePlayerCompany').textContent = player.company ? formatCompanyDisplay(player.unit,
+                    player.company) : '—';
+                document.getElementById('gamePlayerGender').textContent = player.gender || '—';
+                document.getElementById('gamePlayerAge').textContent = player.age ? player.age + '岁' : '—';
+                document.getElementById('summarySubtitle').textContent = (player.company || '货运') + '安全调度指挥中心 · 班次运行档案';
+                showPage('gameMain');
+            });
 
-            // 预留节点信息显示
-            window.showNodeInfo = function(node, line, delay, enc) {
-                var el = document.getElementById('nodeInfo');
-                if (el) {
-                    el.innerHTML = '节点: ' + node + ' &nbsp;|&nbsp; 线路: ' + line + '<br>延迟: ' + delay + ' &nbsp;|&nbsp; 加密: ' + enc;
-                    el.style.display = 'block';
-                }
+            // ================================================================
+            // 12. 游戏主玩法逻辑
+            // ================================================================
+            var selectedGameDuration = 1200;
+            var currentGameCompleted = false;
+            var gameTime = selectedGameDuration;
+            var score = 0;
+            var totalEvents = 0;
+            var successEvents = 0;
+            var failEvents = 0;
+            var wrongAnswers = 0;
+            var personalAbility = 0;
+            var gameRunning = false;
+            var eventInterval, timerInterval;
+            var currentInterval = 30000;
+            var pendingRedDriver = null;
+            var companyReported = false;
+            var redEventInspected = false;
+            var currentChatDriver = null;
+            var currentReportType = null;
+            var selectionStep = 'driver';
+            var selectedReportDriverId = null;
+            var selectedLocation = null;
+            var selectedAlarms = [];
+            window._gamePlayLog = [];
+            var eventAudio = new Audio(
+                'https://mp3tourl.com/audio/1788527162526-8af859fe-11ee-4238-a526-090030543441.mp3');
+
+            // 全国地点（34省区，每省2-3个）
+            var locations = [
+                'G45大广高速 北京段 12km', '北京通州马驹桥物流园', '北京顺义空港物流基地',
+                'G18荣乌高速 天津段 56km', '天津东丽空港国际物流区', '天津滨海新区临港工业区',
+                'G2京沪高速 上海段 18km', '上海浦东外高桥保税区', '上海松江车墩物流园',
+                'G50沪渝高速 重庆段 128km', '重庆渝北金开大道200号', '重庆江北海尔路318号',
+                'G4京港澳高速 河北段 215km', '石家庄正定国际物流园', '唐山曹妃甸工业物流中心',
+                'G5京昆高速 山西段 186km', '太原小店综改示范区物流园', '晋中榆次大学城物流中心',
+                'G1京哈高速 辽宁段 342km', '沈阳于洪国际物流港', '大连金州保税区物流园',
+                'G12珲乌高速 吉林段 89km', '长春宽城物流产业园', '吉林龙潭化工物流转运中心',
+                'G10绥满高速 黑龙江段 156km', '哈尔滨香坊物流枢纽', '齐齐哈尔铁锋鹤城物流园',
+                'G42沪蓉高速 江苏段 78km', '南京江宁空港物流园', '苏州传化物流基地',
+                'G15沈海高速 浙江段 214km', '杭州萧山国际物流园', '宁波北仑港物流中心',
+                'G40沪陕高速 安徽段 167km', '合肥包河物流园', '芜湖鸠江港物流基地',
+                'G15沈海高速 福建段 192km', '福州闽侯物流园', '厦门海沧物流园',
+                'G45大广高速 江西段 203km', '南昌青山湖物流中心', '九江濂溪港物流园',
+                'G2京沪高速 山东段 97km', '济南历城物流中心', '青岛流亭物流园',
+                'G4京港澳高速 河南段 265km', '郑州管城物流港', '洛阳洛龙物流园',
+                'G42沪蓉高速 湖北段 134km', '武汉东西湖物流园', '宜昌三峡物流园',
+                'G4京港澳高速 湖南段 178km', '长沙县物流园', '岳阳港物流中心',
+                'G4京港澳高速 广东段 87km', '广州白云物流园', '深圳平湖物流中心',
+                'G98海南环岛高速 22km', '海口秀英物流园', '三亚吉阳物流中心',
+                'G42沪蓉高速 四川段 203km', '成都双流空港物流园', '绵阳涪城物流园',
+                'G76厦蓉高速 贵州段 145km', '贵阳南明物流园', '遵义红花岗物流中心',
+                'G85银昆高速 云南段 231km', '昆明官渡物流园', '大理下关物流中心',
+                'G30连霍高速 陕西段 189km', '西安未央物流园', '宝鸡陈仓物流中心',
+                'G30连霍高速 甘肃段 276km', '兰州安宁物流园', '酒泉肃州物流中心',
+                'G6京藏高速 青海段 168km', '西宁城北物流园', '海东乐都物流中心',
+                'G1中山高速 台北段 15km', '台北南港物流园', '高雄前镇港物流中心',
+                'G6京藏高速 内蒙古段 312km', '呼和浩特新城物流园', '包头昆都仑物流中心',
+                'G75兰海高速 广西段 167km', '南宁青秀物流园', '柳州柳南物流中心',
+                'G318国道 拉萨段 88km', '拉萨城关物流中心', '日喀则桑珠孜物流园',
+                'G6京藏高速 宁夏段 98km', '银川兴庆物流园', '石嘴山大武口物流中心',
+                'G30连霍高速 新疆段 456km', '乌鲁木齐头屯河物流园', '昌吉物流中心',
+                '香港新界葵涌货柜码头', '香港九龙长沙湾物流中心',
+                '澳门路氹城物流仓储中心', '澳门半岛工业区货运站'
+            ];
+
+            var unitLocationAliases = {
+                '北京市': ['北京'], '天津市': ['天津'], '上海市': ['上海'], '重庆市': ['重庆'],
+                '河北省': ['河北', '石家庄', '唐山'], '山西省': ['山西', '太原', '晋中'],
+                '辽宁省': ['辽宁', '沈阳', '大连'], '吉林省': ['吉林', '长春'], '黑龙江省': ['黑龙江', '哈尔滨', '齐齐哈尔'],
+                '江苏省': ['江苏', '南京', '苏州'], '浙江省': ['浙江', '杭州', '宁波'], '安徽省': ['安徽', '合肥', '芜湖'],
+                '福建省': ['福建', '福州', '厦门'], '江西省': ['江西', '南昌', '九江'], '山东省': ['山东', '济南', '青岛'],
+                '河南省': ['河南', '郑州', '洛阳'], '湖北省': ['湖北', '武汉', '宜昌'], '湖南省': ['湖南', '长沙', '岳阳'],
+                '广东省': ['广东', '广州', '深圳'], '海南省': ['海南', '海口', '三亚'], '四川省': ['四川', '成都', '绵阳'],
+                '贵州省': ['贵州', '贵阳', '遵义'], '云南省': ['云南', '昆明', '大理'], '陕西省': ['陕西', '西安', '宝鸡'],
+                '甘肃省': ['甘肃', '兰州', '酒泉'], '青海省': ['青海', '西宁', '海东'], '台湾省': ['台湾', '台北', '高雄'],
+                '内蒙古自治区': ['内蒙古', '呼和浩特', '包头'], '广西壮族自治区': ['广西', '南宁', '柳州'],
+                '西藏自治区': ['西藏', '拉萨', '日喀则'], '宁夏回族自治区': ['宁夏', '银川', '石嘴山'],
+                '新疆维吾尔自治区': ['新疆', '乌鲁木齐', '昌吉'], '香港特别行政区': ['香港'], '澳门特别行政区': ['澳门']
             };
+
+            function getLocationsForUnit(unit) {
+                var province = (unit || '').replace(/货运安全部$/, '');
+                var aliases = unitLocationAliases[province] || [province];
+                var matched = locations.filter(function(loc) {
+                    return aliases.some(function(alias) { return loc.indexOf(alias) !== -1; });
+                });
+                return matched.length ? matched : locations.slice();
+            }
+
+            var firstNames = ['张', '王', '李', '赵', '陈', '刘', '周', '吴', '郑', '孙', '朱', '马', '胡', '郭', '林', '何', '高', '罗',
+                '梁', '宋', '谢', '韩', '唐', '冯'
+            ];
+            var lastNames = ['伟', '强', '娜', '磊', '明', '芳', '杰', '静', '浩', '丽', '勇', '军', '平', '辉', '超', '敏', '霞', '刚',
+                '洋', '健', '涛', '鹏', '飞', '宇', '鑫'
+            ];
+
+            function getRandomDriverName() {
+                return firstNames[Math.floor(Math.random() * firstNames.length)] +
+                    lastNames[Math.floor(Math.random() * lastNames.length)];
+            }
+
+            var yellowEvents = [{
+                info: '车辆在高架桥上爆胎，车身剧烈抖动',
+                dialogue: {
+                    question: '（电话呼叫中...）李主管！我在高架爆胎了，后方车速极快，怎么处置？！',
+                    options: [
+                        { text: '握紧方向盘缓刹靠边，开双闪，人撤离到护栏外放置三角牌', correct: true, score: 4 },
+                        { text: '立即急刹车停在原地，下车检查轮胎受损情况', correct: false },
+                        { text: '保持原速继续开，寻找最近的高架出口下高架再处理', correct: false },
+                        { text: '猛打方向盘驶入应急车道，躲在车内打电话等待救援', correct: false }
+                    ]
+                }
+            }, {
+                info: '陡坡下坡路段制动水温过高，刹车偏软',
+                dialogue: {
+                    question: '（电话呼叫中...）下长陡坡刹车有点发软，水温表爆表了！',
+                    options: [
+                        { text: '挂低速挡利用发动机制动，寻找避险车道或安全平缓区停靠', correct: true, score: 4 },
+                        { text: '持续猛踩刹车降速，同时拉紧手刹辅助制动', correct: false },
+                        { text: '熄火滑行让发动机和刹车系统快速冷却', correct: false },
+                        { text: '空挡滑行，靠踩刹车维持车速', correct: false }
+                    ]
+                }
+            }, {
+                info: '集装箱/货箱捆绑带松脱晃动',
+                dialogue: {
+                    question: '（电话呼叫中...）后方货物捆绑带松了，车辆行驶时严重偏摆！',
+                    options: [
+                        { text: '减速靠边停靠至服务区或应急车道，规范重新加固捆绑', correct: true, score: 3 },
+                        { text: '让副驾驶打开车窗用手牵引固定绳索', correct: false },
+                        { text: '提高车速利用惯性将货物贴紧车厢', correct: false },
+                        { text: '忽略晃动，坚持开到终点卸货站再处理', correct: false }
+                    ]
+                }
+            }, {
+                info: '夜间高速行驶中前大灯突然全部熄灭',
+                dialogue: {
+                    question: '（电话呼叫中...）大灯突然全灭了！四周一片漆黑！',
+                    options: [
+                        { text: '开启示廓灯/双闪，凭余光缓刹停入应急车道，立三角牌', correct: true, score: 4 },
+                        { text: '立即开启远光灯继续行驶', correct: false },
+                        { text: '紧跟前车尾灯按原速行驶', correct: false },
+                        { text: '在超车道上紧急停车下车检查保险丝', correct: false }
+                    ]
+                }
+            }, {
+                info: '驾驶员连续驾驶超4小时，极度困倦',
+                dialogue: {
+                    question: '（电话呼叫中...）眼皮打架了，但还有50公里就到站了...',
+                    options: [
+                        { text: '必须就近进入服务区或下高速休息至少20分钟', correct: true, score: 3 },
+                        { text: '大声唱歌并把空调开到最大冷风继续开', correct: false },
+                        { text: '喝高浓度功能饮料，加快车速赶路', correct: false },
+                        { text: '松开安全带稍微活动身体提神', correct: false }
+                    ]
+                }
+            }, {
+                info: '突遇团雾天气，前方能见度不足20米',
+                dialogue: {
+                    question: '（电话呼叫中...）前方突然出现浓雾，什么都看不清了！',
+                    options: [
+                        { text: '开启雾灯、近光灯、示廓灯和双闪，减速就近驶入服务区或驶离高速', correct: true, score: 4 },
+                        { text: '开启远光灯穿透浓雾，加速冲出雾区', correct: false },
+                        { text: '直接在行车道紧急停车等待雾气散去', correct: false },
+                        { text: '按喇叭并骑跨车道线行驶以防偏离', correct: false }
+                    ]
+                }
+            }, {
+                info: '新能源货车电池温度过高报警，仪表盘亮红灯',
+                dialogue: {
+                    question: '（电话呼叫中...）仪表盘提示电池过热红灯报警，怎么办？！',
+                    options: [
+                        { text: '立即停靠安全区域，断电并人员撤离至安全距离观察', correct: true, score: 4 },
+                        { text: '用水泼洒电池包降温后继续驾驶', correct: false },
+                        { text: '忽略报警，趁未起火加速赶往目的地', correct: false },
+                        { text: '打开引擎盖用手触摸检查电池温度', correct: false }
+                    ]
+                }
+            }, {
+                info: '机油压力警报灯点亮，发动机伴有异响',
+                dialogue: {
+                    question: '（电话呼叫中...）机油灯亮红灯了，发动机声音很不对劲！',
+                    options: [
+                        { text: '找安全位置停车熄火，检查机油尺并联系拖车救援', correct: true, score: 3 },
+                        { text: '只要能开就继续低速行驶至修理厂', correct: false },
+                        { text: '加满水后继续行驶观察', correct: false },
+                        { text: '踩油门轰油冲洗油路', correct: false }
+                    ]
+                }
+            }, {
+                info: '货物偏载导致车辆重心偏向一侧',
+                dialogue: {
+                    question: '（电话呼叫中...）拐弯时感觉车子要翻，好像货物倒向一侧了！',
+                    options: [
+                        { text: '控制车速避开剧烈转向，就近停靠重新平整堆放货物', correct: true, score: 3 },
+                        { text: '反向猛打方向盘平衡车身', correct: false },
+                        { text: '提高车速靠离心力压住车身', correct: false },
+                        { text: '找重物压在另一侧继续行驶', correct: false }
+                    ]
+                }
+            }, {
+                info: '转向助力突然失效，方向盘极其沉重',
+                dialogue: {
+                    question: '（电话呼叫中...）方向盘突然沉得打不动了！怎么办！',
+                    options: [
+                        { text: '双轮紧握方向盘，减速并开启双闪，平缓靠边停靠', correct: true, score: 4 },
+                        { text: '急踩刹车并松开方向盘', correct: false },
+                        { text: '拉手刹强行锁死后轮转弯', correct: false },
+                        { text: '熄火重新启动尝试恢复转向', correct: false }
+                    ]
+                }
+            }];
+
+            var redEvents = [
+                { info: '货车在高速主干线发生机械故障趴窝，造成后方严重交通瘫痪', requiredReports: ['police'] },
+                { info: '货物超高刮断道路低压电线，导致交通阻塞，无人员伤亡与火情', requiredReports: ['police'] },
+                { info: '货厢内普通的无毒固体货物突然冒烟自燃，无人员伤亡，道路通行正常', requiredReports: ['fire'] },
+                { info: '装卸货时货物坍塌砸伤驾驶员腿部导致大出血，车辆完好', requiredReports: ['ambulance'] },
+                { info: '车辆发动机舱突然剧烈起火并停在主干道上，严重威胁周围交通', requiredReports: ['police', 'fire'] },
+                { info: '货车轮胎剧烈摩擦爆燃起火，火势蔓延至公路隔离带导致主路封锁', requiredReports: ['police', 'fire'] },
+                { info: '发生两车追尾事故，导致后方拥堵，且驾驶员头部被撞伤出血', requiredReports: ['police', 'ambulance'] },
+                { info: '货车掉落重物砸伤路边行人，引发事故拥堵', requiredReports: ['police', 'ambulance'] },
+                { info: '驾驶员突发急性心肌梗塞失控撞向护栏，驾驶员昏迷不醒', requiredReports: ['police', 'ambulance'] },
+                { info: '冷藏车危险化学品制冷剂泄漏，驾驶员吸入有毒气体昏迷中毒', requiredReports: ['fire', 'ambulance'] },
+                { info: '车厢内易燃物品起火，驾驶员在扑救过程中被严重烧伤', requiredReports: ['fire', 'ambulance'] },
+                { info: '高速公路发生多车连环追尾，车辆剧烈起火且有人严重被困伤亡', requiredReports: ['police', 'fire',
+                    'ambulance'
+                ] }
+            ];
+
+            function shuffleArray(arr) { var a = arr.slice(); for (var i = a.length - 1; i > 0; i--) { var j = Math.floor(Math
+                        .random() * (i + 1));
+                    var t = a[i];
+                    a[i] = a[j];
+                    a[j] = t; } return a; }
+
+            var drivers = [];
+
+            function initDrivers() {
+                drivers = [];
+                for (var i = 1; i <= 10; i++) {
+                    var idStr = 'SJ-' + String(i).padStart(3, '0');
+                    drivers.push({ id: idStr, name: getRandomDriverName(), status: 'green', info: '正常驾驶，货物安全',
+                        location: '', yellowInspected: false });
+                }
+            }
+
+            function updateClockDisplay() {
+                var m = Math.floor(gameTime / 60),
+                    s = gameTime % 60;
+                document.getElementById('timerDisplay').textContent = String(m).padStart(2, '0') + ':' + String(s).padStart(2,
+                '0');
+            }
+
+            function showToast(msg) {
+                var t = document.createElement('div');
+                t.className = 'toast';
+                t.textContent = msg;
+                document.body.appendChild(t);
+                setTimeout(function() { t.remove(); }, 3200);
+            }
+
+            function addLog(msg) {
+                var log = document.getElementById('reportLog');
+                var now = new Date();
+                var time = String(now.getHours()).padStart(2, '0') + ':' + String(now.getMinutes()).padStart(2, '0');
+                var entry = '【' + time + '】' + msg;
+                if (!Array.isArray(window._gamePlayLog)) window._gamePlayLog = [];
+                window._gamePlayLog.push(entry);
+                log.innerHTML = entry + '<br>' + log.innerHTML;
+            }
+
+            function updateStats() {
+                document.getElementById('scoreDisplay').textContent = score;
+                document.getElementById('errorDisplay').textContent = wrongAnswers + ' / 3';
+                document.getElementById('handledDisplay').textContent = successEvents + '/' + totalEvents;
+                var accuracy = totalEvents > 0 ? Math.round((successEvents / totalEvents) * 100) : 100;
+                document.getElementById('accuracyDisplay').textContent = accuracy + '%';
+                document.getElementById('abilityBar').style.width = Math.round(personalAbility) + '%';
+                document.getElementById('abilityValText').textContent = Math.round(personalAbility) + '%';
+                updateTrophy();
+            }
+
+            function updateTrophy() {
+                var icon = '🔒',
+                    title = '暂无勋章',
+                    desc = '处理突发事件积累能力值解锁勋章';
+                if (personalAbility >= 90 && wrongAnswers === 0) { icon = '🏆';
+                    title = '王者传奇勋章';
+                    desc = '完美掌控，无失误顶尖调度专家！'; } else if (personalAbility >= 75) { icon = '💎';
+                    title = '钻石调度勋章';
+                    desc = '具有极强的应急指挥与调度处置能力'; } else if (personalAbility >= 50) { icon = '🥇';
+                    title = '黄金调度勋章';
+                    desc = '对突发事故响应迅速，指挥得当'; } else if (personalAbility >= 30) { icon = '🥈';
+                    title = '白银调度勋章';
+                    desc = '掌握基本调度规范，能妥善处理险情'; } else if (personalAbility >= 10) { icon = '🥉';
+                    title = '青铜调度勋章';
+                    desc = '迈出货运安全第一步，成功处理险情'; }
+                document.getElementById('trophyIcon').textContent = icon;
+                document.getElementById('trophyTitle').textContent = title;
+                document.getElementById('trophyDesc').textContent = desc;
+            }
+
+            function resetEventPanel() {
+                document.getElementById('eventSelectText').textContent = '-- 请选择司机编号查询 --';
+                document.getElementById('eventDetail').innerHTML = '暂无事件，请选择司机编号查看详情。';
+                var wrap = document.getElementById('eventSelectWrap');
+                wrap.classList.remove('open');
+                document.getElementById('eventSelectOptions').classList.remove('show');
+            }
+
+            function adjustEventInterval() {
+                clearInterval(eventInterval);
+                if (!gameRunning) return;
+                var durationFactor = selectedGameDuration / 1200;
+                var baseIntervalByTime = 30000 * durationFactor;
+                var accuracy = totalEvents > 0 ? (successEvents / totalEvents) : 1.0;
+                if (accuracy >= 0.8) { currentInterval = baseIntervalByTime * 0.67; } else if (accuracy >= 0.6) { currentInterval =
+                        baseIntervalByTime; } else { currentInterval = baseIntervalByTime * 1.5; }
+                eventInterval = setInterval(generateRandomEvent, Math.max(8000, currentInterval));
+            }
+
+            function recordMistake(reason, driverToReset) {
+                wrongAnswers++;
+                score = Math.max(0, score - 2);
+                failEvents++;
+                totalEvents++;
+                var abilityStep = (1200 / selectedGameDuration);
+                personalAbility = Math.max(0, personalAbility - (3.5 * abilityStep));
+                adjustEventInterval();
+                addLog('❌ 调度失误[' + wrongAnswers + '/3]：' + reason + '（扣2分，能力值下降）');
+                showToast('❌ 调度回答失误！' + reason + '（失误 ' + wrongAnswers + '/3）');
+                if (driverToReset) {
+                    driverToReset.status = 'green';
+                    driverToReset.info = '正常驾驶，货物安全';
+                    driverToReset.yellowInspected = false;
+                    if (pendingRedDriver && pendingRedDriver.id === driverToReset.id) { pendingRedDriver = null;
+                        companyReported = false;
+                        redEventInspected = false;
+                        updateReportButtons(); }
+                    renderDrivers();
+                }
+                resetEventPanel();
+                updateStats();
+                if (wrongAnswers >= 3) {
+                    setTimeout(function() { endGame('⚠️ 连续发生 3 次严重调度失误，调度流程被暂停！', false); }, 800);
+                }
+            }
+
+            function renderDrivers() {
+                var container = document.getElementById('driverGrid');
+                if (!container) return;
+                var html = '';
+                drivers.forEach(function(d) {
+                    var cls = d.status === 'yellow' ? 'yellow' : (d.status === 'red' ? 'red' : 'green');
+                    var statusText = d.status === 'yellow' ? '警告' : (d.status === 'red' ? '异常' : '正常');
+                    html += '<div class="driver-item" data-id="' + d.id + '">';
+                    html += '<span class="indicator ' + cls + '"></span>';
+                    html += '<span class="driver-id">' + d.id + '</span>';
+                    html += '<span class="driver-name">' + d.name + '</span>';
+                    html += '<span class="driver-status">' + statusText + '</span>';
+                    if (d.status === 'red') html += '<span class="pending-badge">待上报</span>';
+                    else if (d.status === 'yellow' && !d.yellowInspected) html +=
+                        '<span class="pending-badge" style="background:rgba(255,170,51,0.2);border-color:#ffaa33;color:#ffaa33;">微信连线</span>';
+                    html += '</div>';
+                });
+                container.innerHTML = html;
+                container.querySelectorAll('.driver-item').forEach(function(item) {
+                    item.addEventListener('click', function() {
+                        var driverId = this.getAttribute('data-id');
+                        var driver = drivers.find(function(dd) { return dd.id === driverId; });
+                        if (driver) handleDriverClick(driver);
+                    });
+                });
+            }
+
+            function handleDriverClick(driver) {
+                if (driver.status === 'green') { showToast('司机 ' + driver.id + ' 运行正常，无需处置。'); return; }
+                if (driver.status === 'yellow') { openChatModal(driver, 'yellow_wechat'); } else if (driver.status === 'red') {
+                    openChatModal(driver, 'red_offline'); }
+            }
+
+            var chatModal = document.getElementById('chatModal');
+            var chatModalTitle = document.getElementById('chatModalTitle');
+            var chatMessages = document.getElementById('chatMessages');
+            var chatOptions = document.getElementById('chatOptions');
+
+            function openChatModal(driver, mode) {
+                currentChatDriver = driver;
+                chatMessages.innerHTML = '';
+                chatOptions.innerHTML = '';
+                if (mode === 'yellow_wechat') {
+                    chatModalTitle.textContent = '💬 微信/应急通信 - ' + driver.name + ' (' + driver.id + ')';
+                    addChatMsg('system', '📱 已建立局域调度微信/无线电通信...');
+                    if (!driver.yellowInspected) {
+                        addChatMsg('driver', driver.name + '：李主管！我车子好像有点突发状况，请确认一下我的定位和现场信息指导我！');
+                        addChatMsg('system', '💡 提示：可前往【突发事件面板】查询该司机精准定位，或直接通过下侧应急电话选项处置。');
+                        var btnDirect = document.createElement('button');
+                        btnDirect.className = 'chat-option-btn';
+                        btnDirect.textContent = '📞 转接紧急通话并提供指导指令';
+                        btnDirect.addEventListener('click', function() {
+                            driver.yellowInspected = true;
+                            renderDrivers();
+                            openPhoneYellow(driver);
+                        });
+                        chatOptions.appendChild(btnDirect);
+                    } else {
+                        openPhoneYellow(driver);
+                        return;
+                    }
+                } else if (mode === 'red_offline') {
+                    chatModalTitle.textContent = '💬 紧急沟通 - 崩溃异常';
+                    addChatMsg('driver', driver.name + '：......（信号中断，系统检测到严重碰撞事故）');
+                    addChatMsg('system', '🚨 该司机处于严重异常状态！请前往【突发事件面板】查明情况后，按规范进行【向公司上报与报警】。');
+                    pendingRedDriver = driver;
+                    updateReportButtons();
+                }
+                chatModal.classList.add('show');
+            }
+
+            function openPhoneYellow(driver) {
+                currentChatDriver = driver;
+                chatModalTitle.textContent = '📞 应急指导通话中 - ' + driver.name + ' (' + driver.id + ')';
+                chatMessages.innerHTML = '';
+                chatOptions.innerHTML = '';
+                var evt = yellowEvents.find(function(e) { return e.info === driver.info; });
+                if (!evt) evt = yellowEvents[0];
+                addChatMsg('system', '📞 应急电话已接通...');
+                addChatMsg('driver', evt.dialogue.question);
+                var shuffledOptions = shuffleArray(evt.dialogue.options);
+                shuffledOptions.forEach(function(opt) {
+                    var btn = document.createElement('button');
+                    btn.className = 'chat-option-btn';
+                    btn.textContent = opt.text;
+                    btn.addEventListener('click', function() {
+                        addChatMsg('user', '指令：' + opt.text);
+                        if (opt.correct) {
+                            addChatMsg('driver', '收到！我立刻按指令处置，危机已解除！（请点击下侧挂断按钮结束通话）');
+                            driver.status = 'green';
+                            driver.info = '危机已处置，恢复正常行驶。';
+                            score += opt.score;
+                            var abilityStep = (1200 / selectedGameDuration);
+                            personalAbility = Math.min(100, personalAbility + (1.5 * abilityStep));
+                            successEvents++;
+                            totalEvents++;
+                            adjustEventInterval();
+                            resetEventPanel();
+                            updateStats();
+                            renderDrivers();
+                            showToast('✅ 指导成功！司机 ' + driver.id + ' 恢复安全状态。请点击挂断按钮。');
+                            chatOptions.innerHTML = '';
+                        } else {
+                            chatModal.classList.remove('show');
+                            recordMistake('应急指导决策错误', driver);
+                        }
+                    });
+                    chatOptions.appendChild(btn);
+                });
+                chatModal.classList.add('show');
+            }
+
+            function addChatMsg(sender, text) {
+                var div = document.createElement('div');
+                div.className = 'chat-msg ' + sender;
+                div.textContent = text;
+                chatMessages.appendChild(div);
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            }
+
+            document.getElementById('closeChatBtn').addEventListener('click', function() { chatModal.classList.remove('show'); });
+
+            var selectWrap = document.getElementById('eventSelectWrap');
+            var selectDisplay = document.getElementById('eventSelectDisplay');
+            var selectText = document.getElementById('eventSelectText');
+            var selectOptions = document.getElementById('eventSelectOptions');
+
+            function populateSelectOptions() {
+                var html = '';
+                drivers.forEach(function(d) {
+                    html += '<div class="select-option" data-id="' + d.id + '">' + d.id + ' - ' + d.name + '</div>';
+                });
+                selectOptions.innerHTML = html;
+                selectOptions.querySelectorAll('.select-option').forEach(function(opt) {
+                    opt.addEventListener('click', function() {
+                        var id = this.getAttribute('data-id');
+                        selectText.textContent = this.textContent;
+                        selectWrap.classList.remove('open');
+                        selectOptions.classList.remove('show');
+                        searchEvent(id);
+                    });
+                });
+            }
+
+            function searchEvent(driverId) {
+                var detail = document.getElementById('eventDetail');
+                if (!driverId) { detail.innerHTML = '请选择司机编号。'; return; }
+                var driver = drivers.find(function(d) { return d.id === driverId; });
+                if (driver) {
+                    if (driver.status === 'green') {
+                        detail.innerHTML = '司机 <strong>' + driver.id + '（' + driver.name + '）</strong><br>状态：<span style="color:#44dd88;">正常</span><br>无突发异常事件。';
+                    } else if (driver.status === 'yellow') {
+                        driver.yellowInspected = true;
+                        renderDrivers();
+                        detail.innerHTML = '<strong>司机 ' + driver.id + '（' + driver.name + '）</strong><br>状态：<span style="color:#ffaa33;">黄色预警</span><br>位置：' +
+                            driver.location + '<br>预警详情：' + driver.info +
+                            '<br><span style="color:#7dd3e8;">【系统通知】已查明定位！请点击列表中的该司机提供紧急指导。</span>';
+                        showToast('已查明司机 ' + driver.id + ' 预警信息！');
+                    } else {
+                        redEventInspected = true;
+                        updateReportButtons();
+                        detail.innerHTML = '<strong>司机 ' + driver.id + '（' + driver.name + '）</strong><br>状态：<span style="color:#ff4444;">红牌严重异常</span><br>事故位置：' +
+                            driver.location + '<br>事故现场：' + driver.info +
+                            '<br><span style="color:#ffaa33;">【处置流程】必须先向公司上报，再进行多选报警处置。</span>';
+                        showToast('已掌握现场事故定位，请前往上报模块处置。');
+                    }
+                } else detail.innerHTML = '未找到该司机编号。';
+            }
+
+            selectDisplay.addEventListener('click', function(e) {
+                e.stopPropagation();
+                selectWrap.classList.toggle('open');
+                selectOptions.classList.toggle('show');
+            });
+            document.addEventListener('click', function(e) {
+                if (!selectWrap.contains(e.target)) { selectWrap.classList.remove('open');
+                    selectOptions.classList.remove('show'); }
+            });
+
+            var btnCompany = document.getElementById('btnReportCompany');
+            var btnAlarmCenter = document.getElementById('btnCallAlarmCenter');
+            var reportSelectionModal = document.getElementById('reportSelectionModal');
+            var reportSelectionTitle = document.getElementById('reportSelectionTitle');
+            var reportSelectionMessage = document.getElementById('reportSelectionMessage');
+            var reportSelectionList = document.getElementById('reportSelectionList');
+            var confirmReportSelectionBtn = document.getElementById('confirmReportSelectionBtn');
+            var cancelReportSelectionBtn = document.getElementById('cancelReportSelectionBtn');
+
+            function updateReportButtons() {
+                var hasRed = pendingRedDriver && pendingRedDriver.status === 'red';
+                btnCompany.disabled = !hasRed || !redEventInspected;
+                btnAlarmCenter.disabled = !hasRed || !redEventInspected;
+            }
+
+            function openReportSelection(type) {
+                if (!pendingRedDriver) { showToast('当前无需要上报的红牌异常司机。'); return; }
+                if (!redEventInspected) { showToast('请先在突发事件区查询该司机详情以核实定位！'); return; }
+                currentReportType = type;
+                selectedReportDriverId = null;
+                selectedLocation = null;
+                selectedAlarms = [];
+                selectionStep = 'driver';
+                reportSelectionTitle.textContent = type === 'company' ? '向公司上报 - 选择事故司机' : '紧急救援 - 选择事故司机';
+                reportSelectionMessage.textContent = '请在下方选择需要处置的事故司机：';
+                var redDrivers = drivers.filter(function(d) { return d.status === 'red'; });
+                var listHtml = '';
+                redDrivers.forEach(function(d) {
+                    listHtml += '<div class="report-selection-item" data-id="' + d.id + '">' + d.id + ' - ' + d
+                        .name + '</div>';
+                });
+                reportSelectionList.innerHTML = listHtml;
+                reportSelectionList.querySelectorAll('.report-selection-item').forEach(function(item) {
+                    item.addEventListener('click', function() {
+                        reportSelectionList.querySelectorAll('.report-selection-item').forEach(function(el) { el
+                                .classList.remove('selected'); });
+                        this.classList.add('selected');
+                        selectedReportDriverId = this.getAttribute('data-id');
+                    });
+                });
+                reportSelectionModal.classList.add('show');
+            }
+
+            function openAddressSelection() {
+                selectionStep = 'location';
+                reportSelectionTitle.textContent = '选择事故精准定位';
+                reportSelectionMessage.textContent = '请核对并选择事故发生的精准位置：';
+                var correctLocation = pendingRedDriver.location;
+                var options = [correctLocation];
+                var temp = locations.filter(function(l) { return l !== correctLocation; });
+                for (var i = 0; i < 3 && i < temp.length; i++) { options.push(temp[Math.floor(Math.random() * temp.length)]); }
+                options = shuffleArray(options);
+                var listHtml = '';
+                options.forEach(function(loc) { listHtml += '<div class="report-selection-item" data-location="' + loc +
+                        '">' + loc + '</div>'; });
+                reportSelectionList.innerHTML = listHtml;
+                selectedLocation = null;
+                reportSelectionList.querySelectorAll('.report-selection-item').forEach(function(item) {
+                    item.addEventListener('click', function() {
+                        reportSelectionList.querySelectorAll('.report-selection-item').forEach(function(el) { el
+                                .classList.remove('selected'); });
+                        this.classList.add('selected');
+                        selectedLocation = this.getAttribute('data-location');
+                    });
+                });
+                reportSelectionModal.classList.add('show');
+            }
+
+            function openAlarmSelection() {
+                selectionStep = 'alarm';
+                reportSelectionTitle.textContent = '🚨 多选紧急报警警种';
+                reportSelectionMessage.textContent = '【重要】请根据现场状况（如追尾、人员受伤、气体泄漏等）勾选所有需要的警种：';
+                selectedAlarms = [];
+                var alarmsDef = [
+                    { id: 'police', label: '🚨 110 警察 (交通事故/碰撞/堵塞)' },
+                    { id: 'fire', label: '🔥 119 火警 (车辆起火/危险品与气体泄漏)' },
+                    { id: 'ambulance', label: '🚑 120 急救 (现场有人受伤/侧翻被困)' }
+                ];
+                var html = '<div class="alarm-multi-group">';
+                alarmsDef.forEach(function(a) {
+                    html += '<div class="alarm-check-item" data-id="' + a.id + '">';
+                    html += '<span>' + a.label + '</span>';
+                    html += '<input type="checkbox" id="chk_' + a.id + '">';
+                    html += '</div>';
+                });
+                html += '</div>';
+                reportSelectionList.innerHTML = html;
+                reportSelectionList.querySelectorAll('.alarm-check-item').forEach(function(item) {
+                    item.addEventListener('click', function() {
+                        var id = this.getAttribute('data-id');
+                        var chk = this.querySelector('input');
+                        chk.checked = !chk.checked;
+                        this.classList.toggle('active', chk.checked);
+                        if (chk.checked) { if (selectedAlarms.indexOf(id) === -1) selectedAlarms.push(id); } else {
+                            selectedAlarms = selectedAlarms.filter(function(x) { return x !== id; }); }
+                    });
+                });
+                reportSelectionModal.classList.add('show');
+            }
+
+            confirmReportSelectionBtn.addEventListener('click', function() {
+                if (!currentReportType || !pendingRedDriver) return;
+                if (selectionStep === 'driver') {
+                    if (!selectedReportDriverId) { showToast('请先选择事故司机。'); return; }
+                    if (selectedReportDriverId !== pendingRedDriver.id) {
+                        reportSelectionModal.classList.remove('show');
+                        recordMistake('上报事故司机对象选择错误', pendingRedDriver);
+                        return;
+                    }
+                    if (currentReportType === 'company') {
+                        if (companyReported) { showToast('已向公司上报过该案件。'); return; }
+                        companyReported = true;
+                        addLog('📋 已成功向公司安全指挥中心上报（司机 ' + pendingRedDriver.id + '，定位：' + pendingRedDriver
+                        .location + '）');
+                        showToast('✅ 向公司上报成功！请继续启动多选报警救援。');
+                        reportSelectionModal.classList.remove('show');
+                    } else {
+                        reportSelectionModal.classList.remove('show');
+                        openAddressSelection();
+                    }
+                } else if (selectionStep === 'location') {
+                    if (!selectedLocation) { showToast('请选择事故位置。'); return; }
+                    if (selectedLocation !== pendingRedDriver.location) {
+                        reportSelectionModal.classList.remove('show');
+                        recordMistake('事故精准位置汇报错误', pendingRedDriver);
+                        return;
+                    }
+                    if (!companyReported) {
+                        reportSelectionModal.classList.remove('show');
+                        recordMistake('越级报警失误（未先向公司安全指挥中心报备）', pendingRedDriver);
+                        return;
+                    }
+                    reportSelectionModal.classList.remove('show');
+                    openAlarmSelection();
+                } else if (selectionStep === 'alarm') {
+                    if (selectedAlarms.length === 0) { showToast('请至少选择一个报警警种！'); return; }
+                    var required = pendingRedDriver.requiredReports.slice().sort();
+                    var actual = selectedAlarms.slice().sort();
+                    var isCorrect = (required.length === actual.length) && required.every(function(val, idx) { return val ===
+                            actual[idx]; });
+                    if (!isCorrect) {
+                        reportSelectionModal.classList.remove('show');
+                        var reqLabels = required.map(function(r) {
+                            return r === 'police' ? '110警察' : (r === 'fire' ? '119火警' : '120急救');
+                        }).join(' + ');
+                        recordMistake('报警警种多选漏选或错选（现场所需应为：' + reqLabels + '）', pendingRedDriver);
+                        return;
+                    }
+                    var targetDriver = pendingRedDriver;
+                    targetDriver.status = 'green';
+                    targetDriver.info = '救援力量已到达，案件处置完毕。';
+                    score += 6;
+                    var abilityStep = (1200 / selectedGameDuration);
+                    personalAbility = Math.min(100, personalAbility + (2.5 * abilityStep));
+                    successEvents++;
+                    totalEvents++;
+                    adjustEventInterval();
+                    var alarmStr = selectedAlarms.map(function(r) {
+                        return r === 'police' ? '110警察' : (r === 'fire' ? '119火警' : '120急救');
+                    }).join(' & ');
+                    addLog('🚨 成功拨打报警救援：[' + alarmStr + ']（司机 ' + targetDriver.id + '，地址：' + targetDriver
+                        .location + '）');
+                    pendingRedDriver = null;
+                    companyReported = false;
+                    redEventInspected = false;
+                    resetEventPanel();
+                    updateStats();
+                    renderDrivers();
+                    updateReportButtons();
+                    showToast('🎉 紧急多重救援成功，案件闭环处置完成！');
+                    reportSelectionModal.classList.remove('show');
+                }
+            });
+
+            cancelReportSelectionBtn.addEventListener('click', function() { reportSelectionModal.classList.remove('show'); });
+            btnCompany.addEventListener('click', function() { openReportSelection('company'); });
+            btnAlarmCenter.addEventListener('click', function() { openReportSelection('alarm'); });
+
+            function generateRandomEvent() {
+                if (!gameRunning || pendingRedDriver) return;
+                var available = drivers.filter(function(d) { return d.status === 'green'; });
+                if (!available.length) return;
+                var driver = available[Math.floor(Math.random() * available.length)];
+                var isRed = Math.random() < 0.35;
+                var player = window._playerInfo || window._registerInfo || {};
+                var unitLocations = getLocationsForUnit(player.unit || '');
+                var randomLoc = unitLocations[Math.floor(Math.random() * unitLocations.length)];
+                driver.location = randomLoc;
+                driver.yellowInspected = false;
+                if (isRed) {
+                    var evt = redEvents[Math.floor(Math.random() * redEvents.length)];
+                    driver.status = 'red';
+                    driver.info = evt.info;
+                    driver.requiredReports = evt.requiredReports;
+                } else {
+                    var evt = yellowEvents[Math.floor(Math.random() * yellowEvents.length)];
+                    driver.status = 'yellow';
+                    driver.info = evt.info;
+                }
+                renderDrivers();
+                try { eventAudio.currentTime = 0;
+                    eventAudio.play().catch(function(e) {}); } catch (e) {}
+                var isHandlingTask = chatModal.classList.contains('show') || reportSelectionModal.classList.contains('show');
+                if (isHandlingTask) {
+                    showToast('⚠️ 收到新突发事件（司机 ' + driver.id + '），请稍后处理！');
+                } else {
+                    document.getElementById('eventNotifyMessage').innerHTML = '检测到司机 <strong>' + driver.id + '（' + driver
+                        .name + '）</strong> 触发<span style="color:' + (isRed ? '#ff4444' : '#ffaa33') + ';">' + (isRed ?
+                        '红牌严重异常' : '黄色预警') + '</span>！<br>请立即前往处理。';
+                    document.getElementById('eventNotifyModal').classList.add('show');
+                }
+            }
+
+            document.getElementById('closeNotifyBtn').addEventListener('click', function() {
+                document.getElementById('eventNotifyModal').classList.remove('show');
+            });
+
+            function startTimer() {
+                timerInterval = setInterval(function() {
+                    if (gameTime > 0) { gameTime--;
+                        updateClockDisplay(); } else { endGame('⏰ 值班管控时间结束，完成本次班次调度！', true); }
+                }, 1000);
+            }
+
+            function getIdiom(acc, sc) {
+                if (acc >= 90 && sc >= 20) return { idiom: '【运筹帷幄】', desc: '决策果断精准，统筹全局无微不至！' };
+                if (acc >= 75) return { idiom: '【沉着冷静】', desc: '面对突发险情不慌不忙，处置井井有条！' };
+                if (acc >= 60) return { idiom: '【恪尽职守】', desc: '尽职尽责保障安全，平稳完成调度班次。' };
+                if (acc >= 40) return { idiom: '【按部就班】', desc: '基本完成规范流程，但仍有疏漏需多加练习。' };
+                return { idiom: '【粗心大意】', desc: '判断与响应频频失误，调度流程亟待加强！' };
+            }
+
+            function endGame(reason, isComplete) {
+                if (!gameRunning) return;
+                gameRunning = false;
+                if (pendingEventStartTimeout) { clearTimeout(pendingEventStartTimeout); pendingEventStartTimeout = null; }
+                clearInterval(timerInterval);
+                clearInterval(eventInterval);
+
+                var accuracy = totalEvents > 0 ? Math.round((successEvents / totalEvents) * 100) : 100;
+                var trophyTitleText = document.getElementById('trophyTitle').textContent;
+                var idiomObj = getIdiom(accuracy, score);
+                var player = window._playerInfo || window._registerInfo || {};
+                var playLog = Array.isArray(window._gamePlayLog) ? window._gamePlayLog.slice() : [];
+                var reportLogHtml = document.getElementById('reportLog') ? document.getElementById('reportLog').innerHTML : '';
+
+                document.getElementById('sumTotal').textContent = totalEvents;
+                document.getElementById('sumSuccess').textContent = successEvents;
+                document.getElementById('sumFail').textContent = failEvents;
+                document.getElementById('sumAccuracy').textContent = accuracy + '%';
+                document.getElementById('sumScore').textContent = score;
+                document.getElementById('sumAbilityText').textContent = Math.round(personalAbility) + '%';
+                document.getElementById('sumTrophyName').textContent = trophyTitleText;
+
+                var headerTitle = '📊 班次管控全景总结报告';
+                var awardCommentary = (reason ? reason + '\n\n' : '') +
+                    '成语评价：' + idiomObj.idiom + ' — ' + idiomObj.desc + '\n\n' +
+                    '📊 班次总结评语：\n' +
+                    '在本次值班中，您累计接手 ' + totalEvents + ' 起突发事件，成功处理 ' + successEvents + ' 起，回答正确率为 ' + accuracy +
+                    '%。最终综合个人能力值达 ' + Math.round(personalAbility) + '%，荣获【' + trophyTitleText + '】！';
+
+                document.getElementById('summaryHeaderTitle').textContent = headerTitle;
+                document.getElementById('summarySubtitle').textContent = (player.company || '货运') + '安全调度指挥中心 · 班次运行档案';
+                document.getElementById('sumAward').textContent = awardCommentary;
+
+                var summaryPlayLog = document.getElementById('summaryPlayLog');
+                if (summaryPlayLog) {
+                    summaryPlayLog.innerHTML = playLog.length ? playLog.map(function(entry) {
+                        return entry + '<br>';
+                    }).reverse().join('') : '暂无操作记录。';
+                }
+
+                document.getElementById('restartBtn').style.display = 'inline-flex';
+                document.getElementById('summaryArchiveBackBtn').style.display = 'none';
+
+                if (isComplete === true && !currentGameCompleted) {
+                    currentGameCompleted = true;
+                    saveCompletedArchive({
+                        name: player.name || document.getElementById('gamePlayerName').textContent || '未命名',
+                        age: player.age || '',
+                        gender: player.gender || '',
+                        company: player.company || '',
+                        unit: player.unit || '',
+                        hasLicense: !!player.hasLicense,
+                        selectedGameDuration: selectedGameDuration,
+                        finalTime: gameTime,
+                        score: score,
+                        totalEvents: totalEvents,
+                        successEvents: successEvents,
+                        failEvents: failEvents,
+                        wrongAnswers: wrongAnswers,
+                        personalAbility: personalAbility,
+                        trophy: trophyTitleText,
+                        accuracy: accuracy,
+                        reason: reason || '',
+                        summaryAward: awardCommentary,
+                        playLog: playLog,
+                        reportLogHtml: reportLogHtml
+                    });
+                    clearResumeSaves(activeResumeId);
+                }
+
+                document.getElementById('summaryModal').classList.add('show');
+            }
+
+            function showArchiveSummary(archive) {
+                var accuracy = Number(archive.accuracy);
+                if (!isFinite(accuracy)) {
+                    accuracy = archive.totalEvents > 0 ? Math.round((archive.successEvents / archive.totalEvents) * 100) : 100;
+                }
+
+                document.getElementById('summaryHeaderTitle').textContent = '📊 已完成班次档案';
+                document.getElementById('summarySubtitle').textContent = (archive.company || '货运') + '安全调度指挥中心 · 已完成运行档案';
+                document.getElementById('sumTotal').textContent = archive.totalEvents || 0;
+                document.getElementById('sumSuccess').textContent = archive.successEvents || 0;
+                document.getElementById('sumFail').textContent = archive.failEvents || 0;
+                document.getElementById('sumAccuracy').textContent = accuracy + '%';
+                document.getElementById('sumScore').textContent = archive.score || 0;
+                document.getElementById('sumAbilityText').textContent = Math.round(Number(archive.personalAbility) || 0) + '%';
+                document.getElementById('sumTrophyName').textContent = archive.trophy || '暂无勋章';
+                document.getElementById('sumAward').textContent = archive.summaryAward || '暂无评价';
+
+                var summaryPlayLog = document.getElementById('summaryPlayLog');
+                var playLog = Array.isArray(archive.playLog) ? archive.playLog : [];
+                if (summaryPlayLog) {
+                    summaryPlayLog.innerHTML = playLog.length ? playLog.map(function(entry) {
+                        return entry + '<br>';
+                    }).reverse().join('') : '暂无操作记录。';
+                }
+
+                document.getElementById('restartBtn').style.display = 'none';
+                document.getElementById('summaryArchiveBackBtn').style.display = 'inline-flex';
+                document.getElementById('summaryModal').classList.add('show');
+            }
+
+            btnGameLogout.addEventListener('click', function() {
+                if (gameRunning) {
+                    showConfirmModal('保存并退出', '是否保存当前班次进度并退出？下次可从【继续游戏】恢复。', function() {
+                        var saved = saveResumeState();
+                        gameRunning = false;
+                        clearInterval(timerInterval);
+                        clearInterval(eventInterval);
+                        document.querySelectorAll('.modal-overlay.show').forEach(function(el) { el.classList.remove('show'); });
+                        document.querySelectorAll('.game-modal-overlay.show').forEach(function(el) { el.classList.remove('show'); });
+                        showPage('home');
+                        showToast(saved ? '💾 当前班次已保存，退出成功。' : '⚠️ 保存失败，本次进度未能写入。');
+                    });
+                } else {
+                    showPage('home');
+                }
+            });
+
+            var restartConfirmModal = document.getElementById('restartConfirmModal');
+            document.getElementById('btnTopRestart').addEventListener('click', function() {
+                if (gameRunning) {
+                    restartConfirmModal.classList.add('show');
+                } else {
+                    location.reload();
+                }
+            });
+            document.getElementById('confirmRestartModalBtn').addEventListener('click', function() {
+                clearResumeSaves(activeResumeId);
+                location.reload();
+            });
+            document.getElementById('cancelRestartModalBtn').addEventListener('click', function() {
+                restartConfirmModal.classList.remove('show');
+            });
+            document.getElementById('restartBtn').addEventListener('click', function() {
+                clearResumeSaves(activeResumeId);
+                location.reload();
+            });
+
+            document.getElementById('summaryArchiveBackBtn').addEventListener('click', function() {
+                document.getElementById('summaryModal').classList.remove('show');
+                document.getElementById('summaryArchiveBackBtn').style.display = 'none';
+                document.getElementById('restartBtn').style.display = 'inline-flex';
+                renderArchiveList();
+                archiveListOverlay.classList.add('show');
+            });
+
+            document.querySelectorAll('.duration-item').forEach(function(item) {
+                item.addEventListener('click', function() {
+                    document.querySelectorAll('.duration-item').forEach(function(el) { el.classList.remove(
+                            'selected'); });
+                    this.classList.add('selected');
+                    selectedGameDuration = parseInt(this.getAttribute('data-time'), 10);
+                });
+            });
+
+            document.getElementById('confirmStartBtn').addEventListener('click', function() {
+                resetRuntimeStateForNewGame();
+                window._gamePlayLog = [];
+                gameTime = selectedGameDuration;
+                document.getElementById('startModal').classList.remove('show');
+                gameRunning = true;
+                window._gameInitialized = true;
+                initDrivers();
+                renderDrivers();
+                populateSelectOptions();
+                updateClockDisplay();
+                updateStats();
+                updateReportButtons();
+                startTimer();
+                adjustEventInterval();
+                if (pendingEventStartTimeout) clearTimeout(pendingEventStartTimeout);
+                pendingEventStartTimeout = setTimeout(function() {
+                    pendingEventStartTimeout = null;
+                    generateRandomEvent();
+                }, 3000);
+                var player = window._playerInfo || window._registerInfo || {};
+                if (player.name) document.getElementById('gamePlayerName').textContent = player.name;
+                if (player.company) document.getElementById('gamePlayerCompany').textContent = formatCompanyDisplay(player
+                    .unit, player.company);
+                if (player.gender) document.getElementById('gamePlayerGender').textContent = player.gender;
+                if (player.age) document.getElementById('gamePlayerAge').textContent = player.age + '岁';
+                document.getElementById('summarySubtitle').textContent = (player.company || '货运') +
+                    '安全调度指挥中心 · 班次运行档案';
+            });
+
+            if (document.getElementById('gameMainPage').classList.contains('show') && !window._gameInitialized) {
+                document.getElementById('startModal').classList.add('show');
+            }
+
+            document.addEventListener('dblclick', function(e) { if (window.innerWidth <= 768) e.preventDefault(); }, { passive: false });
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter' && homePage.classList.contains('active')) {
+                    if (btnStartGame) btnStartGame.click();
+                    e.preventDefault();
+                }
+            });
+
+            console.log('🚛 货运管控模拟器 完整版已加载');
+            console.log('📍 全国地点库已补全，共 ' + locations.length + ' 个地点');
         })();
     </script>
 </body>

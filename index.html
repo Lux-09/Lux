@@ -176,7 +176,16 @@
         .divider-line { display: flex; align-items: center; gap: 12px; width: 80%; max-width: 420px; margin: 4px 0 6px; }
         .divider-line .line { flex: 1; height: 1px; background: linear-gradient(90deg, transparent, rgba(140, 200, 230, 0.5), transparent); }
         .divider-line .diamond { width: 8px; height: 8px; background: #7dd3e8; transform: rotate(45deg); box-shadow: 0 0 10px #7dd3e8; flex-shrink: 0; }
-        .version-tag { font-size: 10px; letter-spacing: 3px; color: #6a8fa0; opacity: 0.6; margin-top: 2px; }
+
+        /* ★★★ 版本号修改位置 ★★★ */
+        .version-tag {
+            font-size: 10px;
+            letter-spacing: 3px;
+            color: #6a8fa0;
+            opacity: V:0.1.0;
+            margin-top: 2px;
+        }
+
         .button-area { display: flex; flex-direction: column; align-items: center; gap: 16px; margin-top: 18px; width: 100%; }
 
         /* ============ 统一按钮风格 ============ */
@@ -649,7 +658,8 @@
                     <span class="diamond"></span>
                     <span class="line"></span>
                 </div>
-                <span class="version-tag">v0.0.8 &nbsp;|&nbsp; BUILD 2026.09</span>
+                <!-- ★★★ 版本号修改位置：修改下方 V0.0.8 即可，注意大写 V ★★★ -->
+                <span class="version-tag">V0.0.8 &nbsp;|&nbsp; BUILD 2026.09</span>
                 <div class="button-area">
                     <button class="btn btn-start" id="btnStartGame" type="button">开始游戏</button>
                 </div>
@@ -736,10 +746,11 @@
 
         <!-- 游戏主界面占位 -->
         <div class="game-main-page" id="gameMainPage">
-            <div class="game-main-placeholder">
+            <div class="game-main-placeholder" id="gameMainPlaceholder">
                 游戏主界面<br>
                 <span style="font-size: 16px; opacity:0.7;">（内容开发中）</span>
             </div>
+            <button class="btn btn-back" id="btnLogout" style="margin-top: 20px;">退出登录</button>
         </div>
 
         <!-- 底部角落信息 -->
@@ -806,7 +817,35 @@
             updateClock();
             setInterval(updateClock, 1000);
 
-            // 页面切换与背景图切换
+            // ========== 存档系统 ==========
+            var SAVE_KEY = 'freightSecuritySave_v1';
+
+            function loadSave() {
+                try {
+                    var raw = localStorage.getItem(SAVE_KEY);
+                    return raw ? JSON.parse(raw) : null;
+                } catch (e) {
+                    return null;
+                }
+            }
+
+            function saveGame(data) {
+                try {
+                    localStorage.setItem(SAVE_KEY, JSON.stringify(data));
+                } catch (e) {
+                    console.error('保存失败', e);
+                }
+            }
+
+            function clearSave() {
+                try {
+                    localStorage.removeItem(SAVE_KEY);
+                } catch (e) {
+                    console.error('清除存档失败', e);
+                }
+            }
+
+            // 页面元素
             var bgLayer = document.getElementById('bgLayer');
             var homePage = document.getElementById('homePage');
             var registerPage = document.getElementById('registerPage');
@@ -817,6 +856,7 @@
             var btnBackHome = document.getElementById('btnBackHome');
             var btnQuizBack = document.getElementById('btnQuizBack');
             var btnEnterMain = document.getElementById('btnEnterMain');
+            var btnLogout = document.getElementById('btnLogout');
             var announceAudio = document.getElementById('announceAudio');
 
             function showPage(page) {
@@ -848,6 +888,25 @@
                 }
             }
 
+            // 存档恢复
+            var savedData = loadSave();
+            if (savedData && savedData.gameState === 'passed') {
+                // 直接进入游戏主界面
+                showPage('gameMain');
+                // 显示玩家信息
+                var placeholder = document.getElementById('gameMainPlaceholder');
+                if (placeholder) {
+                    placeholder.innerHTML = '欢迎回来，' + savedData.name + ' 安全员<br>' +
+                                           '单位：' + savedData.unit + '<br>' +
+                                           '<span style="font-size: 16px; opacity:0.7;">（游戏内容开发中）</span>';
+                }
+                // 隐藏开始游戏按钮？已经在游戏主界面，无需处理
+            } else {
+                // 无存档，显示首页
+                showPage('home');
+            }
+
+            // 按钮事件
             if (btnStartGame) btnStartGame.addEventListener('click', () => showPage('register'));
             if (btnBackHome) btnBackHome.addEventListener('click', () => showPage('home'));
             if (btnQuizBack) btnQuizBack.addEventListener('click', () => showPage('register'));
@@ -857,6 +916,20 @@
                     announceAudio.currentTime = 0;
                 }
                 showPage('gameMain');
+                // 更新游戏主界面内容（如果已有存档数据）
+                var save = loadSave();
+                if (save && save.gameState === 'passed') {
+                    var placeholder = document.getElementById('gameMainPlaceholder');
+                    if (placeholder) {
+                        placeholder.innerHTML = '欢迎回来，' + save.name + ' 安全员<br>' +
+                                               '单位：' + save.unit + '<br>' +
+                                               '<span style="font-size: 16px; opacity:0.7;">（游戏内容开发中）</span>';
+                    }
+                }
+            });
+            if (btnLogout) btnLogout.addEventListener('click', () => {
+                clearSave();
+                showPage('home');
             });
 
             document.addEventListener('keydown', function(e) {
@@ -866,17 +939,17 @@
                 }
             });
 
-            // 生成年龄选项
+            // 生成年龄选项 (18-25)
             var ageOptionsContainer = document.getElementById('ageOptions');
             if (ageOptionsContainer) {
                 var ageHtml = '';
-                for (var i = 18; i <= 40; i++) {
+                for (var i = 18; i <= 25; i++) {
                     ageHtml += '<div class="select-option" data-value="' + i + '">' + i + '岁</div>';
                 }
                 ageOptionsContainer.innerHTML = ageHtml;
             }
 
-            // 生成单位选项
+            // 生成单位选项（全国34个省级行政区）
             var provinces = [
                 '北京市','天津市','上海市','重庆市','河北省','山西省','辽宁省','吉林省',
                 '黑龙江省','江苏省','浙江省','安徽省','福建省','江西省','山东省','河南省',
@@ -893,7 +966,7 @@
                 unitOptionsContainer.innerHTML = unitHtml;
             }
 
-            // 事件委托处理下拉
+            // 事件委托处理所有下拉列表交互
             document.addEventListener('click', function(e) {
                 var display = e.target.closest('.select-display');
                 if (display) {
@@ -977,13 +1050,23 @@
                     if (!companySelect.getAttribute('data-value')) { showGameModal('提示', '请选择应聘公司。'); return; }
                     if (!unitSelect.getAttribute('data-value')) { showGameModal('提示', '请选择货运安全部单位。'); return; }
 
+                    // 暂存注册信息（用于后续保存）
+                    window._registerInfo = {
+                        name: name,
+                        age: ageSelect.getAttribute('data-value'),
+                        gender: genderSelect.getAttribute('data-value'),
+                        company: companySelect.getAttribute('data-value'),
+                        unit: unitSelect.getAttribute('data-value'),
+                        hasLicense: licenseValue === '有'
+                    };
+
                     var quizType = (licenseValue === '没有') ? 'driver' : 'safety';
                     showPage('quiz');
                     generateQuiz(quizType);
                 });
             }
 
-            // 题库
+            // ============ 两套题库 ============
             var safetyQuestions = [
                 { question: "安全员在货物装车前应重点检查什么？", options: ["货物数量", "车辆技术状况及货物捆绑", "司机驾驶证", "天气情况"], correct: 1, explanation: "安全员需确认车辆状态良好及货物固定牢靠，防止运输途中发生意外。" },
                 { question: "发现安全隐患时，安全员首先应？", options: ["自行处理", "立即上报并停止相关作业", "忽视继续工作", "通知司机处理"], correct: 1, explanation: "安全员应立即上报隐患，确保人员安全，不得擅自冒险作业。" },
@@ -1099,6 +1182,19 @@
                         }
                     } else {
                         if (passed) {
+                            // 保存存档
+                            var info = window._registerInfo;
+                            if (info) {
+                                saveGame({
+                                    name: info.name,
+                                    age: info.age,
+                                    gender: info.gender,
+                                    company: info.company,
+                                    unit: info.unit,
+                                    hasLicense: info.hasLicense,
+                                    gameState: 'passed'
+                                });
+                            }
                             showGameModal('考核通过', msg, function() {
                                 showPage('announce');
                                 if (announceAudio) {

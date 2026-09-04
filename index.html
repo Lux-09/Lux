@@ -57,6 +57,7 @@
         .btn:hover { background:rgba(15,30,42,0.7); border-color:rgba(150,220,250,0.85); box-shadow:0 0 32px rgba(100,190,230,0.4),inset 0 0 24px rgba(100,190,230,0.12); color:#f0f8fc; transform:translateY(-1px); }
         .btn:active { transform:translateY(1px); box-shadow:0 0 14px rgba(80,160,200,0.3),inset 0 0 20px rgba(80,160,200,0.15); background:rgba(8,16,24,0.8); }
         .btn-start { padding:16px 52px; font-size:18px; }
+        #btnNewbieGuide { padding:12px 42px; font-size:14px; }
         .btn-register { padding:12px 40px; font-size:15px; }
         .btn-back { padding:8px 20px; font-size:12px; background:rgba(10,20,30,0.35); border-color:rgba(110,150,170,0.5); box-shadow:0 0 10px rgba(80,160,200,0.1); }
         .btn-back:hover { background:rgba(20,40,55,0.6); border-color:rgba(150,220,250,0.8); }
@@ -300,11 +301,8 @@
         .pause-btns { display:flex; justify-content:center; gap:10px; flex-wrap:wrap; }
         .case-time-badge { display:inline-block; margin:4px 0 6px; padding:3px 8px; border:1px solid rgba(255,170,51,0.5); border-radius:6px; color:#ffaa33; background:rgba(255,170,51,0.08); font-size:11px; font-weight:bold; }
         .mobile-case-focus { display:none; }
-        .driver-search-wrap { position:sticky; top:0; z-index:2; padding:6px; background:#0c151f; border-bottom:1px solid rgba(100,160,190,0.22); }
-        .driver-search-input { width:100%; padding:8px 10px; border-radius:6px; border:1px solid rgba(110,160,190,0.45); background:rgba(4,8,15,0.95); color:#d8ecf4; font-family:inherit; font-size:12px; outline:none; }
-        .driver-search-input:focus { border-color:#7dd3e8; box-shadow:0 0 8px rgba(125,211,232,0.18); }
-        .driver-search-empty { padding:10px 12px; color:#7894a4; font-size:11px; text-align:center; }
         #eventDetail { scroll-margin-top:8px; }
+        .event-detail-only { min-height:72px; overflow-y:auto; }
         #chatModal .modal-box { display:flex; flex-direction:column; }
         #chatModal .chat-options { min-height:0; }
         .summary-fullscreen-overlay { scroll-padding-top:8px; }
@@ -326,6 +324,7 @@
             .game-top-bar .sys-name { font-size:11px; }
             .game-top-bar .timer { font-size:14px; }
             .top-btn { font-size:8px; padding:3px 6px; }
+            #btnNewbieGuide { font-size:13px; padding:10px 34px; }
             .info-row { font-size:10px; }
             .info-label { width:56px; }
             .summary-grid { grid-template-columns:1fr; }
@@ -335,9 +334,6 @@
             .game-grid .region-card:nth-child(3) { min-height:0; }
             .event-box { font-size:12px; line-height:1.7; padding:6px 2px; }
             .event-select-mobile-note { display:block; }
-            #eventSelectDisplay { min-height:40px; padding:10px 12px; font-size:12px; }
-            #eventSelectOptions { max-height:180px; }
-            #eventSelectOptions .select-option { padding:11px 12px; font-size:12px; }
             .case-time-badge { font-size:12px; padding:4px 9px; }
             .report-btn { min-height:38px; }
         }
@@ -352,8 +348,6 @@
             #chatModal .modal-btn { min-height:36px; }
             #chatModal .chat-option-btn + .chat-option-btn { margin-top:0; }
             .event-box { overflow:visible; }
-            #eventSelectOptions { max-height:230px; overflow-y:auto; }
-            .driver-search-wrap { display:block; }
             #eventDetail { min-height:72px; padding-bottom:10px; scroll-margin-top:4px; }
             .summary-fullscreen-overlay { align-items:flex-start; padding:8px; }
             .summary-fullscreen-card { height:calc(100vh - 16px); max-height:calc(100vh - 16px); overflow-y:auto; width:100%; padding:14px; gap:9px; }
@@ -369,7 +363,103 @@
             .summary-actions { flex-wrap:wrap; }
         }
 
+        @media (max-width:768px) {
+            .summary-fullscreen-overlay {
+                align-items:center;
+                justify-content:center;
+                padding:6px;
+                padding-top:max(6px, env(safe-area-inset-top));
+                padding-bottom:max(6px, env(safe-area-inset-bottom));
+                overflow:hidden;
+            }
+            .summary-fullscreen-card {
+                width:min(100%, 760px);
+                height:auto;
+                max-height:calc(100svh - 12px);
+                min-height:0;
+                padding:12px;
+                gap:8px;
+                overflow-y:auto;
+                overflow-x:hidden;
+                overscroll-behavior:contain;
+                -webkit-overflow-scrolling:touch;
+            }
+            .summary-header { flex-shrink:0; }
+            .summary-grid { flex-shrink:0; }
+            .summary-box { min-width:0; }
+            .summary-award { flex-shrink:0; max-height:none; }
+            #summaryPlayLog { flex-shrink:0; max-height:110px !important; overflow-y:auto; }
+            .summary-actions { flex-shrink:0; position:sticky; bottom:0; z-index:2; padding:8px 0 calc(4px + env(safe-area-inset-bottom)); margin:0; }
+            .summary-actions .modal-btn { min-height:40px; }
+        }
+
+        @media (max-width:768px) {
+            .summary-fullscreen-overlay {
+                align-items:center;
+                justify-content:center;
+                padding:4px;
+                overflow:hidden;
+            }
+            .summary-fullscreen-card {
+                width:100%;
+                max-width:800px;
+                height:calc(100svh - 8px);
+                max-height:calc(100svh - 8px);
+                min-height:0;
+                padding:10px;
+                gap:7px;
+                overflow:hidden;
+                display:grid;
+                grid-template-rows:auto auto auto minmax(38px, 1fr) auto;
+            }
+            .summary-header { min-width:0; }
+            .summary-title { font-size:16px; line-height:1.25; }
+            .summary-subtitle { font-size:9px; line-height:1.35; }
+            .summary-grid { min-width:0; gap:6px; margin:0; }
+            .summary-box { padding:7px; min-width:0; }
+            .summary-stat-item { font-size:10px; margin-bottom:3px; }
+            .summary-stat-item strong { font-size:11px; }
+            .summary-award { font-size:10px; line-height:1.4; padding:7px; overflow:hidden; }
+            #summaryPlayLog {
+                min-height:0 !important;
+                max-height:none !important;
+                height:auto !important;
+                overflow-y:auto;
+                margin:0 !important;
+                font-size:9px !important;
+            }
+            .summary-actions {
+                position:static !important;
+                min-height:38px;
+                padding:4px 0 calc(2px + env(safe-area-inset-bottom)) !important;
+                margin:0 !important;
+                background:transparent !important;
+                flex-wrap:nowrap;
+            }
+            .summary-actions .modal-btn {
+                min-height:36px;
+                padding:7px 12px;
+                font-size:10px;
+                white-space:nowrap;
+            }
+        }
+
         @media (max-width:480px) {
+            .summary-fullscreen-card {
+                height:calc(100svh - 6px);
+                max-height:calc(100svh - 6px);
+                padding:8px;
+                gap:5px;
+                border-width:1px;
+            }
+            .summary-title { font-size:14px; }
+            .summary-subtitle { font-size:8px; }
+            .summary-box { padding:6px; }
+            .summary-stat-item { font-size:9px; margin-bottom:2px; }
+            .summary-stat-item strong { font-size:10px; }
+            .summary-award { font-size:9px; line-height:1.32; padding:6px; }
+            #summaryPlayLog { font-size:8px !important; }
+            .summary-actions .modal-btn { font-size:9px; padding:6px 10px; min-height:34px; }
             .game-grid { grid-template-columns:1fr 1fr; grid-template-rows:0.92fr 1.6fr 1fr; gap:3px; }
             .game-grid .region-card:nth-child(3), .game-grid .region-card:nth-child(4) { grid-column:1 / -1; }
             .game-top-bar { padding:3px 6px; gap:4px; }
@@ -398,8 +488,6 @@
             .game-top-bar .sys-name { font-size:9px; }
             .game-grid { grid-template-rows:0.92fr 1.55fr 1fr; gap:3px; }
             .event-box { font-size:11px; line-height:1.65; }
-            #eventSelectDisplay { min-height:38px; font-size:11px; }
-            #eventSelectOptions .select-option { padding:10px; font-size:11px; }
             .pause-title { font-size:20px; }
         }
     </style>
@@ -452,6 +540,7 @@
                     <button class="btn btn-start" id="btnStartGame" type="button">开始游戏</button>
                     <button class="btn btn-start" id="btnContinueGame" type="button" style="display:none;">继续游戏</button>
                     <button class="btn btn-start" id="btnArchives" type="button" style="display:none;">档案</button>
+                    <button class="btn btn-start" id="btnNewbieGuide" type="button">新手教程</button>
                     <button class="btn btn-back" id="btnChangeCompany" type="button">公司名字更改</button>
                 </div>
             </div>
@@ -577,20 +666,8 @@
             <div class="region-card">
                 <div class="region-title">⚠ 突发事件面板</div>
                 <div class="region-content">
-                    <div class="custom-select" id="eventSelectWrap" style="margin-bottom:4px;">
-                        <div class="select-display" id="eventSelectDisplay">
-                            <span id="eventSelectText">-- 请选择司机编号查询 --</span>
-                            <span class="arrow">▼</span>
-                        </div>
-                        <div class="select-options" id="eventSelectOptions">
-                            <div class="driver-search-wrap" id="driverSearchWrap">
-                                <input type="search" id="driverSearchInput" class="driver-search-input" placeholder="🔎 输入司机编号或姓名搜索" autocomplete="off">
-                            </div>
-                            <div id="driverSearchResults"></div>
-                        </div>
-                    </div>
                     <div class="case-time-badge" id="caseTimerBadge" style="display:none;">案件剩余：30 秒</div>
-                    <div class="event-box" id="eventDetail">暂无事件，请选择司机编号查看详情。</div>
+                    <div class="event-box event-detail-only" id="eventDetail">暂无事件。发生异常后，请直接点击对应司机查看案件详情。</div>
                 </div>
             </div>
 
@@ -1054,6 +1131,7 @@
             var btnStartGame = document.getElementById('btnStartGame');
             var btnContinueGame = document.getElementById('btnContinueGame');
             var btnArchives = document.getElementById('btnArchives');
+            var btnNewbieGuide = document.getElementById('btnNewbieGuide');
             var btnBackHome = document.getElementById('btnBackHome');
             var btnQuizBack = document.getElementById('btnQuizBack');
             var btnEnterMain = document.getElementById('btnEnterMain');
@@ -1176,6 +1254,22 @@
                 btnArchives.addEventListener('click', function() {
                     renderArchiveList();
                     archiveListOverlay.classList.add('show');
+                });
+            }
+
+            if (btnNewbieGuide) {
+                btnNewbieGuide.addEventListener('click', function() {
+                    showGameModal(
+                        '📘 新手教程',
+                        '<b>一、你要做什么？</b><br>你是货运安全管理员，需要持续观察 10 名司机，发现异常后及时判断、沟通、上报和报警，尽可能完成整个班次。<br><br>' +
+                        '<b>二、先看司机颜色</b><br>🟢 绿色：运行正常，不需要处理。<br>🟡 黄色：一般预警，需要点击司机进入应急指导通话，并选择合适的处置指令。<br>🔴 红色：严重事故，必须立即处理。点击红色司机后，系统会自动把该案件显示到【突发事件面板】。<br><br>' +
+                        '<b>三、黄色事件怎么处理？</b><br>① 点击黄色司机；② 进入应急通话；③ 阅读司机描述；④ 选择正确指令。答错会增加失误并影响能力值和后续事件频率。<br><br>' +
+                        '<b>四、红色事件怎么处理？</b><br>① 点击红色司机查看案件详情；② 确认事故位置和现场情况；③ 向公司安全指挥中心上报；④ 根据案件情况选择需要的报警警种并完成报警。<br><br>' +
+                        '<b>五、案件倒计时</b><br>每起案件都有独立处理时限。黄色案件为 30 秒，红色案件为 60 秒；超过时限仍未完成案件处理，当前班次会直接结束。<br><br>' +
+                        '<b>六、暂停与退出</b><br>【暂停】会冻结班次时间、事件生成和当前案件倒计时；【退出】会保存当前进度并回到主界面，下次可从【继续游戏】恢复。<br><br>' +
+                        '<b>七、重开和完成</b><br>【重开】会放弃当前班次并开始新的班次；完整完成班次后会生成一份【档案】，以后可在主界面的【档案】中查看总结和操作记录。<br><br>' +
+                        '<b>八、实用小技巧</b><br>遇到红色司机优先点击；不要只看颜色，也要阅读案件位置和现场描述；保持较高正确率可以维持更好的事件节奏；处理完一件案件后继续巡查其他司机。'
+                    );
                 });
             }
 
@@ -2011,13 +2105,11 @@
             function resetEventPanel() {
                 var caseBadge = document.getElementById('caseTimerBadge');
                 if (caseBadge) { caseBadge.style.display = 'none'; caseBadge.textContent = '案件剩余：30 秒'; }
-                var driverSearchInput = document.getElementById('driverSearchInput');
-                if (driverSearchInput) driverSearchInput.value = '';
-                document.getElementById('eventSelectText').textContent = '-- 请选择司机编号查询 --';
-                document.getElementById('eventDetail').innerHTML = '暂无事件，请选择司机编号查看详情。';
-                var wrap = document.getElementById('eventSelectWrap');
-                wrap.classList.remove('open');
-                document.getElementById('eventSelectOptions').classList.remove('show');
+                var detail = document.getElementById('eventDetail');
+                if (detail) {
+                    detail.innerHTML = '暂无事件。发生异常后，请直接点击对应司机查看案件详情。';
+                    detail.scrollTop = 0;
+                }
             }
 
             function clearCaseTimeout() {
@@ -2156,6 +2248,7 @@
             function handleDriverClick(driver) {
                 if (driver.status === 'green') { showToast('司机 ' + driver.id + ' 运行正常，无需处置。'); return; }
                 if (driver.status === 'yellow') {
+                    searchEvent(driver.id);
                     openChatModal(driver, 'yellow_wechat');
                 } else if (driver.status === 'red') {
                     // 点击红色异常司机时，立即把该司机案件同步到突发事件面板。
@@ -2255,54 +2348,8 @@
 
             document.getElementById('closeChatBtn').addEventListener('click', function() { chatModal.classList.remove('show'); });
 
-            var selectWrap = document.getElementById('eventSelectWrap');
-            var selectDisplay = document.getElementById('eventSelectDisplay');
-            var selectText = document.getElementById('eventSelectText');
-            var selectOptions = document.getElementById('eventSelectOptions');
-            var driverSearchInput = document.getElementById('driverSearchInput');
-            if (driverSearchInput) {
-                driverSearchInput.addEventListener('click', function(e) { e.stopPropagation(); });
-                driverSearchInput.addEventListener('keydown', function(e) { e.stopPropagation(); });
-                driverSearchInput.addEventListener('input', function() { populateSelectOptions(); });
-            }
-
-            function populateSelectOptions() {
-                var resultBox = document.getElementById('driverSearchResults') || selectOptions;
-                var searchInput = document.getElementById('driverSearchInput');
-                var query = searchInput ? searchInput.value.trim().toLowerCase() : '';
-                var currentPendingId = pendingEventDriver ? pendingEventDriver.id : null;
-                var sortedDrivers = drivers.slice().sort(function(a, b) {
-                    var aPriority = a.id === currentPendingId ? 0 : (a.status === 'red' ? 1 : (a.status === 'yellow' ? 2 : 3));
-                    var bPriority = b.id === currentPendingId ? 0 : (b.status === 'red' ? 1 : (b.status === 'yellow' ? 2 : 3));
-                    return aPriority - bPriority;
-                });
-                if (query) {
-                    sortedDrivers = sortedDrivers.filter(function(d) {
-                        return String(d.id).toLowerCase().indexOf(query) !== -1 || String(d.name).toLowerCase().indexOf(query) !== -1;
-                    });
-                }
-                var html = '';
-                if (!sortedDrivers.length) {
-                    html = '<div class="driver-search-empty">没有找到匹配的司机</div>';
-                } else {
-                    sortedDrivers.forEach(function(d) {
-                        var highlight = d.id === currentPendingId ? ' style="border-color:#ffaa33;color:#fff;background:rgba(255,170,51,0.13);"' : '';
-                        html += '<div class="select-option" data-id="' + d.id + '"' + highlight + '>' + d.id + ' - ' + d.name + (d.status !== 'green' ? '　⚠' : '') + '</div>';
-                    });
-                }
-                resultBox.innerHTML = html;
-                resultBox.querySelectorAll('.select-option').forEach(function(opt) {
-                    opt.addEventListener('click', function() {
-                        var id = this.getAttribute('data-id');
-                        selectText.textContent = this.textContent;
-                        selectWrap.classList.remove('open');
-                        selectOptions.classList.remove('show');
-                        if (searchInput) searchInput.value = '';
-                        populateSelectOptions();
-                        searchEvent(id);
-                    });
-                });
-            }
+            // 司机下拉查询已移除，改为点击司机自动同步案件详情。
+            function populateSelectOptions() { return; }
 
             function focusEventDetail() {
                 var detail = document.getElementById('eventDetail');
@@ -2319,7 +2366,7 @@
 
             function searchEvent(driverId) {
                 var detail = document.getElementById('eventDetail');
-                if (!driverId) { detail.innerHTML = '请选择司机编号。'; return; }
+                if (!driverId) { detail.innerHTML = '暂无指定案件。'; return; }
                 var driver = drivers.find(function(d) { return d.id === driverId; });
                 if (driver) {
                     if (driver.status === 'green') {
@@ -2344,16 +2391,6 @@
                 } else detail.innerHTML = '未找到该司机编号。';
                 focusEventDetail();
             }
-
-            selectDisplay.addEventListener('click', function(e) {
-                e.stopPropagation();
-                selectWrap.classList.toggle('open');
-                selectOptions.classList.toggle('show');
-            });
-            document.addEventListener('click', function(e) {
-                if (!selectWrap.contains(e.target)) { selectWrap.classList.remove('open');
-                    selectOptions.classList.remove('show'); }
-            });
 
             var btnCompany = document.getElementById('btnReportCompany');
             var btnAlarmCenter = document.getElementById('btnCallAlarmCenter');

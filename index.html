@@ -176,13 +176,12 @@
         .divider-line { display: flex; align-items: center; gap: 12px; width: 80%; max-width: 420px; margin: 4px 0 6px; }
         .divider-line .line { flex: 1; height: 1px; background: linear-gradient(90deg, transparent, rgba(140, 200, 230, 0.5), transparent); }
         .divider-line .diamond { width: 8px; height: 8px; background: #7dd3e8; transform: rotate(45deg); box-shadow: 0 0 10px #7dd3e8; flex-shrink: 0; }
-
-        /* ★★★ 版本号修改位置 ★★★ */
+        /* ★★★ 版本号修改位置：修改下方 V0.1.1 即可，注意大写 V ★★★ */
         .version-tag {
             font-size: 10px;
             letter-spacing: 3px;
             color: #6a8fa0;
-            opacity: V:0.1.0;
+            opacity: 0.6;
             margin-top: 2px;
         }
 
@@ -501,8 +500,8 @@
             margin-bottom: 16px;
         }
         .announce-title .star {
-            color: #f0c040;
-            margin: 0 4px;
+            color: #ff0000; /* 红色 */
+            margin: 0;     /* 无间隔 */
         }
         .announce-text {
             font-size: 14px;
@@ -662,6 +661,8 @@
                 <span class="version-tag">V0.0.8 &nbsp;|&nbsp; BUILD 2026.09</span>
                 <div class="button-area">
                     <button class="btn btn-start" id="btnStartGame" type="button">开始游戏</button>
+                    <!-- 继续游戏按钮（有存档时显示） -->
+                    <button class="btn btn-start" id="btnContinueGame" type="button" style="display: none;">继续游戏</button>
                 </div>
             </div>
         </div>
@@ -750,7 +751,10 @@
                 游戏主界面<br>
                 <span style="font-size: 16px; opacity:0.7;">（内容开发中）</span>
             </div>
-            <button class="btn btn-back" id="btnLogout" style="margin-top: 20px;">退出登录</button>
+            <div style="display: flex; gap: 12px; margin-top: 20px;">
+                <button class="btn btn-back" id="btnLogout">退出登录</button>
+                <button class="btn btn-back" id="btnRestart">重新开始</button>
+            </div>
         </div>
 
         <!-- 底部角落信息 -->
@@ -853,10 +857,12 @@
             var announcePage = document.getElementById('announcePage');
             var gameMainPage = document.getElementById('gameMainPage');
             var btnStartGame = document.getElementById('btnStartGame');
+            var btnContinueGame = document.getElementById('btnContinueGame');
             var btnBackHome = document.getElementById('btnBackHome');
             var btnQuizBack = document.getElementById('btnQuizBack');
             var btnEnterMain = document.getElementById('btnEnterMain');
             var btnLogout = document.getElementById('btnLogout');
+            var btnRestart = document.getElementById('btnRestart');
             var announceAudio = document.getElementById('announceAudio');
 
             function showPage(page) {
@@ -888,26 +894,31 @@
                 }
             }
 
-            // 存档恢复
+            // 初始化：检查存档决定是否显示“继续游戏”
             var savedData = loadSave();
             if (savedData && savedData.gameState === 'passed') {
-                // 直接进入游戏主界面
-                showPage('gameMain');
-                // 显示玩家信息
-                var placeholder = document.getElementById('gameMainPlaceholder');
-                if (placeholder) {
-                    placeholder.innerHTML = '欢迎回来，' + savedData.name + ' 安全员<br>' +
-                                           '单位：' + savedData.unit + '<br>' +
-                                           '<span style="font-size: 16px; opacity:0.7;">（游戏内容开发中）</span>';
-                }
-                // 隐藏开始游戏按钮？已经在游戏主界面，无需处理
+                btnContinueGame.style.display = 'inline-flex';
             } else {
-                // 无存档，显示首页
-                showPage('home');
+                btnContinueGame.style.display = 'none';
             }
+            showPage('home'); // 始终显示首页
 
             // 按钮事件
             if (btnStartGame) btnStartGame.addEventListener('click', () => showPage('register'));
+            if (btnContinueGame) btnContinueGame.addEventListener('click', () => {
+                var save = loadSave();
+                if (save && save.gameState === 'passed') {
+                    showPage('gameMain');
+                    var placeholder = document.getElementById('gameMainPlaceholder');
+                    if (placeholder) {
+                        placeholder.innerHTML = '欢迎回来，' + save.name + ' 安全员<br>' +
+                                               '单位：' + save.unit + '<br>' +
+                                               '<span style="font-size: 16px; opacity:0.7;">（游戏内容开发中）</span>';
+                    }
+                } else {
+                    showGameModal('提示', '存档无效，请重新开始。');
+                }
+            });
             if (btnBackHome) btnBackHome.addEventListener('click', () => showPage('home'));
             if (btnQuizBack) btnQuizBack.addEventListener('click', () => showPage('register'));
             if (btnEnterMain) btnEnterMain.addEventListener('click', () => {
@@ -916,12 +927,12 @@
                     announceAudio.currentTime = 0;
                 }
                 showPage('gameMain');
-                // 更新游戏主界面内容（如果已有存档数据）
-                var save = loadSave();
-                if (save && save.gameState === 'passed') {
-                    var placeholder = document.getElementById('gameMainPlaceholder');
-                    if (placeholder) {
-                        placeholder.innerHTML = '欢迎回来，' + save.name + ' 安全员<br>' +
+                // 首次注册时显示欢迎语，但不带“欢迎回来”
+                var placeholder = document.getElementById('gameMainPlaceholder');
+                if (placeholder) {
+                    var save = loadSave();
+                    if (save && save.gameState === 'passed') {
+                        placeholder.innerHTML = '欢迎上任，' + save.name + ' 安全员<br>' +
                                                '单位：' + save.unit + '<br>' +
                                                '<span style="font-size: 16px; opacity:0.7;">（游戏内容开发中）</span>';
                     }
@@ -930,6 +941,12 @@
             if (btnLogout) btnLogout.addEventListener('click', () => {
                 clearSave();
                 showPage('home');
+                btnContinueGame.style.display = 'none';
+            });
+            if (btnRestart) btnRestart.addEventListener('click', () => {
+                clearSave();
+                showPage('home');
+                btnContinueGame.style.display = 'none';
             });
 
             document.addEventListener('keydown', function(e) {
@@ -1050,7 +1067,6 @@
                     if (!companySelect.getAttribute('data-value')) { showGameModal('提示', '请选择应聘公司。'); return; }
                     if (!unitSelect.getAttribute('data-value')) { showGameModal('提示', '请选择货运安全部单位。'); return; }
 
-                    // 暂存注册信息（用于后续保存）
                     window._registerInfo = {
                         name: name,
                         age: ageSelect.getAttribute('data-value'),

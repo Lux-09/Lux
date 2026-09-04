@@ -40,8 +40,13 @@
             transition: background-image 0.4s ease, filter 0.4s ease;
         }
 
-        /* 首页和游戏主界面使用的新图 */
+        /* 首页初始背景（新提供的图） */
         .bg-layer.home-bg {
+            background-image: url('https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEaXPlqmCgPFdbETtBhvt5_FvJoa5-xSwACVTMAAm9BwFTsCXSES1qFaD0E.png');
+        }
+
+        /* 游戏主界面背景（之前的新图） */
+        .bg-layer.game-bg {
             background-image: url('https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEaa1NqmW5X2WitN5yFwAyu_a_aDvITegACdyAAAm9B0FQqncKhQmdWmz0E.png');
         }
 
@@ -55,6 +60,9 @@
                 background-image: url('https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEaXZFqmCyWXGUO-7hbwsVc3eTM48K1FwAC8zMAAm9BwFTDFpVwPEdWMD0E.png');
             }
             .bg-layer.home-bg {
+                background-image: url('https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEaXZFqmCyWXGUO-7hbwsVc3eTM48K1FwAC8zMAAm9BwFTDFpVwPEdWMD0E.png');
+            }
+            .bg-layer.game-bg {
                 background-image: url('https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEaa1FqmW3qYwqgvS0Ui_vmm98-canbagACdSAAAm9B0FTlU4gfLXu6_j0E.png');
             }
         }
@@ -176,7 +184,8 @@
         .divider-line { display: flex; align-items: center; gap: 12px; width: 80%; max-width: 420px; margin: 4px 0 6px; }
         .divider-line .line { flex: 1; height: 1px; background: linear-gradient(90deg, transparent, rgba(140, 200, 230, 0.5), transparent); }
         .divider-line .diamond { width: 8px; height: 8px; background: #7dd3e8; transform: rotate(45deg); box-shadow: 0 0 10px #7dd3e8; flex-shrink: 0; }
-        /* ★★★ 版本号修改位置：修改下方 V0.1.1 即可，注意大写 V ★★★ */
+
+        /* ★★★ 版本号修改位置：修改下方 V0.0.8 即可，注意大写 V ★★★ */
         .version-tag {
             font-size: 10px;
             letter-spacing: 3px;
@@ -500,8 +509,8 @@
             margin-bottom: 16px;
         }
         .announce-title .star {
-            color: #ff0000; /* 红色 */
-            margin: 0;     /* 无间隔 */
+            color: #ff0000;
+            margin: 0;
         }
         .announce-text {
             font-size: 14px;
@@ -872,7 +881,8 @@
                 announcePage.classList.remove('show');
                 gameMainPage.classList.remove('show');
 
-                bgLayer.classList.remove('home-bg', 'blur-bg');
+                // 移除所有背景类
+                bgLayer.classList.remove('home-bg', 'game-bg', 'blur-bg');
 
                 if (page === 'home') {
                     bgLayer.classList.add('home-bg');
@@ -884,8 +894,18 @@
                 } else if (page === 'announce') {
                     announcePage.classList.add('show');
                 } else if (page === 'gameMain') {
-                    bgLayer.classList.add('home-bg', 'blur-bg');
+                    bgLayer.classList.add('game-bg', 'blur-bg');
                     gameMainPage.classList.add('show');
+                }
+
+                // 更新继续游戏按钮显示状态
+                if (page === 'home') {
+                    var save = loadSave();
+                    if (save && save.gameState === 'passed') {
+                        btnContinueGame.style.display = 'inline-flex';
+                    } else {
+                        btnContinueGame.style.display = 'none';
+                    }
                 }
 
                 if (page !== 'announce' && announceAudio) {
@@ -894,14 +914,8 @@
                 }
             }
 
-            // 初始化：检查存档决定是否显示“继续游戏”
-            var savedData = loadSave();
-            if (savedData && savedData.gameState === 'passed') {
-                btnContinueGame.style.display = 'inline-flex';
-            } else {
-                btnContinueGame.style.display = 'none';
-            }
-            showPage('home'); // 始终显示首页
+            // 初始化：显示首页
+            showPage('home');
 
             // 按钮事件
             if (btnStartGame) btnStartGame.addEventListener('click', () => showPage('register'));
@@ -928,10 +942,10 @@
                 }
                 showPage('gameMain');
                 // 首次注册时显示欢迎语，但不带“欢迎回来”
-                var placeholder = document.getElementById('gameMainPlaceholder');
-                if (placeholder) {
-                    var save = loadSave();
-                    if (save && save.gameState === 'passed') {
+                var save = loadSave();
+                if (save && save.gameState === 'passed') {
+                    var placeholder = document.getElementById('gameMainPlaceholder');
+                    if (placeholder) {
                         placeholder.innerHTML = '欢迎上任，' + save.name + ' 安全员<br>' +
                                                '单位：' + save.unit + '<br>' +
                                                '<span style="font-size: 16px; opacity:0.7;">（游戏内容开发中）</span>';
@@ -941,12 +955,10 @@
             if (btnLogout) btnLogout.addEventListener('click', () => {
                 clearSave();
                 showPage('home');
-                btnContinueGame.style.display = 'none';
             });
             if (btnRestart) btnRestart.addEventListener('click', () => {
-                clearSave();
+                // 重新开始：不清除存档，仅返回首页，保留继续游戏按钮
                 showPage('home');
-                btnContinueGame.style.display = 'none';
             });
 
             document.addEventListener('keydown', function(e) {
@@ -1198,7 +1210,6 @@
                         }
                     } else {
                         if (passed) {
-                            // 保存存档
                             var info = window._registerInfo;
                             if (info) {
                                 saveGame({

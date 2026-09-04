@@ -875,7 +875,9 @@
                     var legacyRaw = localStorage.getItem(LEGACY_RESUME_KEY);
                     var legacyParsed = legacyRaw ? JSON.parse(legacyRaw) : [];
                     if (Array.isArray(legacyParsed) && legacyParsed.length > 0) {
+                        // 迁移完成后删除旧键，避免用户删光 v3 存档后旧 v2 存档再次“复活”。
                         localStorage.setItem(RESUME_KEY, JSON.stringify(legacyParsed));
+                        localStorage.removeItem(LEGACY_RESUME_KEY);
                         return legacyParsed;
                     }
                     // 兼容更早版本单独保存的当前进度对象。
@@ -889,6 +891,8 @@
                             oldSingle.playLog = Array.isArray(oldSingle.playLog) ? oldSingle.playLog : [];
                             var migrated = [oldSingle];
                             localStorage.setItem(RESUME_KEY, JSON.stringify(migrated));
+                            // 迁移后清除旧的单档进度，避免删除后再次被恢复。
+                            localStorage.removeItem('freight_sim_saved_state');
                             return migrated;
                         }
                     }
@@ -905,9 +909,19 @@
             }
 
             function deleteSave(id) {
+                var targetId = String(id);
                 var saves = loadSaves();
-                var filtered = saves.filter(function(s) { return s.id !== id; });
-                try { localStorage.setItem(RESUME_KEY, JSON.stringify(filtered)); } catch (e) {}
+                var filtered = saves.filter(function(s) { return String(s.id) !== targetId; });
+                try {
+                    if (filtered.length > 0) localStorage.setItem(RESUME_KEY, JSON.stringify(filtered));
+                    else {
+                        localStorage.removeItem(RESUME_KEY);
+                        // 同步清理历史兼容键，确保删除最后一个存档后不会再次出现。
+                        localStorage.removeItem(LEGACY_RESUME_KEY);
+                        localStorage.removeItem('freight_sim_saved_state');
+                    }
+                } catch (e) {}
+                if (activeResumeId && String(activeResumeId) === targetId) activeResumeId = null;
                 updateContinueButton();
                 renderSaveList();
             }
@@ -934,7 +948,8 @@
             }
 
             function deleteArchive(id) {
-                var archives = loadArchives().filter(function(a) { return a.id !== id; });
+                var targetId = String(id);
+                var archives = loadArchives().filter(function(a) { return String(a.id) !== targetId; });
                 try { localStorage.setItem(ARCHIVE_KEY, JSON.stringify(archives)); } catch (e) {}
                 updateArchiveButton();
                 renderArchiveList();
@@ -2140,8 +2155,13 @@
 
             function handleDriverClick(driver) {
                 if (driver.status === 'green') { showToast('司机 ' + driver.id + ' 运行正常，无需处置。'); return; }
-                if (driver.status === 'yellow') { openChatModal(driver, 'yellow_wechat'); } else if (driver.status === 'red') {
-                    openChatModal(driver, 'red_offline'); }
+                if (driver.status === 'yellow') {
+                    openChatModal(driver, 'yellow_wechat');
+                } else if (driver.status === 'red') {
+                    // 点击红色异常司机时，立即把该司机案件同步到突发事件面板。
+                    searchEvent(driver.id);
+                    openChatModal(driver, 'red_offline');
+                }
             }
 
             var chatModal = document.getElementById('chatModal');
@@ -2520,7 +2540,8 @@
                 var available = drivers.filter(function(d) { return d.status === 'green'; });
                 if (!available.length) return;
                 var driver = available[Math.floor(Math.random() * available.length)];
-                var isRed = Math.random() < 0.18;
+                // 红色严重案件略微提高频率：23%。
+                var isRed = Math.random() < 0.23;
                 var player = window._playerInfo || window._registerInfo || {};
                 var unitLocations = getLocationsForUnit(player.unit || '');
                 var randomLoc = unitLocations[Math.floor(Math.random() * unitLocations.length)];

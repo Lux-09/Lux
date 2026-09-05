@@ -824,6 +824,277 @@
         padding:13px !important;
     }
 }
+
+
+/* ================================================================
+   手机优先 UI 重构 v2：聊天 / 班次总结 / 考核通过
+   这些规则采用独立类名与独立布局，避免旧版响应式样式互相覆盖。
+   ================================================================ */
+
+/* ---------- 聊天弹窗：真正的上下分区，任何按钮都不互相覆盖 ---------- */
+.chat-ui-card {
+    display:flex !important;
+    flex-direction:column !important;
+    width:min(600px, 92vw) !important;
+    max-width:600px !important;
+    height:min(720px, 88vh) !important;
+    max-height:88vh !important;
+    padding:12px !important;
+    box-sizing:border-box !important;
+    overflow:hidden !important;
+    gap:8px !important;
+}
+.chat-ui-title {
+    flex:0 0 auto !important;
+    margin:0 !important;
+}
+.chat-ui-body {
+    flex:1 1 auto !important;
+    min-height:0 !important;
+    display:flex !important;
+    flex-direction:column !important;
+    gap:8px !important;
+    overflow:hidden !important;
+}
+.chat-ui-card .chat-container {
+    flex:0 0 170px !important;
+    height:170px !important;
+    min-height:0 !important;
+    margin:0 !important;
+    box-sizing:border-box !important;
+    overflow-y:auto !important;
+    overflow-x:hidden !important;
+}
+.chat-ui-card .chat-options {
+    flex:1 1 auto !important;
+    min-height:0 !important;
+    max-height:none !important;
+    margin:0 !important;
+    padding:2px 3px 4px !important;
+    box-sizing:border-box !important;
+    overflow-y:auto !important;
+    overflow-x:hidden !important;
+    gap:8px !important;
+    -webkit-overflow-scrolling:touch !important;
+    overscroll-behavior:contain !important;
+}
+.chat-ui-card .chat-option-btn {
+    position:relative !important;
+    z-index:1 !important;
+    display:flex !important;
+    align-items:center !important;
+    width:100% !important;
+    min-height:50px !important;
+    height:auto !important;
+    margin:0 !important;
+    padding:11px 13px !important;
+    box-sizing:border-box !important;
+    flex:0 0 auto !important;
+    touch-action:manipulation !important;
+    pointer-events:auto !important;
+    -webkit-tap-highlight-color:transparent !important;
+    user-select:none !important;
+}
+.chat-ui-footer {
+    position:relative !important;
+    z-index:5 !important;
+    flex:0 0 auto !important;
+    width:100% !important;
+    min-height:48px !important;
+    display:flex !important;
+    align-items:center !important;
+    justify-content:center !important;
+    box-sizing:border-box !important;
+    padding:5px 0 max(2px, env(safe-area-inset-bottom)) !important;
+    border-top:1px solid rgba(100,160,190,.22) !important;
+    background:#08101a !important;
+}
+.chat-ui-card .chat-close-btn {
+    position:static !important;
+    z-index:6 !important;
+    min-width:150px !important;
+    min-height:40px !important;
+    padding:8px 18px !important;
+    margin:0 !important;
+    touch-action:manipulation !important;
+}
+
+/* ---------- 班次总结：独立窗口 + 独立滚动内容，不再使用 fullscreen 命名语义 ---------- */
+#summaryModal {
+    position:fixed !important;
+    inset:0 !important;
+    width:100vw !important;
+    height:100svh !important;
+    padding:16px !important;
+    box-sizing:border-box !important;
+    display:none !important;
+    align-items:center !important;
+    justify-content:center !important;
+    overflow:hidden !important;
+    background:rgba(0,0,0,.72) !important;
+    z-index:1000 !important;
+}
+#summaryModal.show { display:flex !important; }
+#summaryModal > .summary-fullscreen-card {
+    width:min(720px, 92vw) !important;
+    max-width:720px !important;
+    height:min(760px, 84svh) !important;
+    max-height:84svh !important;
+    min-height:0 !important;
+    margin:0 !important;
+    padding:16px !important;
+    box-sizing:border-box !important;
+    overflow-y:auto !important;
+    overflow-x:hidden !important;
+    overscroll-behavior:contain !important;
+    -webkit-overflow-scrolling:touch !important;
+    display:flex !important;
+    flex-direction:column !important;
+    gap:10px !important;
+}
+#summaryModal .summary-header,
+#summaryModal .summary-grid,
+#summaryModal .summary-award,
+#summaryModal #summaryPlayRecordBox,
+#summaryModal .summary-actions { flex-shrink:0 !important; }
+#summaryModal .summary-grid { grid-template-columns:1fr 1fr !important; }
+#summaryModal .summary-award { overflow:visible !important; }
+#summaryModal #summaryPlayRecordBox { min-height:0 !important; }
+#summaryModal #summaryPlayLog {
+    max-height:190px !important;
+    overflow-y:auto !important;
+    -webkit-overflow-scrolling:touch !important;
+}
+#summaryModal .summary-actions {
+    position:static !important;
+    bottom:auto !important;
+    left:auto !important;
+    right:auto !important;
+    display:flex !important;
+    flex-wrap:wrap !important;
+    justify-content:center !important;
+    background:transparent !important;
+    padding:3px 0 calc(3px + env(safe-area-inset-bottom)) !important;
+    margin:0 !important;
+}
+
+/* ---------- 考核通过：重新独立成居中小窗口，正文只在窗口内滚 ---------- */
+#announcePage.announce-page {
+    position:fixed !important;
+    inset:0 !important;
+    width:100vw !important;
+    height:100svh !important;
+    min-height:0 !important;
+    padding:16px !important;
+    box-sizing:border-box !important;
+    display:none !important;
+    align-items:center !important;
+    justify-content:center !important;
+    overflow:hidden !important;
+    background:rgba(0,0,0,.74) !important;
+    z-index:1100 !important;
+}
+#announcePage.announce-page.show { display:flex !important; }
+#announcePage .announce-box {
+    width:min(560px, 90vw) !important;
+    max-width:560px !important;
+    height:min(600px, 78svh) !important;
+    max-height:78svh !important;
+    min-height:0 !important;
+    margin:0 !important;
+    padding:20px 18px 14px !important;
+    box-sizing:border-box !important;
+    display:flex !important;
+    flex-direction:column !important;
+    align-items:stretch !important;
+    justify-content:flex-start !important;
+    overflow:hidden !important;
+    border-radius:16px !important;
+    background:rgba(5,12,20,.98) !important;
+    border:1px solid rgba(120,190,220,.55) !important;
+    box-shadow:0 18px 60px rgba(0,0,0,.72), 0 0 26px rgba(80,160,200,.22) !important;
+}
+#announcePage .announce-title {
+    flex:0 0 auto !important;
+    margin:0 0 12px !important;
+    font-size:clamp(20px, 6vw, 28px) !important;
+    line-height:1.25 !important;
+}
+#announcePage .announce-text {
+    flex:1 1 auto !important;
+    min-height:0 !important;
+    margin:0 0 12px !important;
+    padding:12px !important;
+    box-sizing:border-box !important;
+    overflow-y:auto !important;
+    overflow-x:hidden !important;
+    -webkit-overflow-scrolling:touch !important;
+    overscroll-behavior:contain !important;
+    border:1px solid rgba(100,160,190,.22) !important;
+    border-radius:10px !important;
+    background:rgba(4,8,15,.72) !important;
+    text-align:left !important;
+    font-size:clamp(12px, 3.4vw, 14px) !important;
+    line-height:1.75 !important;
+    letter-spacing:.8px !important;
+    white-space:pre-line !important;
+}
+#announcePage #announceAudio { flex:0 0 auto !important; width:100% !important; }
+#announcePage .btn-enter-main {
+    flex:0 0 auto !important;
+    align-self:center !important;
+    min-height:44px !important;
+    min-width:180px !important;
+    margin:0 !important;
+}
+
+/* 手机尺寸进一步收紧，但仍保持窗口化 */
+@media (max-width: 600px) {
+    .chat-ui-card {
+        width:94vw !important;
+        height:82svh !important;
+        max-height:82svh !important;
+        padding:10px !important;
+        gap:7px !important;
+    }
+    .chat-ui-card .chat-container {
+        flex-basis:110px !important;
+        height:110px !important;
+    }
+    .chat-ui-card .chat-option-btn {
+        min-height:54px !important;
+        padding:10px 12px !important;
+    }
+    .chat-ui-footer { min-height:46px !important; }
+    .chat-ui-card .chat-close-btn {
+        min-width:155px !important;
+        min-height:42px !important;
+    }
+
+    #summaryModal { padding:10px !important; }
+    #summaryModal > .summary-fullscreen-card {
+        width:92vw !important;
+        height:72svh !important;
+        max-height:72svh !important;
+        padding:12px !important;
+        gap:8px !important;
+        border-radius:14px !important;
+    }
+    #summaryModal .summary-grid { grid-template-columns:1fr !important; gap:7px !important; }
+    #summaryModal #summaryPlayLog { max-height:150px !important; }
+
+    #announcePage { padding:10px !important; }
+    #announcePage .announce-box {
+        width:92vw !important;
+        height:70svh !important;
+        max-height:70svh !important;
+        padding:15px 12px 12px !important;
+    }
+    #announcePage .announce-title { font-size:21px !important; letter-spacing:2px !important; }
+    #announcePage .announce-text { padding:10px !important; font-size:12px !important; line-height:1.7 !important; }
+    #announcePage .btn-enter-main { min-width:170px !important; min-height:43px !important; }
+}
+
 </style>
 </head>
 <body>
@@ -1114,13 +1385,17 @@
         </div>
     </div>
 
-    <!-- 聊天弹窗 -->
+    <!-- 聊天弹窗：手机端独立内容区 + 独立底部操作区，彻底避免层叠遮挡 -->
     <div class="modal-overlay" id="chatModal">
-        <div class="modal-box">
-            <div class="modal-title" id="chatModalTitle">💬 司机沟通</div>
-            <div class="chat-container" id="chatMessages"></div>
-            <div class="chat-options" id="chatOptions"></div>
-            <div class="modal-btns"><button class="modal-btn" id="closeChatBtn">挂断 / 关闭</button></div>
+        <div class="modal-box chat-ui-card">
+            <div class="modal-title chat-ui-title" id="chatModalTitle">💬 司机沟通</div>
+            <div class="chat-ui-body">
+                <div class="chat-container" id="chatMessages"></div>
+                <div class="chat-options" id="chatOptions"></div>
+            </div>
+            <div class="chat-ui-footer">
+                <button class="modal-btn chat-close-btn" id="closeChatBtn" type="button">挂断 / 关闭</button>
+            </div>
         </div>
     </div>
 

@@ -621,6 +621,209 @@
     #summaryPlayLog { max-height:135px !important; }
 }
 
+
+
+/* ============ 手机优先最终弹窗布局修正 ============ */
+@media (max-width: 768px) {
+    /* 微信/黄色警报：选项区与挂断区彻底分层，禁止底部遮挡第四个选项。 */
+    #chatModal {
+        inset:0 !important;
+        padding:10px !important;
+        align-items:center !important;
+        justify-content:center !important;
+        box-sizing:border-box !important;
+        overflow:hidden !important;
+    }
+    #chatModal .modal-box {
+        width:92vw !important;
+        max-width:560px !important;
+        max-height:90svh !important;
+        height:auto !important;
+        padding:12px !important;
+        box-sizing:border-box !important;
+        overflow:hidden !important;
+        display:flex !important;
+        flex-direction:column !important;
+        gap:7px !important;
+    }
+    #chatModal .chat-container {
+        height:76px !important;
+        min-height:76px !important;
+        max-height:76px !important;
+        margin:0 !important;
+        flex:0 0 auto !important;
+        overflow-y:auto !important;
+    }
+    #chatModal .chat-options {
+        width:100% !important;
+        max-height:46svh !important;
+        min-height:0 !important;
+        margin:0 !important;
+        padding:2px 2px 4px !important;
+        gap:7px !important;
+        overflow-y:auto !important;
+        overflow-x:hidden !important;
+        flex:0 1 auto !important;
+        box-sizing:border-box !important;
+        -webkit-overflow-scrolling:touch !important;
+        overscroll-behavior:contain !important;
+    }
+    #chatModal .chat-option-btn {
+        width:100% !important;
+        min-height:52px !important;
+        height:auto !important;
+        padding:10px 12px !important;
+        margin:0 !important;
+        flex:0 0 auto !important;
+        box-sizing:border-box !important;
+        text-align:left !important;
+        touch-action:manipulation !important;
+        pointer-events:auto !important;
+        position:relative !important;
+        z-index:3 !important;
+    }
+    #chatModal .modal-btns {
+        position:relative !important;
+        z-index:10 !important;
+        width:100% !important;
+        flex:0 0 auto !important;
+        min-height:42px !important;
+        margin:0 !important;
+        padding:4px 0 0 !important;
+        background:#08101a !important;
+        box-sizing:border-box !important;
+        display:flex !important;
+        justify-content:center !important;
+    }
+    #chatModal .modal-btn {
+        min-height:38px !important;
+        padding:7px 20px !important;
+        font-size:11px !important;
+        z-index:11 !important;
+    }
+
+    /* 班次总结：手机端始终是居中小窗口，不再顶满屏幕；内容超出只在窗口内部滚动。 */
+    #summaryModal {
+        inset:0 !important;
+        width:100vw !important;
+        height:100svh !important;
+        padding:14px !important;
+        display:none !important;
+        align-items:center !important;
+        justify-content:center !important;
+        overflow:hidden !important;
+        box-sizing:border-box !important;
+        background:rgba(4,8,15,.86) !important;
+    }
+    #summaryModal.show {
+        display:flex !important;
+    }
+    #summaryModal .summary-fullscreen-card {
+        width:90vw !important;
+        max-width:640px !important;
+        height:auto !important;
+        max-height:84svh !important;
+        min-height:0 !important;
+        margin:0 !important;
+        padding:14px !important;
+        box-sizing:border-box !important;
+        overflow-y:auto !important;
+        overflow-x:hidden !important;
+        display:flex !important;
+        flex-direction:column !important;
+        gap:9px !important;
+        -webkit-overflow-scrolling:touch !important;
+        overscroll-behavior:contain !important;
+    }
+    #summaryModal .summary-actions {
+        position:static !important;
+        flex-shrink:0 !important;
+        padding:4px 0 calc(3px + env(safe-area-inset-bottom)) !important;
+        margin:0 !important;
+        background:transparent !important;
+        flex-wrap:wrap !important;
+    }
+
+    /* 考核通过/未通过等通用游戏弹窗：手机端同样保持“窗口化”。 */
+    #gameModalOverlay {
+        inset:0 !important;
+        width:100vw !important;
+        height:100svh !important;
+        padding:14px !important;
+        align-items:center !important;
+        justify-content:center !important;
+        box-sizing:border-box !important;
+        overflow:hidden !important;
+    }
+    #gameModalOverlay .game-modal {
+        width:88vw !important;
+        max-width:520px !important;
+        max-height:76svh !important;
+        min-height:0 !important;
+        margin:0 !important;
+        padding:16px !important;
+        box-sizing:border-box !important;
+        overflow-y:auto !important;
+        overflow-x:hidden !important;
+        -webkit-overflow-scrolling:touch !important;
+        scrollbar-width:thin !important;
+    }
+    #gameModalOverlay .modal-title {
+        font-size:15px !important;
+        line-height:1.35 !important;
+        margin-bottom:9px !important;
+    }
+    #gameModalOverlay .modal-message {
+        font-size:12px !important;
+        line-height:1.6 !important;
+        margin-bottom:12px !important;
+    }
+    #gameModalOverlay .modal-btns {
+        position:static !important;
+        background:transparent !important;
+        flex-shrink:0 !important;
+    }
+}
+
+@media (max-width: 480px) {
+    #chatModal .modal-box {
+        width:93vw !important;
+        max-height:88svh !important;
+        padding:10px !important;
+    }
+    #chatModal .chat-container {
+        height:68px !important;
+        min-height:68px !important;
+        max-height:68px !important;
+    }
+    #chatModal .chat-options {
+        max-height:47svh !important;
+        gap:6px !important;
+    }
+    #chatModal .chat-option-btn {
+        min-height:50px !important;
+        padding:9px 11px !important;
+        font-size:11px !important;
+        line-height:1.35 !important;
+    }
+    #summaryModal {
+        padding:10px !important;
+    }
+    #summaryModal .summary-fullscreen-card {
+        width:92vw !important;
+        max-height:82svh !important;
+        padding:11px !important;
+        gap:7px !important;
+    }
+    #gameModalOverlay {
+        padding:10px !important;
+    }
+    #gameModalOverlay .game-modal {
+        width:90vw !important;
+        max-height:72svh !important;
+        padding:13px !important;
+    }
+}
 </style>
 </head>
 <body>

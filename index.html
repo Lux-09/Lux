@@ -1095,6 +1095,85 @@
     #announcePage .btn-enter-main { min-width:170px !important; min-height:43px !important; }
 }
 
+
+
+/* ================================================================
+   黄色警报聊天最终手机优化：缩小弹窗 + 留出更多答案空间 + 滑动不误选
+   ================================================================ */
+@media (max-width: 600px) {
+    .chat-ui-card {
+        width: 92vw !important;
+        height: 68svh !important;
+        max-height: 68svh !important;
+        min-height: 0 !important;
+        padding: 9px !important;
+        gap: 6px !important;
+        border-radius: 14px !important;
+    }
+
+    .chat-ui-title {
+        flex: 0 0 auto !important;
+        min-height: 34px !important;
+        font-size: 14px !important;
+        line-height: 1.25 !important;
+        padding: 7px 8px !important;
+    }
+
+    .chat-ui-body {
+        gap: 6px !important;
+        min-height: 0 !important;
+        overflow: hidden !important;
+    }
+
+    .chat-ui-card .chat-container {
+        flex: 0 0 82px !important;
+        height: 82px !important;
+        max-height: 82px !important;
+        min-height: 82px !important;
+        padding: 6px !important;
+        font-size: 12px !important;
+        line-height: 1.45 !important;
+    }
+
+    .chat-ui-card .chat-options {
+        flex: 1 1 auto !important;
+        min-height: 0 !important;
+        max-height: none !important;
+        overflow-y: auto !important;
+        overflow-x: hidden !important;
+        padding: 2px 2px 5px !important;
+        gap: 6px !important;
+        -webkit-overflow-scrolling: touch !important;
+        overscroll-behavior-y: contain !important;
+        touch-action: pan-y !important;
+    }
+
+    .chat-ui-card .chat-option-btn {
+        min-height: 44px !important;
+        height: auto !important;
+        padding: 9px 10px !important;
+        font-size: 13px !important;
+        line-height: 1.35 !important;
+        margin: 0 !important;
+        flex: 0 0 auto !important;
+        touch-action: manipulation !important;
+    }
+
+    .chat-ui-footer {
+        min-height: 42px !important;
+        height: 42px !important;
+        padding: 3px 0 !important;
+        flex: 0 0 42px !important;
+    }
+
+    .chat-ui-card .chat-close-btn {
+        min-width: 132px !important;
+        min-height: 36px !important;
+        height: 36px !important;
+        padding: 6px 14px !important;
+        font-size: 13px !important;
+    }
+}
 </style>
 </head>
 <body>
@@ -2953,9 +3032,9 @@
                             recordMistake('应急指导决策错误', driver);
                         }
                     }
-                    btn.addEventListener('pointerup', selectYellowOption, {passive:false});
-                    btn.addEventListener('click', selectYellowOption, {passive:false});
-                    btn.addEventListener('touchend', selectYellowOption, {passive:false});
+                    // 手机端只使用 click 作为最终选择事件。
+                    // 不再绑定 pointerup/touchend，避免用户滑动选项时松手误触发选择。
+                    btn.addEventListener('click', selectYellowOption);
                     chatOptions.appendChild(btn);
                 });
                 chatModal.classList.add('show');

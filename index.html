@@ -10,8 +10,8 @@
         html,body { width:100%; height:100%; overflow:hidden; font-family:"Courier New","Consolas","PingFang SC","Microsoft YaHei",monospace; background:#0a0e14; -webkit-tap-highlight-color:transparent; user-select:none; }
 
         /* ============ 背景层 ============ */
-        .bg-layer { position:fixed; top:0; left:0; width:100%; height:100%; z-index:0; background-size:cover; background-position:center; background-image:url('https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEaXPlqmCgPFdbETtBhvt5_FvJoa5-xSwACVTMAAm9BwFTsCXSES1qFaD0E.png'); transition:background-image .4s,filter .4s; }
-        .bg-layer.game-bg { background-image:url('https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEaa1NqmW5X2WitN5yFwAyu_a_aDvITegACdyAAAm9B0FQqncKhQmdWmz0E.png'); }
+        .bg-layer { position:fixed; top:0; left:0; width:100%; height:100%; z-index:0; background-size:cover; background-position:center; background-image:url('A1ZHUYE.png'); transition:background-image .4s,filter .4s; }
+        .bg-layer.game-bg { background-image:url('A2ZHUCHE.png'); }
         .bg-layer.blur-bg { filter:blur(8px); }
         .bg-overlay { position:fixed; top:0; left:0; width:100%; height:100%; z-index:1; background:rgba(4,8,15,0.45); pointer-events:none; }
         .scanlines { position:fixed; top:0; left:0; width:100%; height:100%; z-index:2; pointer-events:none; background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.03) 2px,rgba(0,0,0,0.03) 4px); }
@@ -128,7 +128,7 @@
             display:none; flex-direction:column;
             padding:8px 12px;
             overflow:hidden;
-            background-image:url('https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEaa1NqmW5X2WitN5yFwAyu_a_aDvITegACdyAAAm9B0FQqncKhQmdWmz0E.png');
+            background-image:url('A2ZHUCHE.png');
             background-size:cover; background-position:center; background-blend-mode:overlay;
         }
         .game-main-page.show { display:flex; }
@@ -490,7 +490,138 @@
             .event-box { font-size:11px; line-height:1.65; }
             .pause-title { font-size:20px; }
         }
-    </style>
+    
+/* ============ 最终手机交互与总结窗口修正 ============ */
+@media (max-width: 768px) {
+    #chatModal .chat-option-btn {
+        display:block;
+        width:100%;
+        min-height:48px;
+        margin:0;
+        padding:10px 12px;
+        touch-action:manipulation;
+        -webkit-tap-highlight-color:rgba(125,211,232,.22);
+        -webkit-user-select:none;
+        user-select:none;
+    }
+    #chatModal .chat-option-btn:disabled {
+        opacity:.55;
+    }
+
+    /* 总结页：明确做成居中的“窗口”，窗口不顶满；内容过长只在窗口内部滚动。 */
+    .summary-fullscreen-overlay {
+        position:fixed !important;
+        inset:0 !important;
+        width:100vw !important;
+        height:100vh !important;
+        height:100svh !important;
+        padding:12px !important;
+        display:none !important;
+        align-items:center !important;
+        justify-content:center !important;
+        overflow:hidden !important;
+        box-sizing:border-box !important;
+        background:rgba(4,8,15,.92) !important;
+    }
+    .summary-fullscreen-overlay.show {
+        display:flex !important;
+    }
+    .summary-fullscreen-card {
+        width:92vw !important;
+        max-width:620px !important;
+        height:auto !important;
+        max-height:88svh !important;
+        min-height:0 !important;
+        padding:14px !important;
+        margin:0 auto !important;
+        overflow-y:auto !important;
+        overflow-x:hidden !important;
+        box-sizing:border-box !important;
+        -webkit-overflow-scrolling:touch !important;
+        overscroll-behavior:contain;
+        display:flex !important;
+        flex-direction:column !important;
+        gap:9px !important;
+    }
+    .summary-header,
+    .summary-grid,
+    .summary-award,
+    #summaryPlayRecordBox,
+    .summary-actions {
+        flex-shrink:0 !important;
+    }
+    .summary-grid {
+        grid-template-columns:1fr !important;
+        gap:7px !important;
+    }
+    .summary-title {
+        font-size:clamp(15px,4.3vw,19px) !important;
+        line-height:1.3 !important;
+        white-space:normal !important;
+    }
+    .summary-subtitle {
+        font-size:clamp(9px,2.8vw,11px) !important;
+        line-height:1.45 !important;
+        white-space:normal !important;
+    }
+    .summary-stat-item {
+        font-size:clamp(10px,3vw,12px) !important;
+        line-height:1.4 !important;
+    }
+    .summary-stat-item strong {
+        font-size:clamp(11px,3.2vw,13px) !important;
+    }
+    .summary-award {
+        font-size:clamp(10px,3vw,12px) !important;
+        line-height:1.55 !important;
+        white-space:pre-wrap !important;
+        overflow:visible !important;
+    }
+    #summaryPlayRecordBox {
+        max-height:none !important;
+        overflow:visible !important;
+    }
+    #summaryPlayLog {
+        max-height:150px !important;
+        min-height:60px !important;
+        overflow-y:auto !important;
+        -webkit-overflow-scrolling:touch;
+    }
+    .summary-actions {
+        position:static !important;
+        display:flex !important;
+        justify-content:center !important;
+        flex-wrap:wrap !important;
+        gap:7px !important;
+        padding:5px 0 calc(4px + env(safe-area-inset-bottom)) !important;
+        margin:0 !important;
+        background:transparent !important;
+    }
+    .summary-actions .modal-btn {
+        min-height:40px !important;
+        padding:8px 14px !important;
+        font-size:clamp(10px,3vw,12px) !important;
+        white-space:nowrap !important;
+    }
+}
+@media (max-width: 480px) {
+    .summary-fullscreen-overlay { padding:8px !important; }
+    .summary-fullscreen-card {
+        width:91vw !important;
+        max-height:86svh !important;
+        padding:10px !important;
+        gap:6px !important;
+    }
+    .summary-title { font-size:15px !important; }
+    .summary-subtitle { font-size:9px !important; }
+    .summary-box { padding:7px !important; }
+    .summary-stat-item { font-size:9.5px !important; }
+    .summary-stat-item strong { font-size:10.5px !important; }
+    .summary-award { font-size:9.5px !important; line-height:1.45 !important; padding:7px !important; }
+    #summaryPlayLog { max-height:135px !important; }
+}
+
+</style>
 </head>
 <body>
     <!-- 横屏遮罩 -->
@@ -754,7 +885,7 @@
 
                 祝您工作顺利！
             </div>
-            <audio id="announceAudio" src="https://videotourl.com/audio/1788440810540-78a6ea5a-abcb-4060-b132-54b3361ed2ed.mp3" preload="auto"></audio>
+            <audio id="announceAudio" src="A3kaishi.mp3" preload="auto"></audio>
             <button class="btn btn-enter-main" id="btnEnterMain">进入主控台</button>
         </div>
     </div>
@@ -1824,7 +1955,7 @@
             var selectedAlarms = [];
             window._gamePlayLog = [];
             var eventAudio = new Audio(
-                'https://mp3tourl.com/audio/1788527162526-8af859fe-11ee-4238-a526-090030543441.mp3');
+                'A4yuyintishi.mp3');
 
             // 全国地点（34省区，每省2-3个）
             var locations = [
@@ -2309,7 +2440,18 @@
                     var btn = document.createElement('button');
                     btn.className = 'chat-option-btn';
                     btn.textContent = opt.text;
-                    btn.addEventListener('click', function() {
+                    function selectYellowOption(event) {
+                        if (btn.dataset.selected === '1') return;
+                        btn.dataset.selected = '1';
+                        if (event) {
+                            event.preventDefault();
+                            event.stopPropagation();
+                        }
+                        // 立即禁用全部选项，避免手机浏览器一次触摸触发多次事件。
+                        chatOptions.querySelectorAll('.chat-option-btn').forEach(function(otherBtn) {
+                            otherBtn.disabled = true;
+                            otherBtn.style.pointerEvents = 'none';
+                        });
                         addChatMsg('user', '指令：' + opt.text);
                         if (opt.correct) {
                             addChatMsg('driver', '收到！我立刻按指令处置，危机已解除！（请点击下侧挂断按钮结束通话）');
@@ -2332,7 +2474,10 @@
                             chatModal.classList.remove('show');
                             recordMistake('应急指导决策错误', driver);
                         }
-                    });
+                    }
+                    btn.addEventListener('pointerup', selectYellowOption, {passive:false});
+                    btn.addEventListener('click', selectYellowOption, {passive:false});
+                    btn.addEventListener('touchend', selectYellowOption, {passive:false});
                     chatOptions.appendChild(btn);
                 });
                 chatModal.classList.add('show');

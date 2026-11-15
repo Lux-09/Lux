@@ -182,20 +182,15 @@
   .hit-toggle .arrow{transition:transform .25s;color:var(--muted);font-size:10px}
   .hit-toggle.open .arrow{transform:rotate(180deg)}
 
-  /* 改进动画方案：使用 grid-template-rows 避免高度计算卡顿 */
+  /* 彻底移除高度过渡，改为瞬间显示，杜绝卡顿 */
   .hit-list{
-    display:grid;
-    grid-template-rows:0fr;
-    transition:grid-template-rows .3s ease;
-  }
-  .hit-list-inner{
-    overflow:hidden;
-    padding:0 12px;
+    display: none;
+    background: var(--panel);
   }
   .hit-toggle.open + .hit-list{
-    grid-template-rows:1fr;
+    display: block;
   }
-  .hit-toggle.open + .hit-list .hit-list-inner{
+  .hit-list-inner{
     padding:12px;
   }
 
@@ -203,15 +198,18 @@
   .reject-item:last-child{margin-bottom:0}
   .reject-item b{color:var(--med);font-weight:600}
 
-  /* skip-info 紧贴在 file-group 的最下方，看起来像该组结果的一部分 */
+  /* skip-info 紧贴在 file-group 的最下方 */
   .skip-info{border:1px solid var(--border);background:var(--panel);margin-top:4px;font-size:10.5px;color:var(--muted);border-radius:var(--radius);overflow:hidden}
   .skip-head{padding:10px 14px;border-bottom:1px solid transparent;display:flex;align-items:center;justify-content:space-between;cursor:pointer;transition:background var(--transition)}
   .skip-head:hover{background:var(--panel-2)}
   .skip-head .arrow{transition:transform .25s ease;font-size:10px}
   .skip-info.open .skip-head .arrow{transform:rotate(180deg)}
   .skip-info.open .skip-head{border-bottom-color:var(--border)}
-  .skip-body{max-height:0;overflow:hidden;transition:max-height .25s ease}
-  .skip-info.open .skip-body{max-height:2000px}
+  
+  /* 同样瞬间显示 */
+  .skip-body{display:none; background:var(--bg);}
+  .skip-info.open .skip-body{display:block;}
+  
   .skip-line{padding:5px 14px;font-size:10.5px;color:var(--muted);border-bottom:1px solid rgba(45,58,86,.4);word-break:break-all}
   .skip-line:last-child{border-bottom:none}
 
@@ -240,8 +238,10 @@
   .disclaimer-fold{border:1px solid var(--border);background:rgba(168,136,42,.05);margin-top:16px;border-radius:var(--radius);overflow:hidden;transition:var(--transition)}
   .disc-head{padding:10px 14px;font-size:11px;color:var(--med);display:flex;justify-content:space-between;align-items:center;cursor:pointer}
   .disc-head:hover{background:rgba(168,136,42,.1)}
-  .disc-body{max-height:0;overflow:hidden;transition:max-height .3s ease;padding:0 14px;font-size:11px;color:var(--muted);line-height:1.6}
-  .disclaimer-fold.open .disc-body{max-height:200px;padding-bottom:12px}
+  
+  .disc-body{display:none; padding:0 14px 12px; font-size:11px; color:var(--muted); line-height:1.6}
+  .disclaimer-fold.open .disc-body{display:block;}
+  
   .disclaimer-fold .arrow{transition:transform .25s;font-size:10px}
   .disclaimer-fold.open .arrow{transform:rotate(180deg)}
 
@@ -279,7 +279,7 @@
     </svg>
     <div class="brand">设备护盾</div>
     <div class="spacer"></div>
-    <div class="sys"><span>安全库 <span class="ok">v9.3</span></span><span>引擎 静态监控</span></div>
+    <div class="sys"><span>安全库 <span class="ok">v9.4</span></span><span>引擎 静态监控</span></div>
   </div>
 
   <!-- 顶部态势指标行 -->
@@ -298,8 +298,8 @@
 
     <div id="dropzone">
       <div class="dz-icon">[ + ]</div>
-      <p><strong>拖入 .zip 压缩包或任意文件</strong></p>
-      <p>自动计算 SHA-256 哈希，可多选</p>
+      <p><strong>拖入或点击选择文件（支持多次追加）</strong></p>
+      <p>自动计算 SHA-256 哈希</p>
     </div>
     <input type="file" id="fileInput" multiple>
 
@@ -1202,7 +1202,6 @@ function renderSkipInfo(report){
   </div>`;
 }
 
-// 直接渲染，每个 report 就是独立的 file-group
 function renderReport(report){
   const panelsHtml = report.units.map(u => renderPanel(u, report)).join('');
   const skipHtml = renderSkipInfo(report);
@@ -1225,7 +1224,9 @@ const statStatus = document.getElementById('statStatus');
 const statFiles = document.getElementById('statFiles');
 const statHits = document.getElementById('statHits');
 
-let totalHitCount = 0;
+// 全局累积状态，允许多次追加
+let globalReports = []; 
+let globalRejected = [];
 
 let progRaf=null;
 let progState={pct:0,cur:''};
@@ -1279,9 +1280,19 @@ function bindToggles(){
 }
 
 function animatePanels(){
-  document.querySelectorAll('.verdict-panel').forEach((el,i)=>{
-    el.style.animationDelay=(i*0.05)+'s';
+  // 取消延迟动画，瞬间显示
+  document.querySelectorAll('.verdict-panel').forEach(el => {
+    el.style.animation = 'none';
   });
+}
+
+function updateStats() {
+  statFiles.textContent = globalReports.length + globalRejected.length;
+  let hitCount = 0;
+  globalReports.forEach(rep => {
+    hitCount += rep.units.filter(u => u.findings.length > 0).length;
+  });
+  statHits.textContent = hitCount;
 }
 
 // 计算文件 SHA-256
@@ -1298,48 +1309,41 @@ async function computeHash(file) {
 
 async function handleFiles(files){
   if(!files||!files.length)return;
-  results.innerHTML='';
-  resetSteps();
-  resetProgress();
-  totalHitCount = 0;
   
-  statStatus.textContent = '正在计算哈希';
-  statStatus.style.color = 'var(--accent)';
-  statFiles.textContent = '0';
-  statHits.textContent = '0';
-
+  // 过滤
   const validFiles=[];
-  const rejectedNames=[];
+  const currentRejected=[];
   
   for(const f of files){
     const ext=getExt(f.name);
     if(BINARY_EXTS.includes(ext)){
-      rejectedNames.push(f.name);
+      currentRejected.push(f.name);
     } else {
       validFiles.push(f);
     }
   }
 
-  if(validFiles.length===0){
-    results.innerHTML=renderRejected(rejectedNames);
-    statStatus.textContent = '已拦截';
-    statStatus.style.color = 'var(--med)';
+  if(validFiles.length === 0 && currentRejected.length > 0){
+    globalRejected.push(...currentRejected);
+    results.innerHTML = globalRejected.map(n=>renderRejected([n])).join('');
+    updateStats();
     return;
   }
 
-  // 计算所有有效文件的 Hash（存入 file 对象）
+  if (validFiles.length === 0) return;
+
+  statStatus.textContent = '正在扫描追加';
+  statStatus.style.color = 'var(--accent)';
+  
+  showProgress();
+  resetSteps();
+  setStep(0,'active');
+
+  // 计算 Hash
   for (const f of validFiles) {
     f._hash = await computeHash(f);
   }
 
-  statStatus.textContent = '扫描中';
-  statStatus.style.color = 'var(--ok)';
-  statFiles.textContent = validFiles.length;
-
-  showProgress();
-  setStep(0,'active');
-
-  const reports=[];
   const fileCount=validFiles.length;
 
   for(let i=0;i<fileCount;i++){
@@ -1357,42 +1361,39 @@ async function handleFiles(files){
         requestProgress(globalPct,p.path||'');
       });
       report.hash = f._hash;
-      reports.push(report);
-      
-      // 统计命中
-      const hits = report.units.filter(u=>u.findings.length>0).length;
-      totalHitCount += hits;
-      statHits.textContent = totalHitCount;
-
+      globalReports.push(report);
     }catch(e){
       if(e.message === 'IGNORE_BINARY'){
-        rejectedNames.push(f.name);
+        globalRejected.push(f.name);
         ignored = true;
       } else {
-        reports.push({
+        globalReports.push({
           source:f.name,
           hash: f._hash,
           units:[{source:f.name,findings:[{ruleId:'ERROR',severity:'medium',type:'struct',typeLabel:'结构式',title:'文件解析失败',desc:String(e.message||e),path:f.name,line:0,snippet:'',view:'解析'}]}],
           skipped:[],
         });
-        statHits.textContent = ++totalHitCount;
       }
     }
     if(!ignored) requestProgress(((i+1)/fileCount)*100,'完成 '+f.name);
   }
 
-  setStep(0,'done');setStep(1,'done');setStep(2,'active');
+  setStep(0,'done');setStep(1,'done');setStep(2,'done');
   requestProgress(100,'扫描完成');
   statStatus.textContent = '已完成';
 
   await new Promise(r=>setTimeout(r,200));
-
   hideProgress();
-  let html='';
-  if(rejectedNames.length)html+=renderRejected(rejectedNames);
-  html+=reports.map(renderReport).join('');
-  results.innerHTML=html;
-  setStep(2,'done');
+
+  // 渲染累加结果
+  let html = '';
+  if(globalRejected.length > 0) {
+    html += renderRejected(globalRejected);
+  }
+  html += globalReports.map(renderReport).join('');
+  results.innerHTML = html;
+  
+  updateStats();
   bindToggles();
   animatePanels();
 }

@@ -6,7 +6,6 @@
 <title>设备护盾 · 检测面板</title>
 <style>
   :root{
-    /* 深空蓝主题 */
     --bg:#060910; 
     --panel:#101622; 
     --panel-2:#171f30;
@@ -18,7 +17,6 @@
     --accent:#0078D4; 
     --accent-hover:#106EBE;
     
-    /* 警示色保持不变 */
     --crit:#a83232; 
     --high:#c96f2c; 
     --med:#a8882a; 
@@ -187,7 +185,7 @@
   .hit-toggle .arrow{transition:transform .25s;color:var(--muted);font-size:10px}
   .hit-toggle.open .arrow{transform:rotate(180deg)}
 
-  /* 彻底移除高度过渡，改为瞬间显示，杜绝卡顿 */
+  /* 瞬间显示，杜绝卡顿 */
   .hit-list{
     display: none;
     background: var(--panel);
@@ -211,15 +209,19 @@
   .skip-info.open .skip-head .arrow{transform:rotate(180deg)}
   .skip-info.open .skip-head{border-bottom-color:var(--border)}
   
-  /* 同样瞬间显示 */
   .skip-body{display:none; background:var(--bg);}
   .skip-info.open .skip-body{display:block;}
   
   .skip-line{padding:5px 14px;font-size:10.5px;color:var(--muted);border-bottom:1px solid rgba(45,58,86,.4);word-break:break-all}
   .skip-line:last-child{border-bottom:none}
 
-  .finding{border:1px solid var(--border);background:var(--bg);padding:12px 14px;margin-bottom:8px;border-left:2px solid var(--muted);border-radius:2px}
-  .finding:last-child{margin-bottom:0}
+  /* 详情分组样式 */
+  .detail-group { margin-bottom: 12px; border: 1px solid var(--border); border-radius: 2px; overflow: hidden; }
+  .detail-group:last-child { margin-bottom: 0; }
+  .detail-group-head { background: var(--panel-2); padding: 8px 12px; font-size: 11px; color: var(--accent); font-weight: 600; word-break: break-all; border-bottom: 1px solid var(--border); }
+
+  .finding{background:var(--bg);padding:12px 14px;border-bottom:1px solid var(--border);border-left:2px solid var(--muted)}
+  .finding:last-child{border-bottom:none}
   .finding.critical{border-left-color:var(--crit)}
   .finding.high{border-left-color:var(--high)}
   .finding.medium{border-left-color:var(--med)}
@@ -234,7 +236,6 @@
   .f-type.struct{color:var(--accent);border-color:rgba(0,120,212,.4)}
   .f-id{font-size:10px;color:var(--muted)}
   .f-title{font-size:12.5px;font-weight:600}
-  .f-path{font-size:10.5px;color:var(--accent);word-break:break-all;margin-top:5px}
   .f-desc{font-size:11.5px;color:var(--muted);margin-top:4px;line-height:1.6}
   .f-view{font-size:9.5px;color:var(--muted);margin-top:4px;opacity:.75}
   .finding pre{margin-top:7px;padding:7px 9px;background:#05070a;border:1px solid #161e27;font-size:10.5px;white-space:pre-wrap;word-break:break-all;color:#9fb0c0;overflow-x:auto;user-select:text;border-radius:2px}
@@ -284,10 +285,9 @@
     </svg>
     <div class="brand">设备护盾</div>
     <div class="spacer"></div>
-    <div class="sys"><span>安全库 <span class="ok">v9.5</span></span><span>引擎 静态监控</span></div>
+    <div class="sys"><span>安全库 <span class="ok">v9.6</span></span><span>引擎 聚合展示</span></div>
   </div>
 
-  <!-- 顶部态势指标行 -->
   <div class="status-bar" id="statusBar">
     <div class="item">状态：<span class="val" id="statStatus">待命</span></div>
     <div class="item">批量：<span class="val" id="statFiles">0</span> 文件</div>
@@ -307,7 +307,6 @@
       <p><strong>拖入或点击选择文件进行检测</strong></p>
       <p style="color:var(--med);margin-top:8px;font-size:11px;">※ 若系统不支持多选，可分批点击追加结果</p>
     </div>
-    <!-- 移除 multiple，因为部分手机浏览器底层的单文件拦截，依靠追加逻辑更稳定 -->
     <input type="file" id="fileInput">
 
     <div class="progress-wrap" id="progressWrap">
@@ -320,7 +319,6 @@
 
     <div id="results"></div>
     
-    <!-- 底部精简折叠免责 -->
     <div class="disclaimer-fold" id="discFold">
       <div class="disc-head">
         <span>检测仅为初步静态分析，不等于绝对安全。点击展开详情</span>
@@ -1041,9 +1039,7 @@ async function analyzeZip(file,onProgress){
   await scanUnits(units,onProgress);
   for(const u of units)u.findings=dedupFindings(u.findings);
 
-  const hitUnits=units.filter(u=>u.findings.length>0);
-  if(hitUnits.length===0)return {source:file.name,units:[{source:file.name,findings:[]}],skipped};
-  return {source:file.name,units:hitUnits,skipped};
+  return {source:file.name,units,skipped};
 }
 
 async function analyzeSingle(file,onProgress){
@@ -1114,23 +1110,17 @@ function renderIcon(shape){
   return '<div class="shape check"></div>';
 }
 
-function renderPanel(unit, report){
-  const findings=unit.findings;
-  const {verdict,score}=verdictOf(findings);
+// 聚合渲染：一个 report 对应一个独立的面板
+function renderPanel(report){
+  const allFindings = report.units.flatMap(u => u.findings);
+  const {verdict,score}=verdictOf(allFindings);
   const meta=VERDICT_META[verdict];
-  const hit=findings.length>0;
-  const sevOrder={critical:0,high:1,medium:2};
-  const typeOrder={obvious:0,hidden:1,struct:2};
-  const sorted=[...findings].sort((a,b)=>
-    (sevOrder[a.severity]-sevOrder[b.severity])||(typeOrder[a.type]-typeOrder[b.type])||a.path.localeCompare(b.path));
+  const hit=allFindings.length>0;
 
-  const nObvious=sorted.filter(f=>f.type==='obvious').length;
-  const nHidden=sorted.filter(f=>f.type==='hidden').length;
-  const nStruct=sorted.filter(f=>f.type==='struct').length;
+  const nObvious=allFindings.filter(f=>f.type==='obvious').length;
+  const nHidden=allFindings.filter(f=>f.type==='hidden').length;
+  const nStruct=allFindings.filter(f=>f.type==='struct').length;
 
-  const isNested = unit.source !== report.source;
-  const titleFile = isNested ? unit.source : report.source;
-  const sourceInfo = isNested ? `所属总包: ${report.source}` : `单文件`;
   const hashInfo = report.hash ? report.hash.substring(0, 16) + '...' : '--';
 
   let html=`
@@ -1140,8 +1130,8 @@ function renderPanel(unit, report){
       <div class="verdict-meta">
         <div class="status">${meta.label}</div>
         <div class="desc">${esc(meta.desc)}</div>
-        <div class="file">${esc(titleFile)}</div>
-        <div class="meta-info">[源] ${esc(sourceInfo)} | [HASH] ${hashInfo}</div>
+        <div class="file">${esc(report.source)}</div>
+        <div class="meta-info">[HASH] ${hashInfo}</div>
       </div>
     </div>
     <div class="verdict-stats">
@@ -1154,24 +1144,48 @@ function renderPanel(unit, report){
   if(hit){
     html+=`
     <button class="hit-toggle" type="button">
-      <span>查看命中详情 / DETAILS</span><span class="arrow">▼</span>
+      <span>查看命中详情 / DETAILS (共 ${allFindings.length} 处)</span><span class="arrow">▼</span>
     </button>
     <div class="hit-list"><div class="hit-list-inner">`;
-    for(const f of sorted){
-      html+=`
-        <div class="finding ${f.severity}">
-          <div class="f-row">
-            <span class="f-sev ${f.severity}">${f.severity}</span>
-            <span class="f-type ${f.type}">${f.typeLabel}</span>
-            <span class="f-id">${esc(f.ruleId)}</span>
-            <span class="f-title">${esc(f.title)}</span>
-          </div>
-          <div class="f-path">${esc(f.path)}${f.line?' : '+f.line:''}</div>
-          ${f.desc?`<div class="f-desc">${esc(f.desc)}</div>`:''}
-          ${f.view?`<div class="f-view">命中视图：${esc(f.view)}</div>`:''}
-          ${f.snippet?`<pre>${esc(f.snippet)}</pre>`:''}
-        </div>`;
+
+    // 按文件路径分组
+    const groups = {};
+    allFindings.forEach(f => {
+      if(!groups[f.path]) groups[f.path] = [];
+      groups[f.path].push(f);
+    });
+
+    const sevOrder={critical:0,high:1,medium:2};
+    const typeOrder={obvious:0,hidden:1,struct:2};
+
+    for(const [path, findings] of Object.entries(groups)) {
+      findings.sort((a,b)=>
+        (sevOrder[a.severity]-sevOrder[b.severity])||
+        (typeOrder[a.type]-typeOrder[b.type])||
+        a.line - b.line
+      );
+
+      html += `<div class="detail-group">`;
+      html += `<div class="detail-group-head">[ 文件: ${esc(path)} ] 命中 ${findings.length} 项</div>`;
+
+      for(const f of findings){
+        html+=`
+          <div class="finding ${f.severity}">
+            <div class="f-row">
+              <span class="f-sev ${f.severity}">${f.severity}</span>
+              <span class="f-type ${f.type}">${f.typeLabel}</span>
+              <span class="f-id">${esc(f.ruleId)}</span>
+              <span class="f-title">${esc(f.title)}</span>
+            </div>
+            <div class="f-path">${f.line?'第 '+f.line+' 行':''}</div>
+            ${f.desc?`<div class="f-desc">${esc(f.desc)}</div>`:''}
+            ${f.view?`<div class="f-view">命中视图：${esc(f.view)}</div>`:''}
+            ${f.snippet?`<pre>${esc(f.snippet)}</pre>`:''}
+          </div>`;
+      }
+      html += `</div>`;
     }
+
     html+=`</div></div>`;
   }
   html+=`</div>`;
@@ -1210,9 +1224,9 @@ function renderSkipInfo(report){
 }
 
 function renderReport(report){
-  const panelsHtml = report.units.map(u => renderPanel(u, report)).join('');
+  const panelHtml = renderPanel(report);
   const skipHtml = renderSkipInfo(report);
-  return `<div class="file-group">${panelsHtml}${skipHtml}</div>`;
+  return `<div class="file-group">${panelHtml}${skipHtml}</div>`;
 }
 
 /* ============================================================
@@ -1232,7 +1246,6 @@ const statStatus = document.getElementById('statStatus');
 const statFiles = document.getElementById('statFiles');
 const statHits = document.getElementById('statHits');
 
-// 全局累积状态
 let globalReports = []; 
 let globalRejected = [];
 
@@ -1297,12 +1310,12 @@ function updateStats() {
   statFiles.textContent = globalReports.length + globalRejected.length;
   let hitCount = 0;
   globalReports.forEach(rep => {
-    hitCount += rep.units.filter(u => u.findings.length > 0).length;
+    const allFindings = rep.units.flatMap(u => u.findings);
+    if (allFindings.length > 0) hitCount++;
   });
   statHits.textContent = hitCount;
 }
 
-// 清空逻辑
 clearBtn.addEventListener('click', () => {
   globalReports = [];
   globalRejected = [];
